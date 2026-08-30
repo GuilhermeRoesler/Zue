@@ -1,9 +1,16 @@
 ---
-description: Spec condensada da Zue — vitrine web/tablet, stack e design system.
+description: Spec condensada da Zue — vitrine web/tablet, stack, design e specs vivas.
 alwaysApply: true
 ---
 
 # Zue — Spec (rule)
+
+## Specs vivas (obrigatório)
+
+- Rule + skill + README devem espelhar o repo **agora**, não um plano antigo.
+- Em toda mudança de stack, arquitetura, Capacitor/kiosk, componentes de domínio, contatos ou scripts npm: atualizar **os três** na mesma entrega.
+- Hooks em `.cursor/hooks` marcam pendência (`afterFileEdit`) e forçam sync no `stop` se houver drift.
+- Validar com: `node .cursor/hooks/check-spec-drift.mjs` (exit 0).
 
 ## Produto
 

@@ -24,6 +24,9 @@ dist-ssr
 *.sw?
 .env
 
+# Cursor hooks — estado local das specs vivas
+.cursor/hooks/state/
+
 # Capacitor / Android
 android/.gradle/
 android/app/build/

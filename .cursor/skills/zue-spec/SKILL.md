@@ -1,12 +1,50 @@
 ---
 name: zue-spec
 description: >-
-  Spec detalhada do projeto Zue — vitrine de moda web e app Android (Capacitor)
-  para tablet na loja. Use ao implementar features, integrar Capacitor/kiosk,
-  alterar UI, catálogo, WhatsApp/contato ou arquitetura do site.
+  Spec detalhada e viva do projeto Zue — vitrine de moda web e app Android
+  (Capacitor) para tablet na loja. Use ao implementar features, Capacitor/kiosk,
+  UI, catálogo, WhatsApp/contato, arquitetura, ou ao sincronizar specs com o repo.
 ---
 
 # Zue — Spec detalhada
+
+## Specs vivas
+
+As specs **não são estáticas**. Sempre que o código mudar de forma relevante, atualize na mesma entrega:
+
+1. `.cursor/rules/zue-spec.mdc` (resumo)
+2. `.cursor/skills/zue-spec/SKILL.md` (este arquivo)
+3. `README.md`
+
+### Automação (Cursor hooks)
+
+| Evento | Script | Função |
+|--------|--------|--------|
+| `sessionStart` | `.cursor/hooks/session-start.mjs` | Injeta política + status de drift |
+| `afterFileEdit` | `.cursor/hooks/after-file-edit.mjs` | Marca pendência em edições de produto |
+| `stop` | `.cursor/hooks/stop-sync-specs.mjs` | Follow-up automático se specs/README ficarem para trás |
+
+Config: `.cursor/hooks.json`. Estado local (gitignored): `.cursor/hooks/state/`.
+
+Checker factual:
+
+```bash
+node .cursor/hooks/check-spec-drift.mjs
+```
+
+Exit `0` = alinhado; `1` = lista de drifts (scripts, Capacitor, `appId`, componentes, WhatsApp/e-mail, links do README).
+
+### O que dispara atualização obrigatória
+
+- Dependências/scripts em `package.json` (esp. Capacitor)
+- `capacitor.config.ts`, pasta `android/`, `src/lib/kiosk.ts`
+- Novos/renomeados componentes em `src/components/*.tsx`
+- Contatos (WhatsApp / e-mail), seções de navegação, comportamento web vs nativo
+- Fluxo de build Android ou identidade do app
+
+Não inventar features nas specs: só documentar o que o repo realmente tem.
+
+---
 
 ## Visão do produto
 
@@ -206,9 +244,11 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 - [ ] No nativo: sem newsletter popup / FAB WhatsApp a menos que o produto mude
 - [ ] `npm run lint` / build sem regressão óbvia
 - [ ] Se tocar em UI ou Capacitor: `npm run cap:sync` e fullscreen/kiosk preservados
-- [ ] README atualizado se houver mudança de stack ou fluxo de build
+- [ ] **Specs vivas:** rule + skill + README alinhados ao código
+- [ ] `node .cursor/hooks/check-spec-drift.mjs` com exit 0
 
 ## Recursos do repo
 
 - Spec curta (sempre ativa): `.cursor/rules/zue-spec.mdc`
 - README do projeto: `README.md`
+- Hooks de sync: `.cursor/hooks.json` e `.cursor/hooks/`
