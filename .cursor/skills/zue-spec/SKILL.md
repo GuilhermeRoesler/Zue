@@ -191,11 +191,20 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 ### Fluxo de build Android
 
+Local (opcional):
+
 ```text
 npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studio
 ```
 
-Pré-requisitos na máquina: **Android Studio**, SDK Android e JDK 17/21.
+**CI (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-debug.yml`
+
+- Dispara em `push`/`PR` na `main` e `workflow_dispatch`
+- Roda `npm run cap:sync` + `./gradlew assembleDebug`
+- Publica artifact **`zue-debug-apk`** (retenção 30 dias)
+- SDK/JDK ficam no runner (`ubuntu-latest`); não exige SDK na máquina do time
+
+Pré-requisitos locais só se for abrir o Android Studio: SDK Android e JDK 17/21.
 
 ### Arquivos-chave
 

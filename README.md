@@ -85,6 +85,16 @@ npm run cap:android   # sync + abre o Studio
 
 No Android Studio: rode no tablet ou **Build → Build Bundle(s) / APK(s)**.
 
+### CI/CD (GitHub Actions)
+
+O workflow [`.github/workflows/android-debug.yml`](.github/workflows/android-debug.yml) gera um **APK debug** automaticamente em `push`/`PR` na `main` (e via *Run workflow*).
+
+1. Abra a Action concluída no GitHub
+2. Baixe o artifact **`zue-debug-apk`**
+3. Instale no tablet (fonte desconhecida / sideload)
+
+O SDK Android fica **no runner** — não é preciso ter SDK local só para obter o APK. Build local com Android Studio continua opcional.
+
 ## Scripts
 
 - `npm run dev` — servidor de desenvolvimento
