@@ -13,7 +13,7 @@ description: >-
 A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital**:
 
 1. **Web** — catálogo e presença online para clientes.
-2. **App Android (preferencial na loja)** — mesmo build web empacotado com **Capacitor**, rodando em tablet em modo vitrine/kiosk (tela cheia, sempre aberta).
+2. **App Android (preferencial na loja)** — mesmo build web empacotado com **Capacitor 8**, rodando em tablet em modo vitrine/kiosk (tela cheia, sempre aberta).
 
 Não é um e-commerce com carrinho/pagamento. Preços aparecem como “Consulte”; o fluxo de venda/consulta é **WhatsApp** ou **e-mail**.
 
@@ -33,14 +33,26 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | Camada | Tecnologia |
 |--------|------------|
 | UI | React 18 + TypeScript |
-| Build | Vite 5 |
+| Build | Vite 5 (`base: './'` — obrigatório para o WebView) |
 | Estilo | Tailwind CSS **v4** (`@import "tailwindcss"` em `src/index.css`) |
 | Componentes | shadcn/ui — style `radix-nova`, `baseColor: neutral`, CSS variables |
 | Ícones | Lucide React |
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
+| App nativo | **Capacitor 8** + `@capacitor/android` |
+| Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
-Scripts: `npm run dev` | `build` | `preview` | `lint`.
+### Scripts npm
+
+| Script | Função |
+|--------|--------|
+| `npm run dev` | servidor web de desenvolvimento |
+| `npm run build` | build de produção → `dist/` |
+| `npm run preview` | preview do build |
+| `npm run lint` | ESLint |
+| `npm run cap:sync` | `build` + `npx cap sync android` |
+| `npm run cap:open` | abre o projeto no Android Studio |
+| `npm run cap:android` | sync + abre Android Studio |
 
 Aliases (tsconfig / Vite): `@/` → `src/`.
 
@@ -59,7 +71,14 @@ Sem React Router. `App.tsx` controla `currentSection`:
 | `about` | `About` |
 | `contact` | `Contact` |
 
-Layout persistente: `Header` + `main` + `Footer` + `WhatsAppButton` + `NewsletterPopup` (abre após ~3s).
+Layout persistente: `Header` + `main` + `Footer`.
+
+| Superfície | `WhatsAppButton` | `NewsletterPopup` |
+|------------|------------------|-------------------|
+| Web | sim | sim (~3s) |
+| App nativo (Capacitor) | **não** | **não** |
+
+Detecção: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
 ### Componentes de domínio (`src/components/`)
 
@@ -112,29 +131,46 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 ## Capacitor / tablet na loja
 
-Meta: encapsular o `dist` do Vite num WebView Android.
+**Status: integrado.** O `dist` do Vite é empacotado num WebView Android.
 
-### Requisitos de produto (kiosk)
+### Identidade do app
 
-1. App ocupa **100% da tela** (esconder status/navigation bars)
-2. Preferir **manter tela ligada** enquanto a vitrine estiver ativa
-3. Orientação controlada (landscape ou portrait conforme o tablet da loja)
-4. Mesmo código serve web e app; features só-nativas via plugins Capacitor
-5. Links externos (WhatsApp): configurar intents Android / `Browser` ou sistema
+| Campo | Valor |
+|-------|--------|
+| `appId` | `br.com.zue.vitrine` |
+| `appName` | `Zue` |
+| `webDir` | `dist` |
+| Config | `capacitor.config.ts` |
+| Projeto nativo | pasta `android/` |
 
-### Fluxo esperado (quando integrar)
+### Requisitos de produto (kiosk) — implementados
+
+1. **100% da tela** — `StatusBar.hide()` + modo imersivo sticky em `MainActivity`
+2. **Tela sempre ligada** — `KeepAwake.keepAwake()` + `FLAG_KEEP_SCREEN_ON` nativo
+3. Orientação livre (`fullUser`) — ajustar no manifest se a loja fixar landscape/portrait
+4. Mesmo código web/app; nativo só via plugins / `MainActivity`
+5. Viewport com `user-scalable=no` e `viewport-fit=cover` no `index.html`
+
+### Fluxo de build Android
 
 ```text
-npm run build  →  npx cap sync android  →  abrir Android Studio / gerar APK-AAB
+npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studio
 ```
 
-### UX específica do modo loja
+Pré-requisitos na máquina: **Android Studio**, SDK Android e JDK 17/21.
 
-- Reduzir ou desligar `NewsletterPopup` no app (não faz sentido em vitrine pública)
-- Evitar CTAs que abram apps externos sem necessidade na navegação do catálogo
-- Touch targets generosos; testar em resolução de tablet
+### Arquivos-chave
 
-Detalhes de implementação Capacitor devem seguir a doc oficial e plugins (`StatusBar`, `KeepAwake`, etc.) sem reescrever a UI em React Native.
+- `src/lib/kiosk.ts` — init StatusBar + KeepAwake; `isNativeApp()`
+- `src/main.tsx` — chama `initKioskMode()` na subida
+- `android/.../MainActivity.java` — imersivo sticky + keep screen on
+- `android/.../AndroidManifest.xml` / `res/values/styles.xml` — tema fullscreen
+
+### UX modo loja
+
+- Sem `NewsletterPopup` e sem FAB WhatsApp no nativo
+- Touch targets generosos; validar em resolução de tablet
+- Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 
 ---
 
@@ -147,6 +183,7 @@ Detalhes de implementação Capacitor devem seguir a doc oficial e plugins (`Sta
 5. Não adicionar rotas/router sem necessidade; estender o switch de seções se precisar de novas páginas
 6. Ao tocar no design, preservar a linguagem visual já estabelecida (não “modernizar” para outro aesthetic)
 7. Não commitar segredos; variáveis de ambiente para chaves (ex. Supabase) se forem usadas
+8. Após mudanças de UI relevantes ao app: rodar `npm run cap:sync` antes de gerar APK
 
 ### WhatsApp — padrão
 
@@ -165,9 +202,10 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 
 - [ ] Visual alinhado (tipografia, preto/branco, `rounded-none`)
 - [ ] Responsivo mobile + tablet
-- [ ] WhatsApp/mailto intactos e com mensagem contextual
+- [ ] WhatsApp/mailto intactos e com mensagem contextual (web)
+- [ ] No nativo: sem newsletter popup / FAB WhatsApp a menos que o produto mude
 - [ ] `npm run lint` / build sem regressão óbvia
-- [ ] Se tocar em Capacitor: sync documentado e fullscreen/kiosk considerados
+- [ ] Se tocar em UI ou Capacitor: `npm run cap:sync` e fullscreen/kiosk preservados
 - [ ] README atualizado se houver mudança de stack ou fluxo de build
 
 ## Recursos do repo

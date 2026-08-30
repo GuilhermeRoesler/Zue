@@ -8,14 +8,17 @@ alwaysApply: true
 ## Produto
 
 - Vitrine digital da marca **Zue** (moda premium, tagline *Elegância Atemporal*).
-- Alvos: site web + app Android (tablet na loja) via Capacitor, mesmo código-fonte.
+- Alvos: site web + **app Android** (tablet na loja) via **Capacitor 8** (`br.com.zue.vitrine`), mesmo código-fonte.
 - Conversão principal: WhatsApp (`wa.me/5551989354834`) e `mailto` — sem checkout online.
+- No app nativo: sem newsletter popup e sem FAB WhatsApp (modo vitrine).
 
 ## Stack
 
-- React 18 + TypeScript + Vite
+- React 18 + TypeScript + Vite (`base: './'`)
 - Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`)
+- Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
+- Scripts Android: `cap:sync` | `cap:open` | `cap:android`
 
 ## Design (obrigatório)
 
@@ -29,4 +32,5 @@ alwaysApply: true
 - Preservar o design system existente; preferir componentes em `src/components/ui/`
 - Manter mensagens WhatsApp contextualizadas por produto/seção
 - UX de tablet/kiosk: fullscreen, tela ligada, UI de sistema oculta (ver skill `zue-spec`)
+- Após mudanças de UI do app: `npm run cap:sync` antes do APK
 - Para o guia completo, usar a skill **zue-spec**

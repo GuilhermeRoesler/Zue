@@ -7,18 +7,25 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import NewsletterPopup from './components/NewsletterPopup';
+import { isNativeApp } from './lib/kiosk';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const nativeApp = isNativeApp();
 
   useEffect(() => {
+    // Na vitrine (app nativo) o popup atrapalha o uso contínuo no tablet
+    if (nativeApp) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       setShowNewsletter(true);
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [nativeApp]);
 
   const renderCurrentSection = () => {
     switch (currentSection) {
@@ -42,7 +49,7 @@ function App() {
       <main>{renderCurrentSection()}</main>
 
       <Footer onNavigate={setCurrentSection} />
-      <WhatsAppButton />
+      {!nativeApp && <WhatsAppButton />}
 
       {showNewsletter && <NewsletterPopup onClose={() => setShowNewsletter(false)} />}
     </div>

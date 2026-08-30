@@ -23,3 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Capacitor / Android
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/local.properties
+*.apk
+*.aab
+*.keystore
+*.jks

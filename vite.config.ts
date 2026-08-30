@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Caminhos relativos necessários para o WebView do Capacitor
+  base: './',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
