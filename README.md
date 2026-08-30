@@ -1,93 +1,110 @@
 # Zue - Elegância Atemporal
 
-Este projeto é um website de e-commerce e catálogo para a marca de moda feminina **Zue**. Desenvolvido com **React**, **TypeScript** e **Vite**, o projeto foca em uma interface minimalista, elegante e responsiva, utilizando **Tailwind CSS** para estilização.
+Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, **TypeScript** e **Vite**, com interface minimalista e responsiva em **Tailwind CSS v4**. O mesmo código-fonte é a base para um **app Android** (tablet na loja) via **Capacitor**.
 
 ![](images/demo.png)
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
-O site serve como uma vitrine digital para a marca, permitindo aos clientes:
+O site funciona como vitrine da marca:
 
-- Visualizar coleções e lançamentos na página inicial.
-- Navegar por um catálogo de produtos com filtros por categoria.
-- Conhecer a história e os valores da marca.
-- Entrar em contato diretamente via WhatsApp ou E-mail.
-- Inscrever-se em uma newsletter para novidades.
+- Visualizar coleções e lançamentos na página inicial
+- Navegar pelo catálogo com filtros por categoria
+- Conhecer a história e os valores da marca
+- Entrar em contato via WhatsApp ou e-mail
+- Inscrever-se na newsletter
 
-## 🚀 Tecnologias Utilizadas
+Na loja física, a meta é rodar a mesma interface em tablet Android em modo vitrine (tela cheia / kiosk), reaproveitando animações, componentes e o fluxo de manutenção web.
 
-- **[React](https://react.dev/)**: Biblioteca principal para construção da interface.
-- **[TypeScript](https://www.typescriptlang.org/)**: Superset do JavaScript para tipagem estática e segurança no código.
-- **[Vite](https://vitejs.dev/)**: Build tool rápida para desenvolvimento front-end.
-- **[Tailwind CSS](https://tailwindcss.com/)**: Framework de utilitários para estilização rápida e consistente.
-- **[Lucide React](https://lucide.dev/)**: Biblioteca de ícones leve e moderna.
-- **ESLint**: Para padronização e qualidade do código.
+## Specs (Cursor)
 
-## 📦 Pré-requisitos
+A especificação do produto e do design system vive em dois formatos:
 
-Antes de começar, você precisará ter instalado em sua máquina:
+| Formato | Caminho | Uso |
+|--------|---------|-----|
+| **Rule** (resumo) | [`.cursor/rules/zue-spec.mdc`](.cursor/rules/zue-spec.mdc) | Contexto curto, sempre aplicado ao agente |
+| **Skill** (detalhada) | [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md) | Guia completo: arquitetura, design, Capacitor/kiosk, convenções |
 
-- [Node.js](https://nodejs.org/en/) (versão 18 ou superior recomendada)
-- npm (geralmente vem com o Node.js)
+Consulte a skill ao implementar features, mudar UI ou integrar o app Android.
 
-## 🔧 Instalação e Execução
+## Tecnologias
 
-1.  **Clone o repositório** (se ainda não o fez):
+- **[React](https://react.dev/)** — interface
+- **[TypeScript](https://www.typescriptlang.org/)** — tipagem
+- **[Vite](https://vitejs.dev/)** — build e dev server
+- **[Tailwind CSS v4](https://tailwindcss.com/)** — estilização
+- **[shadcn/ui](https://ui.shadcn.com/)** — componentes (`radix-nova`)
+- **[Lucide React](https://lucide.dev/)** — ícones
+- **Capacitor** (planejado) — empacote Android a partir do build web
+- **ESLint** — qualidade de código
 
-    ```bash
-    git clone <url-do-seu-repositorio>
-    cd zue
-    ```
+## Pré-requisitos
 
-2.  **Instale as dependências**:
+- [Node.js](https://nodejs.org/en/) 18+
+- npm
 
-    ```bash
-    npm install
-    ```
+Para o app Android (quando integrado): Android Studio e JDK conforme a documentação do Capacitor.
 
-3.  **Inicie o servidor de desenvolvimento**:
-    ```bash
-    npm run dev
-    ```
-    O terminal mostrará o link local (geralmente `http://localhost:5173/`) para acessar o site.
+## Instalação e execução
 
-## 📜 Scripts Disponíveis
+```bash
+git clone <url-do-seu-repositorio>
+cd zue
+npm install
+npm run dev
+```
 
-No diretório do projeto, você pode rodar:
+O terminal mostra a URL local (em geral `http://localhost:5173/`).
 
-- `npm run dev`: Inicia o servidor de desenvolvimento.
-- `npm run build`: Compila a aplicação para produção na pasta `dist`.
-- `npm run preview`: Visualiza localmente a versão de produção gerada.
-- `npm run lint`: Executa o ESLint para verificar problemas no código.
+## Scripts
 
-## 📂 Estrutura do Projeto
+- `npm run dev` — servidor de desenvolvimento
+- `npm run build` — build de produção em `dist/`
+- `npm run preview` — preview do build
+- `npm run lint` — ESLint
 
-A estrutura principal dentro de `src/` está organizada da seguinte forma:
+Fluxo previsto com Capacitor: `npm run build` → `npx cap sync android` → gerar APK/AAB.
+
+## Estrutura
 
 ```text
 src/
-├── components/           # Componentes reutilizáveis da aplicação
-│   ├── About.tsx         # Página/Seção "Sobre"
-│   ├── Contact.tsx       # Página/Seção de Contato com formulário
-│   ├── Footer.tsx        # Rodapé do site
-│   ├── Header.tsx        # Menu de navegação responsivo
-│   ├── Hero.tsx          # Seção principal da Home (Hero banner)
-│   ├── NewsletterPopup.tsx # Modal de inscrição na newsletter
-│   ├── ProductCatalog.tsx # Catálogo de produtos com filtros
-│   └── WhatsAppButton.tsx # Botão flutuante do WhatsApp
-├── App.tsx               # Componente raiz que gerencia a navegação
-├── index.css             # Estilos globais e diretivas do Tailwind
-├── main.tsx              # Ponto de entrada da aplicação React
-└── vite-env.d.ts         # Tipos do Vite
+├── components/           # Seções e UI da vitrine
+│   ├── ui/               # Primitivos shadcn
+│   ├── About.tsx
+│   ├── Contact.tsx
+│   ├── Footer.tsx
+│   ├── Header.tsx
+│   ├── Hero.tsx
+│   ├── NewsletterPopup.tsx
+│   ├── ProductCatalog.tsx
+│   └── WhatsAppButton.tsx
+├── lib/utils.ts
+├── App.tsx               # Navegação por seções (estado)
+├── index.css             # Tema Tailwind v4 + tokens
+└── main.tsx
+
+.cursor/
+├── rules/zue-spec.mdc    # Spec curta (rule)
+└── skills/zue-spec/      # Spec detalhada (skill)
 ```
 
-## ✨ Funcionalidades Destacadas
+## Funcionalidades
 
-- **Integração com WhatsApp**: Botões de ação (CTA) que redirecionam diretamente para uma conversa no WhatsApp com mensagens pré-definidas (ex: consulta de produtos).
-- **Formulários Funcionais**: Formulários de contato e newsletter que utilizam `mailto` para enviar dados diretamente via cliente de e-mail do usuário.
-- **Design Responsivo**: Adaptado para funcionar perfeitamente em desktops, tablets e dispositivos móveis.
-- **Animações Suaves**: Uso de transições CSS para interações de hover e abertura de menus.
+- **WhatsApp**: CTAs com mensagens pré-definidas (coleção, produto, contato)
+- **Formulários**: contato e newsletter via `mailto`
+- **Design responsivo**: desktop, tablet e mobile
+- **Animações**: transições CSS em hover e menus
+- **Vitrine tablet** (roadmap): fullscreen, tela ligada e modo kiosk via Capacitor
 
-## 📄 Licença
+## Design em resumo
 
-Este projeto é de uso privado para a marca Zue.
+- Tipografia: Playfair Display (títulos) + Inter light (corpo)
+- Paleta: preto, branco e cinzas; cantos retos (`rounded-none`)
+- Imagens de produto: URLs Pexels (aspecto ~3/4)
+
+Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).
+
+## Licença
+
+Uso privado da marca Zue.

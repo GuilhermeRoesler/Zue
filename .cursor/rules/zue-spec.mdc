@@ -1,0 +1,32 @@
+---
+description: Spec condensada da Zue — vitrine web/tablet, stack e design system.
+alwaysApply: true
+---
+
+# Zue — Spec (rule)
+
+## Produto
+
+- Vitrine digital da marca **Zue** (moda premium, tagline *Elegância Atemporal*).
+- Alvos: site web + app Android (tablet na loja) via Capacitor, mesmo código-fonte.
+- Conversão principal: WhatsApp (`wa.me/5551989354834`) e `mailto` — sem checkout online.
+
+## Stack
+
+- React 18 + TypeScript + Vite
+- Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`)
+- Lucide React; navegação por estado em `App.tsx` (sem React Router)
+
+## Design (obrigatório)
+
+- Tipografia: **Playfair Display** (títulos) + **Inter** light (corpo)
+- Paleta: preto / branco / cinzas; `rounded-none` nos CTAs e cards da marca
+- Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
+- Imagens: Pexels remotas (ou assets locais futuros); aspect ~3/4 em produtos
+
+## Ao alterar código
+
+- Preservar o design system existente; preferir componentes em `src/components/ui/`
+- Manter mensagens WhatsApp contextualizadas por produto/seção
+- UX de tablet/kiosk: fullscreen, tela ligada, UI de sistema oculta (ver skill `zue-spec`)
+- Para o guia completo, usar a skill **zue-spec**
