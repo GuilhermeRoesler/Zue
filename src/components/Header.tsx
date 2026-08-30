@@ -1,101 +1,130 @@
-import React, { useState } from 'react';
-import { Menu, X, ShoppingBag, User, Search } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, ShoppingBag, User, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   currentSection: string;
   onNavigate: (section: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
+const navigationItems = [
+  { id: 'home', label: 'Início' },
+  { id: 'catalog', label: 'Catálogo' },
+  { id: 'about', label: 'Sobre' },
+  { id: 'contact', label: 'Contato' },
+];
+
+const Header = ({ currentSection, onNavigate }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navigationItems = [
-    { id: 'home', label: 'Início' },
-    { id: 'catalog', label: 'Catálogo' },
-    { id: 'about', label: 'Sobre' },
-    { id: 'contact', label: 'Contato' },
-  ];
-
   return (
-    <>
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="shrink-0">
-              <button 
-                onClick={() => onNavigate('home')}
-                className="text-2xl font-light tracking-widest text-black hover:text-gray-600 transition-colors duration-300"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                ZUE
-              </button>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              {navigationItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => onNavigate(item.id)}
-                  className={`text-sm font-light tracking-wide transition-colors duration-300 ${
-                    currentSection === item.id
-                      ? 'text-black border-b border-black'
-                      : 'text-gray-600 hover:text-black'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Desktop Icons */}
-            <div className="hidden md:flex items-center space-x-6">
-              <Search className="w-5 h-5 text-gray-600 hover:text-black cursor-pointer transition-colors duration-300" />
-              <User className="w-5 h-5 text-gray-600 hover:text-black cursor-pointer transition-colors duration-300" />
-              <ShoppingBag className="w-5 h-5 text-gray-600 hover:text-black cursor-pointer transition-colors duration-300" />
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-600 hover:text-black transition-colors duration-300"
-              >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
+    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <div className="shrink-0">
+            <Button
+              variant="ghost"
+              onClick={() => onNavigate('home')}
+              className="h-auto rounded-none px-0 text-2xl font-light tracking-widest text-black hover:bg-transparent hover:text-gray-600"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              ZUE
+            </Button>
           </div>
-        </div>
-      </header>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-100 absolute top-16 left-0 right-0 z-40">
-          <div className="px-4 py-6 space-y-4">
+          <nav className="hidden space-x-8 md:flex">
             {navigationItems.map((item) => (
-              <button
+              <Button
                 key={item.id}
-                onClick={() => {
-                  onNavigate(item.id);
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`block w-full text-left text-lg font-light tracking-wide transition-colors duration-300 ${
-                  currentSection === item.id ? 'text-black' : 'text-gray-600'
-                }`}
+                variant="ghost"
+                onClick={() => onNavigate(item.id)}
+                className={cn(
+                  'h-auto rounded-none border-b px-0 pb-0.5 text-sm font-light tracking-wide hover:bg-transparent',
+                  currentSection === item.id
+                    ? 'border-black text-black'
+                    : 'border-transparent text-gray-600 hover:text-black'
+                )}
               >
                 {item.label}
-              </button>
+              </Button>
             ))}
-            <div className="flex items-center space-x-6 pt-4 border-t border-gray-100">
-              <Search className="w-5 h-5 text-gray-600" />
-              <User className="w-5 h-5 text-gray-600" />
-              <ShoppingBag className="w-5 h-5 text-gray-600" />
-            </div>
+          </nav>
+
+          <div className="hidden items-center space-x-2 md:flex">
+            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
+              <Search className="size-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
+              <User className="size-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
+              <ShoppingBag className="size-5" />
+            </Button>
           </div>
+
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-none text-gray-600 hover:bg-transparent hover:text-black md:hidden"
+              >
+                <Menu className="size-6" />
+                <span className="sr-only">Abrir menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="top"
+              className="top-16 gap-0 border-b border-gray-100 bg-white p-0 shadow-none"
+              showCloseButton={false}
+            >
+              <SheetHeader className="sr-only">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 px-4 py-6">
+                {navigationItems.map((item) => (
+                  <Button
+                    key={item.id}
+                    variant="ghost"
+                    onClick={() => {
+                      onNavigate(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      'h-auto w-full justify-start rounded-none px-0 text-lg font-light tracking-wide hover:bg-transparent',
+                      currentSection === item.id ? 'text-black' : 'text-gray-600'
+                    )}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+                <Separator className="bg-gray-100" />
+                <div className="flex items-center space-x-2 pt-2">
+                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
+                    <Search className="size-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
+                    <User className="size-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
+                    <ShoppingBag className="size-5" />
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      )}
-    </>
+      </div>
+    </header>
   );
 };
 

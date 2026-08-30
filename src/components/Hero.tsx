@@ -1,134 +1,162 @@
-import React from 'react';
 import { ArrowRight, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface HeroProps {
   onNavigate: (section: string) => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
+const launchImages = [
+  'https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'https://images.pexels.com/photos/7679471/pexels-photo-7679471.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'https://images.pexels.com/photos/7679730/pexels-photo-7679730.jpeg?auto=compress&cs=tinysrgb&w=800',
+];
+
+const brandValues = [
+  {
+    letter: 'Q',
+    title: 'Qualidade Premium',
+    description: 'Peças confeccionadas com os melhores materiais e acabamento impecável.',
+  },
+  {
+    letter: 'E',
+    title: 'Exclusividade',
+    description: 'Coleções limitadas para mulheres que buscam peças únicas e especiais.',
+  },
+  {
+    letter: 'S',
+    title: 'Sofisticação',
+    description: 'Design atemporal que transcende tendências e valoriza a elegância feminina.',
+  },
+];
+
+const Hero = ({ onNavigate }: HeroProps) => {
   const handleWhatsAppClick = () => {
-    const message = encodeURIComponent("Olá! Gostaria de conhecer a nova coleção da Zue.");
+    const message = encodeURIComponent('Olá! Gostaria de conhecer a nova coleção da Zue.');
     window.open(`https://wa.me/5551989354834?text=${message}`, '_blank');
   };
 
   return (
     <div className="bg-white">
-      {/* Main Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-gray-50 to-white"></div>
-        
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-          <h1 className="text-5xl md:text-7xl font-light text-black mb-6 tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>
+      <section className="relative flex h-screen items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-50 to-white" />
+
+        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+          <h1
+            className="mb-6 text-5xl font-light tracking-wide text-black md:text-7xl"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          >
             Elegância
             <br />
             <span className="italic font-normal">Atemporal</span>
           </h1>
-          
-          <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+
+          <p className="mx-auto mb-12 max-w-2xl text-lg font-light leading-relaxed text-gray-600 md:text-xl">
             Descubra peças exclusivas que celebram a feminilidade moderna com sofisticação e estilo únicos.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button
+          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
+            <Button
               onClick={handleWhatsAppClick}
-              className="group bg-black text-white px-8 py-4 flex items-center gap-3 hover:bg-gray-800 transition-all duration-300 transform hover:scale-105"
+              className="h-auto gap-3 rounded-none bg-black px-8 py-4 font-light tracking-wide text-white hover:scale-105 hover:bg-gray-800"
             >
-              <MessageCircle className="w-5 h-5" />
-              <span className="font-light tracking-wide">Conheça Nossa Coleção</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
-            
-            <button
+              <MessageCircle className="size-5" />
+              Conheça Nossa Coleção
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
+            </Button>
+
+            <Button
+              variant="outline"
               onClick={() => onNavigate('catalog')}
-              className="group border border-black text-black px-8 py-4 flex items-center gap-3 hover:bg-black hover:text-white transition-all duration-300"
+              className="h-auto gap-3 rounded-none border-black bg-transparent px-8 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
             >
-              <span className="font-light tracking-wide">Ver Catálogo</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
+              Ver Catálogo
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
+            </Button>
           </div>
         </div>
 
-        {/* Decorative Elements */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-          <div className="w-px h-12 bg-gray-300"></div>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 transform">
+          <div className="h-12 w-px bg-gray-300" />
         </div>
       </section>
 
-      {/* New Launches Section */}
-      <section className="py-20 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-black mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>
+      <section className="bg-gray-50 px-4 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2
+              className="mb-4 text-4xl font-light text-black md:text-5xl"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
               Lançamentos
             </h2>
-            <p className="text-gray-600 font-light text-lg max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-lg font-light text-gray-600">
               As mais recentes adições à nossa coleção, cuidadosamente selecionadas para mulheres que valorizam qualidade e elegância.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="group cursor-pointer">
-                <div className="aspect-[3/4] bg-gray-200 mb-6 overflow-hidden">
-                  <img 
-                    src={`https://images.pexels.com/photos/${item === 1 ? '7679720' : item === 2 ? '7679471' : '7679730'}/pexels-photo-${item === 1 ? '7679720' : item === 2 ? '7679471' : '7679730'}.jpeg?auto=compress&cs=tinysrgb&w=800`}
-                    alt={`Lançamento ${item}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {launchImages.map((image, index) => (
+              <Card
+                key={image}
+                className="group cursor-pointer gap-0 rounded-none bg-transparent py-0 ring-0"
+              >
+                <div className="mb-6 aspect-[3/4] overflow-hidden bg-gray-200">
+                  <img
+                    src={image}
+                    alt={`Lançamento ${index + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-light text-black mb-2 tracking-wide">
-                    Peça Exclusiva {item.toString().padStart(2, '0')}
-                  </h3>
-                  <p className="text-gray-600 text-sm font-light mb-4">
+                <CardHeader className="items-center px-0 text-center">
+                  <CardTitle className="text-lg font-light tracking-wide text-black">
+                    Peça Exclusiva {(index + 1).toString().padStart(2, '0')}
+                  </CardTitle>
+                  <CardDescription className="text-sm font-light text-gray-600">
                     Coleção Primavera/Verão 2025
-                  </p>
-                  <button
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="justify-center rounded-none border-0 bg-transparent px-0 pt-4">
+                  <Button
+                    variant="ghost"
                     onClick={handleWhatsAppClick}
-                    className="text-black border-b border-transparent hover:border-black transition-all duration-300 font-light tracking-wide text-sm"
+                    className="h-auto rounded-none border-b border-transparent px-0 font-light tracking-wide text-sm text-black hover:border-black hover:bg-transparent"
                   >
                     Consultar Disponibilidade
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Brand Values Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>Q</span>
-              </div>
-              <h3 className="text-xl font-light text-black mb-4 tracking-wide">Qualidade Premium</h3>
-              <p className="text-gray-600 font-light leading-relaxed">
-                Peças confeccionadas com os melhores materiais e acabamento impecável.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>E</span>
-              </div>
-              <h3 className="text-xl font-light text-black mb-4 tracking-wide">Exclusividade</h3>
-              <p className="text-gray-600 font-light leading-relaxed">
-                Coleções limitadas para mulheres que buscam peças únicas e especiais.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>S</span>
-              </div>
-              <h3 className="text-xl font-light text-black mb-4 tracking-wide">Sofisticação</h3>
-              <p className="text-gray-600 font-light leading-relaxed">
-                Design atemporal que transcende tendências e valoriza a elegância feminina.
-              </p>
-            </div>
+      <section className="bg-white px-4 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+            {brandValues.map((value) => (
+              <Card
+                key={value.letter}
+                className="gap-0 rounded-none bg-transparent py-0 text-center ring-0"
+              >
+                <CardContent className="px-0">
+                  <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full border border-gray-300">
+                    <span className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>
+                      {value.letter}
+                    </span>
+                  </div>
+                  <h3 className="mb-4 text-xl font-light tracking-wide text-black">{value.title}</h3>
+                  <p className="font-light leading-relaxed text-gray-600">{value.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>

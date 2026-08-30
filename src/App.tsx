@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ShoppingBag, User, Search, MessageCircle, ArrowRight, Filter, Phone, Mail, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductCatalog from './components/ProductCatalog';
@@ -14,7 +13,6 @@ function App() {
   const [showNewsletter, setShowNewsletter] = useState(false);
 
   useEffect(() => {
-    // Show newsletter popup after 3 seconds
     const timer = setTimeout(() => {
       setShowNewsletter(true);
     }, 3000);
@@ -38,19 +36,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header currentSection={currentSection} onNavigate={setCurrentSection} />
-      
-      <main>
-        {renderCurrentSection()}
-      </main>
+
+      <main>{renderCurrentSection()}</main>
 
       <Footer onNavigate={setCurrentSection} />
       <WhatsAppButton />
-      
-      {showNewsletter && (
-        <NewsletterPopup onClose={() => setShowNewsletter(false)} />
-      )}
+
+      {showNewsletter && <NewsletterPopup onClose={() => setShowNewsletter(false)} />}
     </div>
   );
 }

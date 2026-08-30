@@ -1,123 +1,156 @@
-import React from 'react';
-import { MessageCircle, Mail, Instagram, MapPin } from 'lucide-react';
+import { MessageCircle, Mail, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
 
 interface FooterProps {
   onNavigate: (section: string) => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+const Footer = ({ onNavigate }: FooterProps) => {
   const handleWhatsAppClick = () => {
-    const message = encodeURIComponent("Olá! Gostaria de mais informações sobre a Zue.");
+    const message = encodeURIComponent('Olá! Gostaria de mais informações sobre a Zue.');
     window.open(`https://wa.me/5551989354834?text=${message}`, '_blank');
   };
 
   return (
     <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand Column */}
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <h3 className="text-3xl font-light mb-6 tracking-widest" style={{ fontFamily: 'Playfair Display, serif' }}>
+            <h3
+              className="mb-6 text-3xl font-light tracking-widest"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
               ZUE
             </h3>
-            <p className="text-gray-300 font-light leading-relaxed mb-6 max-w-md">
-              Elegância atemporal para a mulher moderna. Descobra peças únicas que celebram sua personalidade e sofisticação.
+            <p className="mb-6 max-w-md font-light leading-relaxed text-gray-300">
+              Elegância atemporal para a mulher moderna. Descubra peças únicas que celebram sua personalidade e sofisticação.
             </p>
-            
-            <div className="flex items-center gap-6">
-              <button
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
                 onClick={handleWhatsAppClick}
-                className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300"
+                className="h-auto gap-2 rounded-none px-2 text-white hover:bg-transparent hover:text-gray-300"
               >
-                <MessageCircle className="w-5 h-5" />
-                <span className="font-light text-sm">WhatsApp</span>
-              </button>
-              
-              <a
-                href="mailto:guiroesler2@gmail.com"
-                className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300"
+                <MessageCircle className="size-5" />
+                <span className="text-sm font-light">WhatsApp</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                asChild
+                className="h-auto gap-2 rounded-none px-2 text-white hover:bg-transparent hover:text-gray-300"
               >
-                <Mail className="w-5 h-5" />
-                <span className="font-light text-sm">E-mail</span>
-              </a>
-              
-              <a
-                href="#"
-                className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300"
+                <a href="mailto:guiroesler2@gmail.com">
+                  <Mail className="size-5" />
+                  <span className="text-sm font-light">E-mail</span>
+                </a>
+              </Button>
+
+              <Button
+                variant="ghost"
+                asChild
+                className="h-auto gap-2 rounded-none px-2 text-white hover:bg-transparent hover:text-gray-300"
               >
-                <Instagram className="w-5 h-5" />
-                <span className="font-light text-sm">Instagram</span>
-              </a>
+                <a href="#">
+                  <InstagramIcon className="size-5" />
+                  <span className="text-sm font-light">Instagram</span>
+                </a>
+              </Button>
             </div>
           </div>
 
-          {/* Navigation Column */}
           <div>
-            <h4 className="text-lg font-light mb-6 tracking-wide">Navegação</h4>
-            <nav className="space-y-4">
+            <h4 className="mb-6 text-lg font-light tracking-wide">Navegação</h4>
+            <nav className="flex flex-col items-start gap-2">
               {[
                 { id: 'home', label: 'Início' },
                 { id: 'catalog', label: 'Catálogo' },
                 { id: 'about', label: 'Sobre' },
-                { id: 'contact', label: 'Contato' }
+                { id: 'contact', label: 'Contato' },
               ].map((item) => (
-                <button
+                <Button
                   key={item.id}
+                  variant="ghost"
                   onClick={() => onNavigate(item.id)}
-                  className="block text-gray-300 hover:text-white transition-colors duration-300 font-light text-sm"
+                  className="h-auto rounded-none px-0 text-sm font-light text-gray-300 hover:bg-transparent hover:text-white"
                 >
                   {item.label}
-                </button>
+                </Button>
               ))}
             </nav>
           </div>
 
-          {/* Contact Column */}
           <div>
-            <h4 className="text-lg font-light mb-6 tracking-wide">Contato</h4>
+            <h4 className="mb-6 text-lg font-light tracking-wide">Contato</h4>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <MessageCircle className="w-5 h-5 text-gray-400 mt-0.5 shrink-0" />
+                <MessageCircle className="mt-0.5 size-5 shrink-0 text-gray-400" />
                 <div>
-                  <p className="text-gray-300 font-light text-sm">WhatsApp</p>
-                  <p className="text-white font-light text-sm">+55 (51) 98935-4834</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-gray-400 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-gray-300 font-light text-sm">E-mail</p>
-                  <p className="text-white font-light text-sm">guiroesler2@gmail.com</p>
+                  <p className="text-sm font-light text-gray-300">WhatsApp</p>
+                  <p className="text-sm font-light text-white">+55 (51) 98935-4834</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gray-400 mt-0.5 shrink-0" />
+                <Mail className="mt-0.5 size-5 shrink-0 text-gray-400" />
                 <div>
-                  <p className="text-gray-300 font-light text-sm">Localização</p>
-                  <p className="text-white font-light text-sm">Rio Grande do Sul, Brasil</p>
+                  <p className="text-sm font-light text-gray-300">E-mail</p>
+                  <p className="text-sm font-light text-white">guiroesler2@gmail.com</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-gray-400" />
+                <div>
+                  <p className="text-sm font-light text-gray-300">Localização</p>
+                  <p className="text-sm font-light text-white">Rio Grande do Sul, Brasil</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-gray-400 font-light text-sm text-center md:text-left">
-              © 2025 Zue. Todos os direitos reservados.
-            </p>
-            
-            <div className="flex items-center gap-8 text-sm">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-light">
-                Política de Privacidade
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-light">
-                Termos de Uso
-              </a>
-            </div>
+        <Separator className="mt-12 bg-gray-800" />
+
+        <div className="flex flex-col items-center justify-between gap-6 pt-8 md:flex-row">
+          <p className="text-center text-sm font-light text-gray-400 md:text-left">
+            © 2025 Zue. Todos os direitos reservados.
+          </p>
+
+          <div className="flex items-center gap-2 text-sm">
+            <Button
+              variant="ghost"
+              asChild
+              className="h-auto rounded-none px-2 text-sm font-light text-gray-400 hover:bg-transparent hover:text-white"
+            >
+              <a href="#">Política de Privacidade</a>
+            </Button>
+            <Button
+              variant="ghost"
+              asChild
+              className="h-auto rounded-none px-2 text-sm font-light text-gray-400 hover:bg-transparent hover:text-white"
+            >
+              <a href="#">Termos de Uso</a>
+            </Button>
           </div>
         </div>
       </div>
