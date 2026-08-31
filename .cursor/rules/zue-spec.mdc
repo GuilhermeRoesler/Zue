@@ -17,7 +17,7 @@ alwaysApply: true
 - **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** em **Playfair Display** (mesmo do hero); masters dark/light em `resources/icon-dark.png` / `icon-light.png` (`icon.png` = dark); favicon web com corner radius (~22%, alinhado ao mask Android) e `prefers-color-scheme`; PWA/Android usam dark quadrado; `npm run icons:generate`
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
-- **Landing**: início (`Hero` — hero full-bleed + looks da mídia do catálogo, nav discreta ao catálogo; Header em glassmorphism leve sobre o hero) + sobre (`About`); **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen com transição fluida** (FLIP via `motion`); deslize navega slides.
+- **Landing**: início (`Hero` — hero full-bleed + looks da mídia do catálogo, nav discreta ao catálogo) + sobre (`About` — hero full-bleed com mídia da vitrine, essência, pilares tipográficos, info da loja, ponte ao catálogo; Header em glassmorphism leve sobre os heróis de Início e Sobre); **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen com transição fluida** (FLIP via `motion`); deslize navega slides.
 - **Hibernação** após **2 min** sem interação (em DEV: **2 s**), **exceto na Início**: tela ligada, composição tipográfica ZUE + tagline; carrosséis **visíveis seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
 - **Pasta de mídia**: gerente seleciona pasta (Drive sync); **subpastas = coleções**; ordenação nome/data; long-press na logo ZUE no Header (seção catálogo).
 

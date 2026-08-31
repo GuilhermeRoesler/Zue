@@ -69,7 +69,12 @@ function App() {
           />
         );
       case 'about':
-        return <About />;
+        return (
+          <About
+            collections={catalog.collections}
+            onNavigateCatalog={() => setCurrentSection('catalog')}
+          />
+        );
       case 'catalog':
         return (
           <CatalogPage

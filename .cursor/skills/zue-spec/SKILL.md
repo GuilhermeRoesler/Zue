@@ -42,7 +42,7 @@ Não inventar features nas specs: só documentar o que o repo realmente tem.
 
 A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital** — pensada como **app default de um tablet na loja**, ligado o dia inteiro, com o mesmo build na web.
 
-1. **Landing** — início (`Hero`: hero full-bleed + looks da vitrine) e sobre (`About`: história, valores, políticas).
+1. **Landing** — início (`Hero`: hero full-bleed + looks da vitrine) e sobre (`About`: hero full-bleed com mídia do catálogo, essência, pilares, info da loja, ponte ao catálogo; copy em `src/data/about.ts`).
 2. **Catálogo** — página imersiva com carrosséis empilhados (`CatalogPage` + `CatalogPlayer`); 1ª coleção em destaque; toque expande fullscreen; deslize navega.
 3. **Hibernação** — após **2 min** sem interação (DEV: **2 s**), **exceto na Início**: tela ligada, composição tipográfica ZUE + tagline; toque retoma o estado anterior.
 
@@ -114,9 +114,9 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
 ### Componentes de domínio (`src/components/`)
 
-- `Header` — nav (Início, Catálogo, Sobre) + sheet mobile; long-press na logo no catálogo abre pasta; na Início usa glassmorphism leve sobre o hero e solidifica ao rolar
+- `Header` — nav (Início, Catálogo, Sobre) + sheet mobile; long-press na logo no catálogo abre pasta; na Início e Sobre usa glassmorphism leve sobre o hero full-bleed e solidifica ao rolar
 - `Hero` — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE, looks em grade (navega ao catálogo); sem valores Q/E/S
-- `About` — história, valores, políticas
+- `About` — hero full-bleed (mídia da vitrine), essência editorial, pilares tipográficos (sem cards), info prática da loja, ponte discreta ao catálogo; conteúdo em `src/data/about.ts`
 - `CatalogPage` — catálogo imersivo: coleções empilhadas (destaque + secundárias), estados loading/erro/vazio, expand fullscreen
 - `CatalogPlayer` — Embla embedded ou fullscreen (`fixed inset-0`); transição fluida via `motion` (`layout` FLIP no container e na mídia ativa, mesma curva de easing, sem recálculo de crop `object-cover` durante a animação); lazy; gestos; chrome/hint/overlay só reaparecem após `onLayoutAnimationComplete`; Embla `reInit()` adiado até o layout assentar; índice + progresso
 - `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
@@ -168,6 +168,7 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 - Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh, demais ~58dvh); transição fullscreen fluida (FLIP via `motion`, ~560ms, easing sem bounce); barra de progresso; títulos acima da barra
 - Landing: hero full-bleed (imagem/vídeo da 1ª coleção) + grade de looks `aspect-3/4` da mídia real; hover `scale-105`; nav discreta ao catálogo
+- Sobre: hero full-bleed com mídia distinta da Início quando possível; essência + imagem; pilares tipográficos com hairlines (`rounded-none`, sem cards); info da loja em lista; ponte tipográfica ao catálogo
 - Seções com um propósito claro; copy curto e sofisticado (PT-BR)
 
 ### Motion

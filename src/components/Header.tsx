@@ -31,7 +31,9 @@ const Header = ({
   onLogoLongPress,
 }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [overHero, setOverHero] = useState(currentSection === 'home');
+  const [overHero, setOverHero] = useState(
+    currentSection === 'home' || currentSection === 'about'
+  );
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
   const longPressTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -44,7 +46,15 @@ const Header = ({
   const [animateIndicator, setAnimateIndicator] = useState(false);
 
   const isHome = currentSection === 'home';
-  const overlay = isHome && overHero && !isMobileMenuOpen;
+  const isAbout = currentSection === 'about';
+  /** Glass sobre hero full-bleed (Início e Sobre). */
+  const hasHeroOverlay = isHome || isAbout;
+  const overlayHeroId = isHome
+    ? 'zue-home-hero'
+    : isAbout
+      ? 'zue-about-hero'
+      : null;
+  const overlay = hasHeroOverlay && overHero && !isMobileMenuOpen;
 
   const clearLongPress = useCallback(() => {
     if (longPressTimer.current !== undefined) {
@@ -74,7 +84,7 @@ const Header = ({
   useEffect(() => () => clearLongPress(), [clearLongPress]);
 
   useEffect(() => {
-    if (!isHome) {
+    if (!hasHeroOverlay || !overlayHeroId) {
       setOverHero(false);
       return;
     }
@@ -85,7 +95,7 @@ const Header = ({
     let cancelled = false;
 
     const attach = () => {
-      const hero = document.getElementById('zue-home-hero');
+      const hero = document.getElementById(overlayHeroId);
       if (!hero || cancelled) return false;
 
       io = new IntersectionObserver(
@@ -117,7 +127,7 @@ const Header = ({
       cancelled = true;
       io?.disconnect();
     };
-  }, [isHome]);
+  }, [hasHeroOverlay, overlayHeroId]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -164,7 +174,7 @@ const Header = ({
     <header
       className={cn(
         'z-50 transition-[background-color,border-color,backdrop-filter,color] duration-300',
-        isHome ? 'fixed inset-x-0 top-0' : 'sticky top-0',
+        hasHeroOverlay ? 'fixed inset-x-0 top-0' : 'sticky top-0',
         overlay
           ? 'border-b border-white/20 bg-white/10 shadow-[inset_0_1px_0_0_rgb(255_255_255_/0.12)] backdrop-blur-md supports-backdrop-filter:bg-white/10'
           : 'border-b border-gray-100 bg-white/95 backdrop-blur-sm'

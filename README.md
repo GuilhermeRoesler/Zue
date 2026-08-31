@@ -10,7 +10,7 @@ O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código
 
 - **Início** — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE e looks em grade (toque leva ao catálogo); header em glassmorphism leve sobre o hero
 - **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen com transição fluida (FLIP via `motion`, sem salto/stretch) (autoplay nos visíveis + barra de progresso)
-- **Sobre** — história, valores e políticas da loja
+- **Sobre** — hero full-bleed com mídia da vitrine, essência da marca, pilares tipográficos, info prática da loja e ponte discreta ao catálogo (copy em `src/data/about.ts`); header em glass sobre o hero
 - **Hibernação** — após 2 min sem toque (2 s em DEV), **exceto na Início**: composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
 - **Pasta de mídia** — pasta Drive sync; subpastas = coleções; ordenação nome/data; long-press na logo ZUE
 
@@ -221,6 +221,7 @@ src/
 │   ├── TextReveal.tsx
 │   └── UpdatePrompt.tsx
 ├── data/
+│   ├── about.ts          # Copy editorial da página Sobre
 │   └── catalog-slides.ts
 ├── hooks/
 │   ├── use-catalog-slides.ts
