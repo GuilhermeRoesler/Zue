@@ -17,7 +17,7 @@ alwaysApply: true
 - **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
-- **Landing** (início + sobre) + **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen**; deslize navega slides.
+- **Landing**: início (`Hero` — hero full-bleed + looks da mídia do catálogo, nav discreta ao catálogo; Header em glassmorphism leve sobre o hero) + sobre (`About`); **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen**; deslize navega slides.
 - **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; carrosséis **visíveis seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
 - **Pasta de mídia**: gerente seleciona pasta (Drive sync); **subpastas = coleções**; ordenação nome/data; long-press na logo ZUE no Header (seção catálogo).
 

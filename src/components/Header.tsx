@@ -31,6 +31,7 @@ const Header = ({
   onLogoLongPress,
 }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [overHero, setOverHero] = useState(currentSection === 'home');
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
   const longPressTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -41,6 +42,9 @@ const Header = ({
     ready: false,
   });
   const [animateIndicator, setAnimateIndicator] = useState(false);
+
+  const isHome = currentSection === 'home';
+  const overlay = isHome && overHero && !isMobileMenuOpen;
 
   const clearLongPress = useCallback(() => {
     if (longPressTimer.current !== undefined) {
@@ -69,6 +73,52 @@ const Header = ({
 
   useEffect(() => () => clearLongPress(), [clearLongPress]);
 
+  useEffect(() => {
+    if (!isHome) {
+      setOverHero(false);
+      return;
+    }
+
+    setOverHero(true);
+
+    let io: IntersectionObserver | null = null;
+    let cancelled = false;
+
+    const attach = () => {
+      const hero = document.getElementById('zue-home-hero');
+      if (!hero || cancelled) return false;
+
+      io = new IntersectionObserver(
+        ([entry]) => {
+          setOverHero(Boolean(entry?.isIntersecting));
+        },
+        {
+          // Sai do overlay quando o hero deixa a faixa sob o header
+          rootMargin: '-72px 0px 0px 0px',
+          threshold: 0,
+        }
+      );
+      io.observe(hero);
+      return true;
+    };
+
+    if (!attach()) {
+      const id = requestAnimationFrame(() => {
+        if (!attach() && !cancelled) setOverHero(true);
+      });
+      return () => {
+        cancelled = true;
+        cancelAnimationFrame(id);
+        io?.disconnect();
+      };
+    }
+
+    return () => {
+      cancelled = true;
+      io?.disconnect();
+    };
+  }, [isHome]);
+
   useLayoutEffect(() => {
     const nav = navRef.current;
     const item = itemRefs.current.get(currentSection);
@@ -84,11 +134,10 @@ const Header = ({
       width: itemRect.width,
       ready: true,
     });
-  }, [currentSection]);
+  }, [currentSection, overlay]);
 
   useEffect(() => {
     if (!indicator.ready) return;
-    // Evita animar do 0 no primeiro paint; desliza só nas trocas seguintes
     const id = requestAnimationFrame(() => setAnimateIndicator(true));
     return () => cancelAnimationFrame(id);
   }, [indicator.ready]);
@@ -112,7 +161,15 @@ const Header = ({
   }, [currentSection]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
+    <header
+      className={cn(
+        'z-50 transition-[background-color,border-color,backdrop-filter,color] duration-300',
+        isHome ? 'fixed inset-x-0 top-0' : 'sticky top-0',
+        overlay
+          ? 'border-b border-white/20 bg-white/10 shadow-[inset_0_1px_0_0_rgb(255_255_255_/0.12)] backdrop-blur-md supports-backdrop-filter:bg-white/10'
+          : 'border-b border-gray-100 bg-white/95 backdrop-blur-sm'
+      )}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="shrink-0">
@@ -123,8 +180,12 @@ const Header = ({
               onPointerUp={clearLongPress}
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
-              className="h-auto select-none rounded-none px-0 text-2xl font-light tracking-widest text-black hover:bg-transparent hover:text-gray-600"
-              style={{ fontFamily: 'Playfair Display, serif' }}
+              className={cn(
+                'h-auto select-none rounded-none px-0 font-heading text-2xl font-light tracking-widest hover:bg-transparent',
+                overlay
+                  ? 'text-white hover:text-white/75'
+                  : 'text-black hover:text-gray-600'
+              )}
             >
               ZUE
             </Button>
@@ -148,9 +209,13 @@ const Header = ({
                   onClick={() => onNavigate(item.id)}
                   className={cn(
                     'h-auto rounded-none border-0 px-0 pb-1 text-sm font-light tracking-wide hover:bg-transparent focus-visible:ring-0',
-                    currentSection === item.id
-                      ? 'text-black'
-                      : 'text-gray-600 hover:text-black'
+                    overlay
+                      ? currentSection === item.id
+                        ? 'text-white'
+                        : 'text-white/65 hover:text-white'
+                      : currentSection === item.id
+                        ? 'text-black'
+                        : 'text-gray-600 hover:text-black'
                   )}
                 >
                   {item.label}
@@ -161,7 +226,8 @@ const Header = ({
             <span
               aria-hidden
               className={cn(
-                'pointer-events-none absolute bottom-0 h-px bg-black',
+                'pointer-events-none absolute bottom-0 h-px',
+                overlay ? 'bg-white' : 'bg-black',
                 animateIndicator &&
                   'motion-safe:transition-[left,width,opacity] motion-safe:duration-300 motion-safe:ease-in-out',
                 indicator.ready ? 'opacity-100' : 'opacity-0'
@@ -175,7 +241,12 @@ const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-none text-gray-600 hover:bg-transparent hover:text-black md:hidden"
+                className={cn(
+                  'rounded-none hover:bg-transparent md:hidden',
+                  overlay
+                    ? 'text-white hover:text-white/75'
+                    : 'text-gray-600 hover:text-black'
+                )}
               >
                 <Menu className="size-6" />
                 <span className="sr-only">Abrir menu</span>

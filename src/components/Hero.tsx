@@ -1,149 +1,218 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useMemo } from 'react';
+import type { CatalogCollection, CatalogSlide } from '@/data/catalog-slides';
 import Reveal from '@/components/Reveal';
 import TextReveal from '@/components/TextReveal';
+import { cn } from '@/lib/utils';
 
-const launchImages = [
-  'https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'https://images.pexels.com/photos/7679471/pexels-photo-7679471.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'https://images.pexels.com/photos/7679730/pexels-photo-7679730.jpeg?auto=compress&cs=tinysrgb&w=800',
-];
+interface HeroProps {
+  collections: CatalogCollection[];
+  onNavigateCatalog: () => void;
+}
 
-const brandValues = [
-  {
-    letter: 'Q',
-    title: 'Qualidade Premium',
-    description: 'Peças confeccionadas com os melhores materiais e acabamento impecável.',
-  },
-  {
-    letter: 'E',
-    title: 'Exclusividade',
-    description: 'Coleções limitadas para mulheres que buscam peças únicas e especiais.',
-  },
-  {
-    letter: 'S',
-    title: 'Sofisticação',
-    description: 'Design atemporal que transcende tendências e valoriza a elegância feminina.',
-  },
-];
+interface FeaturedLook {
+  slide: CatalogSlide;
+  collectionTitle: string;
+}
 
-const Hero = () => {
+function firstImageSlide(slides: CatalogSlide[]): CatalogSlide | undefined {
+  return slides.find((s) => s.type === 'image') ?? slides[0];
+}
+
+/** Até 3 looks: prioriza 1ª imagem de cada coleção; completa com slides seguintes. */
+function pickFeaturedLooks(
+  collections: CatalogCollection[],
+  max = 3
+): FeaturedLook[] {
+  const looks: FeaturedLook[] = [];
+  const seen = new Set<string>();
+
+  for (const collection of collections) {
+    const slide = firstImageSlide(collection.slides);
+    if (!slide || seen.has(slide.id)) continue;
+    seen.add(slide.id);
+    looks.push({ slide, collectionTitle: collection.title });
+    if (looks.length >= max) return looks;
+  }
+
+  for (const collection of collections) {
+    for (const slide of collection.slides) {
+      if (seen.has(slide.id)) continue;
+      if (slide.type !== 'image' && looks.length > 0) continue;
+      seen.add(slide.id);
+      looks.push({ slide, collectionTitle: collection.title });
+      if (looks.length >= max) return looks;
+    }
+  }
+
+  return looks;
+}
+
+function MediaFill({
+  slide,
+  className,
+  priority,
+}: {
+  slide: CatalogSlide;
+  className?: string;
+  priority?: boolean;
+}) {
+  if (slide.type === 'video') {
+    return (
+      <video
+        src={slide.src}
+        className={cn('h-full w-full object-cover', className)}
+        muted
+        playsInline
+        autoPlay
+        loop
+        aria-label={slide.alt ?? slide.title ?? 'Look Zue'}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={slide.src}
+      alt={slide.alt ?? slide.title ?? 'Look Zue'}
+      className={cn('h-full w-full object-cover', className)}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding={priority ? 'sync' : 'async'}
+    />
+  );
+}
+
+const Hero = ({ collections, onNavigateCatalog }: HeroProps) => {
+  const featuredLooks = useMemo(
+    () => pickFeaturedLooks(collections, 3),
+    [collections]
+  );
+  const heroSlide = featuredLooks[0]?.slide;
+
   return (
     <div className="bg-white">
-      <section className="relative flex h-screen items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-gray-50 to-white" />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35] motion-safe:animate-zue-wave"
-          aria-hidden
-          style={{
-            background:
-              'radial-gradient(ellipse 60% 40% at 50% 45%, rgb(0 0 0 / 0.04), transparent 70%)',
-          }}
-        />
+      {/* Porta de entrada: marca + imagem full-bleed */}
+      <section
+        id="zue-home-hero"
+        className="relative flex min-h-dvh items-end overflow-hidden bg-black text-white"
+      >
+        {heroSlide ? (
+          <div className="absolute inset-0" aria-hidden={!heroSlide.alt}>
+            <MediaFill
+              slide={heroSlide}
+              priority
+              className="scale-[1.06] motion-safe:animate-zue-hero-drift"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/35 to-black/20" />
+            <div
+              className="pointer-events-none absolute inset-0 opacity-40 motion-safe:animate-zue-wave"
+              style={{
+                background:
+                  'radial-gradient(ellipse 55% 45% at 50% 40%, rgb(255 255 255 / 0.08), transparent 70%)',
+              }}
+            />
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-linear-to-b from-neutral-900 to-black" />
+        )}
 
-        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-          <p
-            className="mb-8 text-sm font-light tracking-[0.4em] text-gray-500 uppercase motion-safe:animate-fadeIn"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Zue
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:px-8">
+          <p className="mb-5 text-[10px] font-light tracking-[0.45em] text-white/70 uppercase motion-safe:animate-fadeIn">
+            Elegância Atemporal
           </p>
 
-          <h1
-            className="mb-6 text-5xl font-light tracking-wide text-black md:text-7xl"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            <TextReveal text="Elegância" delay={120} as="span" className="block" />
-            <span className="mt-1 block italic font-normal">
-              <TextReveal text="Atemporal" delay={320} as="span" />
-            </span>
+          <h1 className="font-heading text-6xl font-light tracking-[0.28em] text-white sm:text-7xl md:text-8xl">
+            <TextReveal text="ZUE" delay={80} as="span" />
           </h1>
 
-          <Reveal delay={480} variant="fade">
-            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-gray-600 md:text-xl">
-              Descubra peças exclusivas que celebram a feminilidade moderna com sofisticação e estilo únicos.
+          <div className="mt-6 h-px w-14 origin-left bg-white/80 motion-safe:animate-zue-line" />
+
+          <Reveal delay={360} variant="fade" className="mt-6 max-w-md">
+            <p className="text-sm font-light leading-relaxed tracking-wide text-white/80 sm:text-base">
+              Peças selecionadas para a mulher que prefere o essencial bem feito.
             </p>
           </Reveal>
-        </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-          <div className="h-12 w-px origin-top bg-gray-300 motion-safe:animate-zue-line" />
-        </div>
-      </section>
-
-      <section className="bg-gray-50 px-4 py-20">
-        <div className="mx-auto max-w-7xl">
-          <Reveal className="mb-16 text-center">
-            <h2
-              className="mb-4 text-4xl font-light text-black md:text-5xl"
-              style={{ fontFamily: 'Playfair Display, serif' }}
+          <Reveal delay={480} variant="fade" className="mt-10">
+            <button
+              type="button"
+              onClick={onNavigateCatalog}
+              className="group inline-flex items-center gap-3 border border-white/40 bg-transparent px-6 py-3 text-[11px] font-light tracking-[0.32em] text-white uppercase transition-colors duration-300 hover:border-white hover:bg-white hover:text-black"
             >
-              Lançamentos
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg font-light text-gray-600">
-              As mais recentes adições à nossa coleção, cuidadosamente selecionadas para mulheres que valorizam qualidade e elegância.
-            </p>
+              Ver catálogo
+              <span
+                className="inline-block h-px w-6 bg-current transition-all duration-300 group-hover:w-10"
+                aria-hidden
+              />
+            </button>
           </Reveal>
+        </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {launchImages.map((image, index) => (
-              <Reveal key={image} delay={index * 120}>
-                <Card className="group gap-0 rounded-none bg-transparent py-0 ring-0">
-                  <div className="mb-6 aspect-[3/4] overflow-hidden bg-gray-200">
-                    <img
-                      src={image}
-                      alt={`Lançamento ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
-                  </div>
-                  <CardHeader className="items-center px-0 text-center">
-                    <CardTitle className="text-lg font-light tracking-wide text-black transition-colors duration-300 group-hover:text-gray-700">
-                      Peça Exclusiva {(index + 1).toString().padStart(2, '0')}
-                    </CardTitle>
-                    <CardDescription className="text-sm font-light tracking-wide text-gray-600">
-                      Coleção Primavera/Verão 2025
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Reveal>
-            ))}
-          </div>
+        <div
+          className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2"
+          aria-hidden
+        >
+          <div className="h-10 w-px origin-top bg-white/35 motion-safe:animate-zue-line" />
         </div>
       </section>
 
-      <section className="bg-white px-4 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
-            {brandValues.map((value, index) => (
-              <Reveal key={value.letter} delay={index * 100}>
-                <Card className="group gap-0 rounded-none bg-transparent py-0 text-center ring-0">
-                  <CardContent className="px-0">
-                    <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full border border-gray-300 transition-colors duration-500 group-hover:border-black group-hover:bg-black group-hover:text-white">
-                      <span
-                        className="text-2xl transition-transform duration-500 group-hover:scale-110"
-                        style={{ fontFamily: 'Playfair Display, serif' }}
-                      >
-                        {value.letter}
-                      </span>
+      {/* Looks da vitrine — mesma mídia do catálogo */}
+      {featuredLooks.length > 0 && (
+        <section className="bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <Reveal className="mb-12 flex flex-col gap-3 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[10px] font-light tracking-[0.35em] text-gray-500 uppercase">
+                  Em vitrine
+                </p>
+                <h2 className="mt-3 font-heading text-3xl font-light tracking-[0.12em] text-black sm:text-4xl">
+                  Looks
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={onNavigateCatalog}
+                className="self-start text-[11px] font-light tracking-[0.28em] text-gray-500 uppercase underline-offset-4 transition-colors hover:text-black hover:underline sm:self-auto"
+              >
+                Abrir catálogo
+              </button>
+            </Reveal>
+
+            <div
+              className={cn(
+                'grid gap-6 sm:gap-8',
+                featuredLooks.length === 1 && 'grid-cols-1',
+                featuredLooks.length === 2 && 'grid-cols-1 md:grid-cols-2',
+                featuredLooks.length >= 3 && 'grid-cols-1 md:grid-cols-3'
+              )}
+            >
+              {featuredLooks.map((look, index) => (
+                <Reveal key={look.slide.id} delay={index * 100}>
+                  <button
+                    type="button"
+                    onClick={onNavigateCatalog}
+                    className="group block w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black"
+                  >
+                    <div className="aspect-3/4 overflow-hidden bg-gray-100">
+                      <MediaFill
+                        slide={look.slide}
+                        className="transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
                     </div>
-                    <h3 className="mb-4 text-xl font-light tracking-wide text-black">
-                      {value.title}
-                    </h3>
-                    <p className="font-light leading-relaxed text-gray-600">
-                      {value.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
+                    <div className="mt-5 space-y-1">
+                      <p className="text-[10px] font-light tracking-[0.3em] text-gray-400 uppercase">
+                        {look.collectionTitle}
+                      </p>
+                      <p className="font-heading text-lg font-light tracking-wide text-black transition-colors duration-300 group-hover:text-gray-600">
+                        {look.slide.title ?? look.slide.alt ?? 'Look'}
+                      </p>
+                    </div>
+                  </button>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 };

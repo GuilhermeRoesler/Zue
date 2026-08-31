@@ -60,7 +60,12 @@ function App() {
   const renderCurrentSection = () => {
     switch (currentSection) {
       case 'home':
-        return <Hero />;
+        return (
+          <Hero
+            collections={catalog.collections}
+            onNavigateCatalog={() => setCurrentSection('catalog')}
+          />
+        );
       case 'about':
         return <About />;
       case 'catalog':
@@ -75,7 +80,12 @@ function App() {
           />
         );
       default:
-        return <Hero />;
+        return (
+          <Hero
+            collections={catalog.collections}
+            onNavigateCatalog={() => setCurrentSection('catalog')}
+          />
+        );
     }
   };
 

@@ -222,6 +222,16 @@
   }
 }
 
+@keyframes zue-hero-drift {
+  0%,
+  100% {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.12) translate3d(1.2%, -0.8%, 0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
 }
@@ -236,6 +246,10 @@
 
 .animate-zue-line {
   animation: zue-line 1.2s ease-out 0.6s both;
+}
+
+.animate-zue-hero-drift {
+  animation: zue-hero-drift 18s ease-in-out infinite;
 }
 
 .animate-zue-hibernate-aura {
@@ -266,6 +280,7 @@ html.zue-custom-cursor * {
   .animate-zue-breathe,
   .animate-zue-wave,
   .animate-zue-line,
+  .animate-zue-hero-drift,
   .animate-zue-hibernate-aura,
   .animate-zue-hibernate-mark,
   .animate-zue-hibernate-rule {

@@ -8,7 +8,7 @@ Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, 
 
 O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código):
 
-- **Início** — landing com hero, lançamentos e valores da marca
+- **Início** — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE e looks em grade (toque leva ao catálogo); header em glassmorphism leve sobre o hero
 - **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen (autoplay nos visíveis + barra de progresso)
 - **Sobre** — história, valores e políticas da loja
 - **Hibernação** — após 2 min sem toque (2 s em DEV): composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
