@@ -1,22 +1,20 @@
-name: Android Debug APK
+name: Android Release APK
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 concurrency:
-  group: android-apk-${{ github.workflow }}-${{ github.ref }}
+  group: android-release-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  build-apk:
-    name: Build debug APK
+  release-apk:
+    name: Build and release APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -70,10 +68,16 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Prepare release asset
+        run: |
+          mkdir -p dist-apk
+          cp android/app/build/outputs/apk/debug/*.apk \
+            "dist-apk/zue-${GITHUB_REF_NAME}.apk"
+          ls -la dist-apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: zue-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 30
+          files: dist-apk/zue-*.apk
+          generate_release_notes: true
+          fail_on_unmatched_files: true

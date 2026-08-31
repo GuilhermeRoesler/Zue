@@ -197,12 +197,16 @@ Local (opcional):
 npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studio
 ```
 
-**CI (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-debug.yml`
+**CI (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-release.yml`
 
-- Dispara em `push`/`PR` na `main` e `workflow_dispatch`
+- Dispara ao dar push em tag `v*` (ex.: `v1.0.0`)
 - Roda `npm run cap:sync` + `./gradlew assembleDebug`
-- Publica artifact **`zue-debug-apk`** (retenção 30 dias)
+- Cria **GitHub Release** com o asset `zue-<tag>.apk`
 - SDK/JDK ficam no runner (`ubuntu-latest`); não exige SDK na máquina do time
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 Pré-requisitos locais só se for abrir o Android Studio: SDK Android e JDK 17/21.
 

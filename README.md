@@ -87,11 +87,16 @@ No Android Studio: rode no tablet ou **Build → Build Bundle(s) / APK(s)**.
 
 ### CI/CD (GitHub Actions)
 
-O workflow [`.github/workflows/android-debug.yml`](.github/workflows/android-debug.yml) gera um **APK debug** automaticamente em `push`/`PR` na `main` (e via *Run workflow*).
+O workflow [`.github/workflows/android-release.yml`](.github/workflows/android-release.yml) gera um **APK** e publica em uma **GitHub Release** quando você cria uma tag `v*` (ex.: `v1.0.0`).
 
-1. Abra a Action concluída no GitHub
-2. Baixe o artifact **`zue-debug-apk`**
-3. Instale no tablet (fonte desconhecida / sideload)
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+1. Aguarde a Action da tag concluir
+2. Abra **Releases** no repositório
+3. Baixe `zue-v1.0.0.apk` e instale no tablet (sideload)
 
 O SDK Android fica **no runner** — não é preciso ter SDK local só para obter o APK. Build local com Android Studio continua opcional.
 
