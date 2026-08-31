@@ -26,13 +26,8 @@ A especificação acompanha o estado real do repositório (não é documento con
 |--------|---------|-----|
 | **Rule** (resumo) | [`.cursor/rules/zue-spec.mdc`](.cursor/rules/zue-spec.mdc) | Contexto curto, sempre aplicado ao agente |
 | **Skill** (detalhada) | [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md) | Guia completo: arquitetura, design, Capacitor/kiosk, convenções |
-| **Hooks** | [`.cursor/hooks.json`](.cursor/hooks.json) + [`.cursor/hooks/`](.cursor/hooks/) | Mantêm as specs sincronizadas com o código |
 
-- `sessionStart` injeta a política de specs vivas
-- `afterFileEdit` marca pendência quando o produto muda
-- `stop` dispara follow-up se rule/skill/README ficarem defasados ou com drift
-
-Validar alinhamento:
+Em mudanças de produto/stack, atualizar rule + skill + README na mesma entrega. Validar alinhamento:
 
 ```bash
 node .cursor/hooks/check-spec-drift.mjs
@@ -264,8 +259,7 @@ public/
 └── site.webmanifest
 
 .cursor/
-├── hooks.json            # Specs vivas (sessionStart / afterFileEdit / stop)
-├── hooks/                # Scripts Node + checker de drift
+├── hooks/                # Checker de drift das specs (`check-spec-drift.mjs`)
 ├── rules/zue-spec.mdc    # Spec curta (rule)
 └── skills/zue-spec/      # Spec detalhada (skill)
 ```

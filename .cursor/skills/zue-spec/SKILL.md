@@ -16,17 +16,9 @@ As specs **não são estáticas**. Sempre que o código mudar de forma relevante
 2. `.cursor/skills/zue-spec/SKILL.md` (este arquivo)
 3. `README.md`
 
-### Automação (Cursor hooks)
+### Checker de drift
 
-| Evento | Script | Função |
-|--------|--------|--------|
-| `sessionStart` | `.cursor/hooks/session-start.mjs` | Injeta política + status de drift |
-| `afterFileEdit` | `.cursor/hooks/after-file-edit.mjs` | Marca pendência em edições de produto |
-| `stop` | `.cursor/hooks/stop-sync-specs.mjs` | Follow-up automático se specs/README ficarem para trás |
-
-Config: `.cursor/hooks.json`. Estado local (gitignored): `.cursor/hooks/state/`.
-
-Checker factual:
+Validação factual (também no `npm run ci` / GitHub Actions):
 
 ```bash
 node .cursor/hooks/check-spec-drift.mjs
@@ -325,4 +317,4 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 - CI validação: `.github/workflows/ci.yml`
 - CI GitHub Pages: `.github/workflows/github-pages.yml`
 - CI release APK: `.github/workflows/android-release.yml`
-- Hooks de sync: `.cursor/hooks.json` e `.cursor/hooks/`
+- Checker de drift: `.cursor/hooks/check-spec-drift.mjs`

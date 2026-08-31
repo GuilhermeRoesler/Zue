@@ -173,12 +173,6 @@ export function checkSpecDrift() {
     );
   }
 
-  if (!docs.includes('.cursor/hooks')) {
-    issues.push(
-      'Specs/README devem citar os hooks em `.cursor/hooks` que mantêm as specs vivas'
-    );
-  }
-
   return { ok: issues.length === 0, issues, facts };
 }
 
