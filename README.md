@@ -9,7 +9,7 @@ Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, 
 O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código):
 
 - **Início** — landing com hero, lançamentos e valores da marca
-- **Catálogo** — carrossel fullscreen de fotos e vídeos com barra de progresso
+- **Catálogo** — página com carrosséis empilhados (margens alinhadas); clique expande fullscreen com animação (autoplay contínuo + barra de progresso)
 - **Sobre** — história, valores e políticas da loja
 - **Hibernação** — após 2 min sem toque (2 s em DEV): composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
 - **Pasta de mídia** — gerente escolhe uma pasta (ex.: Drive sincronizado) que alimenta o catálogo
@@ -78,8 +78,8 @@ Comportamento no tablet:
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
 - Hibernação após 2 min sem interação (2 s em DEV; wordmark ZUE + tagline)
-- Catálogo em carrossel fullscreen (foto 5 s; vídeo = duração do arquivo)
-- Pasta de mídia selecionável (long-press na logo ZUE no catálogo)
+- Catálogo em página com carrosséis; expand fullscreen (foto 5 s; vídeo = duração do arquivo)
+- Pasta de mídia selecionável (long-press na logo ZUE no Header, seção catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
 
 ### Pasta de mídia (gerente / Google Drive)
@@ -206,7 +206,8 @@ src/
 ├── components/           # Seções e UI da vitrine
 │   ├── ui/               # Primitivos shadcn (incl. carousel)
 │   ├── About.tsx
-│   ├── CatalogCarousel.tsx
+│   ├── CatalogPage.tsx
+│   ├── CatalogPlayer.tsx
 │   ├── CustomCursor.tsx
 │   ├── Footer.tsx
 │   ├── Header.tsx
@@ -266,8 +267,8 @@ public/
 
 ## Funcionalidades
 
-- **Catálogo imersivo**: carrossel shadcn/embla fullscreen com autoplay e barra de progresso
-- **Pasta de mídia**: seletor discreto (long-press na logo); Drive sync operacional
+- **Catálogo**: página com carrosséis shadcn/embla + expand fullscreen animado (autoplay contínuo, barra de progresso, seta voltar)
+- **Pasta de mídia**: seletor discreto (long-press na logo no Header); Drive sync operacional
 - **Hibernação**: idle de 2 min (2 s em DEV) → wordmark tipográfico + tagline; wake retoma estado
 - **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
 - **Design responsivo**: desktop, tablet e mobile

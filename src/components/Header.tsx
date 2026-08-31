@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 interface HeaderProps {
   currentSection: string;
   onNavigate: (section: string) => void;
+  /** Pressione a logo ~1s no catálogo para abrir configuração de pasta (gerente). */
+  onLogoLongPress?: () => void;
 }
 
 const navigationItems = [
@@ -21,16 +23,51 @@ const navigationItems = [
   { id: 'about', label: 'Sobre' },
 ];
 
-const Header = ({ currentSection, onNavigate }: HeaderProps) => {
+const LONG_PRESS_MS = 1000;
+
+const Header = ({
+  currentSection,
+  onNavigate,
+  onLogoLongPress,
+}: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
+  const longPressTimer = useRef<ReturnType<typeof setTimeout>>();
+  const longPressFired = useRef(false);
   const [indicator, setIndicator] = useState({
     left: 0,
     width: 0,
     ready: false,
   });
   const [animateIndicator, setAnimateIndicator] = useState(false);
+
+  const clearLongPress = useCallback(() => {
+    if (longPressTimer.current !== undefined) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = undefined;
+    }
+  }, []);
+
+  const startLongPress = useCallback(() => {
+    clearLongPress();
+    longPressFired.current = false;
+    if (!onLogoLongPress) return;
+    longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true;
+      onLogoLongPress();
+    }, LONG_PRESS_MS);
+  }, [clearLongPress, onLogoLongPress]);
+
+  const handleLogoClick = useCallback(() => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    onNavigate('home');
+  }, [onNavigate]);
+
+  useEffect(() => () => clearLongPress(), [clearLongPress]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -81,8 +118,12 @@ const Header = ({ currentSection, onNavigate }: HeaderProps) => {
           <div className="shrink-0">
             <Button
               variant="ghost"
-              onClick={() => onNavigate('home')}
-              className="h-auto rounded-none px-0 text-2xl font-light tracking-widest text-black hover:bg-transparent hover:text-gray-600"
+              onClick={handleLogoClick}
+              onPointerDown={startLongPress}
+              onPointerUp={clearLongPress}
+              onPointerLeave={clearLongPress}
+              onPointerCancel={clearLongPress}
+              className="h-auto select-none rounded-none px-0 text-2xl font-light tracking-widest text-black hover:bg-transparent hover:text-gray-600"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               ZUE

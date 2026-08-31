@@ -1,5 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { CATALOG_SLIDES, type CatalogSlide } from '@/data/catalog-slides';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  CATALOG_COLLECTIONS,
+  CATALOG_SLIDES,
+  slidesToVitrineCollection,
+  type CatalogCollection,
+  type CatalogSlide,
+} from '@/data/catalog-slides';
 import {
   clearMediaFolder,
   pickMediaFolder,
@@ -9,6 +15,7 @@ import {
 
 export interface UseCatalogSlidesResult {
   slides: CatalogSlide[];
+  collections: CatalogCollection[];
   source: MediaSourceKind;
   folderLabel: string | null;
   loading: boolean;
@@ -34,6 +41,11 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
   const [error, setError] = useState<string | null>(null);
   const slidesRef = useRef(slides);
   slidesRef.current = slides;
+
+  const collections = useMemo(() => {
+    if (source === 'demo') return CATALOG_COLLECTIONS;
+    return slidesToVitrineCollection(slides);
+  }, [source, slides]);
 
   const applyFolder = useCallback((next: CatalogSlide[], label: string) => {
     revokeBlobUrls(slidesRef.current.filter((s) => s.src.startsWith('blob:')));
@@ -108,6 +120,7 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
 
   return {
     slides,
+    collections,
     source,
     folderLabel,
     loading,

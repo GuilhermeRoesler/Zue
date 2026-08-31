@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import CatalogCarousel from './components/CatalogCarousel';
+import CatalogPage from './components/CatalogPage';
 import About from './components/About';
 import Footer from './components/Footer';
 import HibernateOverlay from './components/HibernateOverlay';
@@ -24,18 +24,44 @@ function App() {
     null
   );
   const [mediaSheetOpen, setMediaSheetOpen] = useState(false);
+  const [catalogFullscreen, setCatalogFullscreen] = useState(false);
   const nativeApp = isNativeApp();
   const isHibernating = useIdle(IDLE_TIMEOUT_MS);
   const catalog = useCatalogSlides();
 
   const isCatalog = currentSection === 'catalog';
 
-  useLenis(!isCatalog && !isHibernating && !mediaSheetOpen);
+  useLenis(!catalogFullscreen && !isHibernating && !mediaSheetOpen);
+
+  useEffect(() => {
+    if (!catalogFullscreen) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlOverscroll = html.style.overscrollBehavior;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    html.style.overscrollBehavior = 'none';
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+      html.style.overscrollBehavior = prevHtmlOverscroll;
+    };
+  }, [catalogFullscreen]);
 
   useEffect(() => {
     if (!nativeApp) return;
     scheduleUpdateCheck(setAvailableUpdate);
   }, [nativeApp]);
+
+  useEffect(() => {
+    if (!isCatalog) setCatalogFullscreen(false);
+  }, [isCatalog]);
+
+  const handleCatalogExpandChange = useCallback((expanded: boolean) => {
+    setCatalogFullscreen(expanded);
+  }, []);
 
   const renderCurrentSection = () => {
     switch (currentSection) {
@@ -44,7 +70,13 @@ function App() {
       case 'about':
         return <About />;
       case 'catalog':
-        return null;
+        return (
+          <CatalogPage
+            collections={catalog.collections}
+            paused={mediaSheetOpen}
+            onExpandChange={handleCatalogExpandChange}
+          />
+        );
       default:
         return <Hero />;
     }
@@ -54,22 +86,21 @@ function App() {
     <div className="min-h-screen bg-background">
       {!nativeApp && <CustomCursor />}
 
-      {!isCatalog && (
-        <>
-          <Header currentSection={currentSection} onNavigate={setCurrentSection} />
-          <main>{renderCurrentSection()}</main>
-          <Footer onNavigate={setCurrentSection} />
-        </>
-      )}
-
-      {isCatalog && (
-        <CatalogCarousel
-          slides={catalog.slides}
-          paused={isHibernating || mediaSheetOpen}
-          onNavigateHome={() => setCurrentSection('home')}
-          onLogoLongPress={() => setMediaSheetOpen(true)}
+      {!catalogFullscreen && (
+        <Header
+          currentSection={currentSection}
+          onNavigate={setCurrentSection}
+          onLogoLongPress={
+            isCatalog ? () => setMediaSheetOpen(true) : undefined
+          }
         />
       )}
+
+      <main className={catalogFullscreen ? 'contents' : undefined}>
+        {renderCurrentSection()}
+      </main>
+
+      {!catalogFullscreen && <Footer onNavigate={setCurrentSection} />}
 
       <MediaFolderSheet
         open={mediaSheetOpen}

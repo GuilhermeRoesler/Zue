@@ -18,9 +18,9 @@ alwaysApply: true
 - **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
-- **Landing** (início + sobre) + **catálogo** em carrossel fullscreen (foto/vídeo).
-- **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; ao toque **retoma de onde parou**.
-- **Pasta de mídia**: gerente seleciona pasta (Drive sync) que alimenta o catálogo; long-press na logo ZUE no catálogo.
+- **Landing** (início + sobre) + **catálogo** como página com carrosséis empilhados; clique expande **fullscreen** (foto/vídeo, autoplay nos dois modos).
+- **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; carrosséis **seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
+- **Pasta de mídia**: gerente seleciona pasta (Drive sync) que alimenta o catálogo; long-press na logo ZUE no Header (seção catálogo).
 
 ## Stack
 
@@ -40,7 +40,7 @@ alwaysApply: true
 - Tipografia: **Playfair Display** (títulos) + **Inter** light (corpo)
 - Paleta: preto / branco / cinzas; `rounded-none` nos elementos da marca
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
-- Catálogo: mídia fullscreen; barra fina de progresso na base do slide
+- Catálogo: página com carrosséis (~70dvh, margens alinhadas); fullscreen com animação; seta voltar (chrome auto-hide); barra fina de progresso; autoplay contínuo (também sob hibernação)
 - Scrollbar: fina, angular, preto/cinza (`src/index.css`)
 - Web: Lenis + cursor custom; stagger/reveal na landing; respeitar `prefers-reduced-motion`
 

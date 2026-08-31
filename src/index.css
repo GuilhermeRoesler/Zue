@@ -241,6 +241,28 @@
   }
 }
 
+@keyframes zue-catalog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zue-catalog-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
 }
@@ -270,6 +292,14 @@
   transform-origin: center;
 }
 
+.animate-zue-catalog-enter {
+  animation: zue-catalog-enter 0.38s ease-out both;
+}
+
+.animate-zue-catalog-exit {
+  animation: zue-catalog-exit 0.38s ease-in both;
+}
+
 html.lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
@@ -287,7 +317,9 @@ html.zue-custom-cursor * {
   .animate-zue-line,
   .animate-zue-hibernate-aura,
   .animate-zue-hibernate-mark,
-  .animate-zue-hibernate-rule {
+  .animate-zue-hibernate-rule,
+  .animate-zue-catalog-enter,
+  .animate-zue-catalog-exit {
     animation: none !important;
   }
 }

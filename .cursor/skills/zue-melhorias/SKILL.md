@@ -41,14 +41,14 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 - [x] Timeout sem interação: **2 min** em produção / **2 s** em DEV (`IDLE_TIMEOUT_MS` em `src/lib/idle-config.ts`)
 - [x] Ao idle: composição tipográfica **ZUE** + tagline (tela ligada)
-- [x] Parar carrosséis, vídeos e animações pesadas ao hibernar
+- [x] Overlay tipográfico ao idle; **carrosséis seguem em autoplay** por baixo (acordar sem reinício)
 - [x] Qualquer toque/gesto: sair da hibernação e **retomar de onde parou**
 
 ### M3 — Catálogo em carrosséis fullscreen
 
-- [ ] Catálogo = lista de carrosséis (coleções / pastas / temas), não só um player
-- [x] Player: **fullscreen**, barra **fina na base** (progresso do slide ativo)
-- [x] Auto-avanço: **foto ≈ 5s** (embla autoplay); **vídeo = duração do vídeo**
+- [x] Catálogo = lista de carrosséis (coleções / pastas / temas), não só um player
+- [x] Player: **embedded** na página + **fullscreen** sob demanda; barra **fina na base** (progresso do slide ativo)
+- [x] Auto-avanço: **foto ≈ 5s** (embla autoplay); **vídeo = duração do vídeo** (embedded e fullscreen)
 - [x] Fim da lista → loop (`opts.loop`)
 - [ ] Gestos: swipe explícito documentado (embla já suporta drag)
 
@@ -68,7 +68,7 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 ### M6 — Pasta de mídia (gerente)
 
-- [x] Ação discreta no app (long-press ~1 s na logo ZUE no catálogo) para **selecionar pasta**
+- [x] Ação discreta no app (long-press ~1 s na logo ZUE no Header, seção catálogo) para **selecionar pasta**
 - [x] Conteúdo da pasta alimenta o carrossel (`useCatalogSlides` + `media-folder.ts`)
 - [x] Fluxo operacional: pasta no Google Drive sincronizada no tablet / PC (ver README)
 - [x] Documentado no README
@@ -80,7 +80,7 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 ```text
 App
 ├── Landing          → marca / atmosfera (sem conversão no nativo)
-├── Catálogo         → carrosséis fullscreen (foto + vídeo)
+├── Catálogo         → página com carrosséis + expand fullscreen (foto + vídeo)
 ├── HibernateOverlay → branco + logo; idle timeout
 └── MediaSource      → pasta local (Drive sync) → manifesto de slides
 ```
@@ -109,9 +109,9 @@ App
 
 ### Fase 2 — Player de catálogo ✅ (v1)
 
-1. `src/data/catalog-slides.ts` + `CatalogCarousel.tsx`
-2. shadcn carousel + embla autoplay + barra de progresso
-3. Pausa ao hibernar; vídeo mute + duração nativa
+1. `src/data/catalog-slides.ts` + `CatalogPage.tsx` + `CatalogPlayer.tsx`
+2. shadcn carousel + embla autoplay + barra de progresso (embedded + fullscreen)
+3. Pausa ao hibernar; vídeo mute + duração nativa; seta voltar com chrome auto-hide
 
 ### Fase 3 — Fonte de mídia ✅
 
@@ -135,7 +135,7 @@ App
 | ---------------------- | ---------------------------------------- |
 | Timeout idle           | **2 min** (`idle-config.ts`)             |
 | Hibernação             | Tela ligada; overlay branco + logo       |
-| Pós-hibernate          | **Retoma** seção e slide do carrossel    |
+| Pós-hibernate          | Overlay some; carrossel **já avançou** (não reinicia) |
 | WhatsApp / CTA         | **Removidos** (web = app)                |
 | Drive                  | Pasta local sync via seletor (sem API Google) |
 | Vídeos                 | Mute; avanço no `ended`                  |
