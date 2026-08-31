@@ -72,9 +72,10 @@ Roadmap de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`.
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
 | Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
+| Filesystem / pasta | `@capacitor/filesystem`, `@capacitor/preferences`, `@capawesome/capacitor-file-picker` |
 | App info | `@capacitor/app` (versão nativa para checagem de update) |
 | Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
-| Testes | **Vitest** (`src/**/*.{test,spec}.{ts,tsx}`); hoje: `utils.test.ts` (`cn`), `app-update.test.ts` (`compareSemver`) |
+| Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts` |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
 ### Scripts npm
@@ -124,17 +125,23 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `Header` — nav (Início, Catálogo, Sobre) + sheet mobile
 - `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
-- `CatalogCarousel` — carrossel fullscreen shadcn + autoplay + barra de progresso
+- `CatalogCarousel` — carrossel fullscreen shadcn + autoplay + barra de progresso; long-press na logo abre pasta
 - `HibernateOverlay` — tela de hibernação
+- `MediaFolderSheet` — UI discreta do gerente (selecionar / atualizar pasta)
 - `Footer` — marca e navegação
 - `UpdatePrompt` — diálogo de nova versão (somente app Android)
 
 UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 
-### Dados do catálogo
+### Fonte de mídia (pasta)
 
-- `src/data/catalog-slides.ts` — slides demo (`image` | `video`); substituir por pasta de mídia (roadmap Fase 3)
-- Imagens via URLs **Pexels** até haver assets locais
+- Libs: `src/lib/media-folder.ts` (pick/restore/clear), `src/lib/media-types.ts` (extensões → slides)
+- Hook: `src/hooks/use-catalog-slides.ts` — pasta salva ou fallback `CATALOG_SLIDES` demo
+- **Web**: File System Access API (`showDirectoryPicker`) + IndexedDB para o handle
+- **Android**: `@capawesome/capacitor-file-picker` `pickDirectory` + `Filesystem.readdir` + path em Preferences
+- Extensões: jpg/jpeg/png/webp/gif/bmp/heic + mp4/webm/mov/m4v/mkv
+- Acesso gerente: **pressionar logo ZUE ~1 s** no catálogo → sheet “Mídia da vitrine”
+- Sem pasta vinculada: slides demo em `src/data/catalog-slides.ts` (Pexels)
 
 ---
 
@@ -243,6 +250,9 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/components/HibernateOverlay.tsx` — overlay de hibernação
 - `src/components/CatalogCarousel.tsx` — player fullscreen
 - `src/data/catalog-slides.ts` — manifesto de slides demo
+- `src/lib/media-folder.ts` / `media-types.ts` / `media-types.test.ts` — pasta de mídia
+- `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta)
+- `src/components/MediaFolderSheet.tsx` — UI do gerente
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
 - `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin`
@@ -265,6 +275,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 - Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
 - Hibernação após 2 min idle; wake retoma estado
 - Catálogo: foto 5 s (autoplay embla); vídeo = duração do arquivo (mute)
+- Pasta de mídia via long-press na logo; fallback demo se não houver pasta
 - Touch targets generosos; validar em resolução de tablet
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 - Update prompt discreto; download em background thread nativo

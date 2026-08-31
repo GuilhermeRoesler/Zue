@@ -5,10 +5,12 @@ import CatalogCarousel from './components/CatalogCarousel';
 import About from './components/About';
 import Footer from './components/Footer';
 import HibernateOverlay from './components/HibernateOverlay';
+import MediaFolderSheet from './components/MediaFolderSheet';
 import UpdatePrompt from './components/UpdatePrompt';
 import { isNativeApp } from './lib/kiosk';
 import { IDLE_TIMEOUT_MS } from './lib/idle-config';
 import { useIdle } from './hooks/use-idle';
+import { useCatalogSlides } from './hooks/use-catalog-slides';
 import {
   type AvailableUpdate,
   scheduleUpdateCheck,
@@ -19,8 +21,10 @@ function App() {
   const [availableUpdate, setAvailableUpdate] = useState<AvailableUpdate | null>(
     null
   );
+  const [mediaSheetOpen, setMediaSheetOpen] = useState(false);
   const nativeApp = isNativeApp();
   const isHibernating = useIdle(IDLE_TIMEOUT_MS);
+  const catalog = useCatalogSlides();
 
   const isCatalog = currentSection === 'catalog';
 
@@ -54,10 +58,31 @@ function App() {
 
       {isCatalog && (
         <CatalogCarousel
-          paused={isHibernating}
+          slides={catalog.slides}
+          paused={isHibernating || mediaSheetOpen}
           onNavigateHome={() => setCurrentSection('home')}
+          onLogoLongPress={() => setMediaSheetOpen(true)}
         />
       )}
+
+      <MediaFolderSheet
+        open={mediaSheetOpen}
+        onOpenChange={setMediaSheetOpen}
+        source={catalog.source}
+        folderLabel={catalog.folderLabel}
+        slideCount={catalog.slides.length}
+        loading={catalog.loading}
+        error={catalog.error}
+        onPickFolder={() => {
+          void catalog.pickFolder();
+        }}
+        onUseDemo={() => {
+          void catalog.useDemo();
+        }}
+        onRefresh={() => {
+          void catalog.refresh();
+        }}
+      />
 
       <HibernateOverlay visible={isHibernating} />
 

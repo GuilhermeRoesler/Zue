@@ -68,10 +68,10 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 ### M6 — Pasta de mídia (gerente)
 
-- [ ] Ação no app (idealmente protegida / pouco visível ao cliente) para **selecionar pasta de imagens/vídeos**
-- [ ] Conteúdo da pasta alimenta os carrosséis
-- [ ] Fluxo desejado pelo produto: gerente usa **pasta no Google Drive** sincronizada e envia mídia de qualquer dispositivo pela conta Google
-- [ ] Documentar no README o fluxo operacional da loja (como atualizar a pasta)
+- [x] Ação discreta no app (long-press ~1 s na logo ZUE no catálogo) para **selecionar pasta**
+- [x] Conteúdo da pasta alimenta o carrossel (`useCatalogSlides` + `media-folder.ts`)
+- [x] Fluxo operacional: pasta no Google Drive sincronizada no tablet / PC (ver README)
+- [x] Documentado no README
 
 ---
 
@@ -113,12 +113,12 @@ App
 2. shadcn carousel + embla autoplay + barra de progresso
 3. Pausa ao hibernar; vídeo mute + duração nativa
 
-### Fase 3 — Fonte de mídia
+### Fase 3 — Fonte de mídia ✅
 
-1. Seletor de pasta (Capacitor Filesystem / SAF no Android)
-2. Scan de imagens/vídeos → slides
-3. Instruções Drive: pasta offline/sync no tablet
-4. (Opcional depois) API Drive — só se pasta local sync for insuficiente
+1. Seletor de pasta (web: File System Access; Android: Capawesome SAF)
+2. Scan de imagens/vídeos → slides (`media-types` + `Filesystem.readdir`)
+3. Instruções Drive no README
+4. API Drive nativa — adiada (pasta local sync suficiente)
 
 ### Fase 4 — Polish web + motion
 
@@ -137,7 +137,7 @@ App
 | Hibernação             | Tela ligada; overlay branco + logo       |
 | Pós-hibernate          | **Retoma** seção e slide do carrossel    |
 | WhatsApp / CTA         | **Removidos** (web = app)                |
-| Drive                  | Pasta local sync — Fase 3                |
+| Drive                  | Pasta local sync via seletor (sem API Google) |
 | Vídeos                 | Mute; avanço no `ended`                  |
 
 ---

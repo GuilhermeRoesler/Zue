@@ -12,6 +12,7 @@ O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código
 - **Catálogo** — carrossel fullscreen de fotos e vídeos com barra de progresso
 - **Sobre** — história, valores e políticas da loja
 - **Hibernação** — após 2 min sem toque: tela branca com logo; ao interagir, retoma de onde parou
+- **Pasta de mídia** — gerente escolhe uma pasta (ex.: Drive sincronizado) que alimenta o catálogo
 
 Sem checkout, WhatsApp ou CTAs de conversão.
 
@@ -49,8 +50,9 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[Lucide React](https://lucide.dev/)** — ícones
 - **[Capacitor 8](https://capacitorjs.com/)** — app Android a partir do build web
 - **ESLint** — qualidade de código
-- **Vitest** — testes unitários (`src/lib/utils.test.ts`, `src/lib/app-update.test.ts`)
+- **Vitest** — testes unitários (`utils`, `app-update`, `media-types`)
 - **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
+- **Capacitor plugins** — Filesystem, Preferences, File Picker (Capawesome), StatusBar, Keep Awake, App
 
 ## Pré-requisitos
 
@@ -81,7 +83,22 @@ Comportamento no tablet:
 - Tela permanece ligada
 - Hibernação após 2 min sem interação (logo centralizada em fundo branco)
 - Catálogo em carrossel fullscreen (foto 5 s; vídeo = duração do arquivo)
+- Pasta de mídia selecionável (long-press na logo ZUE no catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
+
+### Pasta de mídia (gerente / Google Drive)
+
+O catálogo pode usar arquivos reais da loja em vez dos slides de demonstração.
+
+1. No Google Drive, crie uma pasta (ex.: `Zue Vitrine`) e coloque fotos/vídeos nela
+2. No tablet (ou PC), sincronize essa pasta com o app **Google Drive** (disponível offline / pasta espelhada)
+3. Abra o catálogo na Zue e **pressione a logo ZUE por ~1 segundo**
+4. Em **Mídia da vitrine** → **Selecionar pasta** e escolha a pasta sincronizada
+5. Novos arquivos: envie pelo Drive de qualquer dispositivo; no tablet use **Atualizar pasta** (mesmo long-press)
+
+Formatos: `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc. Ordem = nome do arquivo (numérico).
+
+Web: Chrome/Edge com File System Access API. Android: seletor nativo (SAF) via Capawesome.
 
 ```bash
 npm run cap:sync      # build web + sync no projeto android/
@@ -198,10 +215,12 @@ src/
 │   ├── Header.tsx
 │   ├── Hero.tsx
 │   ├── HibernateOverlay.tsx
+│   ├── MediaFolderSheet.tsx
 │   └── UpdatePrompt.tsx
 ├── data/
 │   └── catalog-slides.ts
 ├── hooks/
+│   ├── use-catalog-slides.ts
 │   └── use-idle.ts
 ├── lib/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
@@ -209,6 +228,9 @@ src/
 │   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
 │   ├── idle-config.ts    # Timeout idle (2 min) e slide de imagem (5 s)
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
+│   ├── media-folder.ts   # Pick/restore pasta (web + Android)
+│   ├── media-types.ts    # Extensões → slides
+│   ├── media-types.test.ts
 │   ├── utils.ts          # cn() — clsx + tailwind-merge
 │   └── utils.test.ts     # Vitest: cn
 ├── App.tsx               # Navegação por seções (estado)
@@ -244,13 +266,14 @@ public/
 ## Funcionalidades
 
 - **Catálogo imersivo**: carrossel shadcn/embla fullscreen com autoplay e barra de progresso
+- **Pasta de mídia**: seletor discreto (long-press na logo); Drive sync operacional
 - **Hibernação**: idle de 2 min → logo em fundo branco; wake retoma estado
 - **Design responsivo**: desktop, tablet e mobile
 - **Animações**: transições CSS em hover e menus; pulse sutil na hibernação
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
 
-Roadmap (Lenis, cursor custom, pasta Drive): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
+Roadmap restante (Lenis, cursor custom, animações premium): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
 
 ## Design em resumo
 

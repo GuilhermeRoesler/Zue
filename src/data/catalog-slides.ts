@@ -8,7 +8,7 @@ export interface CatalogSlide {
   title?: string;
 }
 
-/** Slides de demonstração — substituir por pasta de mídia (Fase 3). */
+/** Slides de demonstração — usados quando nenhuma pasta de mídia está vinculada. */
 export const CATALOG_SLIDES: CatalogSlide[] = [
   {
     id: '1',

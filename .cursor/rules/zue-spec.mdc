@@ -21,17 +21,18 @@ alwaysApply: true
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 - **Landing** (início + sobre) + **catálogo** em carrossel fullscreen (foto/vídeo).
 - **Hibernação** após **2 min** sem interação: tela ligada, fundo branco + logo; ao toque **retoma de onde parou**.
+- **Pasta de mídia**: gerente seleciona pasta (Drive sync) que alimenta o catálogo; long-press na logo ZUE no catálogo.
 
 ## Stack
 
 - React 18 + TypeScript + Vite (`base: './'`)
 - Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`) — carrossel: `embla-carousel-react` + `embla-carousel-autoplay`
-- Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
+- Capacitor 8 + StatusBar + Keep Awake + Filesystem + Preferences + `@capawesome/capacitor-file-picker`; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
 - Scripts: `icons:generate` | `cap:sync` | `cap:open` | `cap:android`
 - Qualidade: `lint` | `typecheck` | `test` (Vitest) | `ci` (pipeline local)
-- Testes unitários atuais: `src/lib/utils.test.ts` (`cn`) e `src/lib/app-update.test.ts` (`compareSemver`)
+- Testes unitários atuais: `utils.test.ts` (`cn`), `app-update.test.ts` (`compareSemver`), `media-types.test.ts`
 - CI: `.github/workflows/ci.yml` — lint, typecheck, testes, build e spec-drift em push/PR; `.github/workflows/github-pages.yml` — deploy do `dist/` no **GitHub Pages**; `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)
 
 ## Design (obrigatório)

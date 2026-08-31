@@ -7,13 +7,16 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { CATALOG_SLIDES } from '@/data/catalog-slides';
+import type { CatalogSlide } from '@/data/catalog-slides';
 import { IMAGE_SLIDE_MS } from '@/lib/idle-config';
 import { cn } from '@/lib/utils';
 
 interface CatalogCarouselProps {
+  slides: CatalogSlide[];
   paused?: boolean;
   onNavigateHome?: () => void;
+  /** Pressione a logo ~1s para abrir configuração de pasta (gerente). */
+  onLogoLongPress?: () => void;
 }
 
 function SlideProgressBar({ progress }: { progress: number }) {
@@ -30,7 +33,14 @@ function SlideProgressBar({ progress }: { progress: number }) {
   );
 }
 
-const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProps) => {
+const LONG_PRESS_MS = 1000;
+
+const CatalogCarousel = ({
+  slides,
+  paused = false,
+  onNavigateHome,
+  onLogoLongPress,
+}: CatalogCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -40,6 +50,33 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
   );
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const rafRef = useRef<number>();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout>>();
+  const longPressFired = useRef(false);
+
+  const clearLongPress = useCallback(() => {
+    if (longPressTimer.current !== undefined) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = undefined;
+    }
+  }, []);
+
+  const startLongPress = useCallback(() => {
+    clearLongPress();
+    longPressFired.current = false;
+    if (!onLogoLongPress) return;
+    longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true;
+      onLogoLongPress();
+    }, LONG_PRESS_MS);
+  }, [clearLongPress, onLogoLongPress]);
+
+  const handleLogoClick = useCallback(() => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    onNavigateHome?.();
+  }, [onNavigateHome]);
 
   const stopProgressLoop = useCallback(() => {
     if (rafRef.current !== undefined) {
@@ -80,6 +117,12 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
   );
 
   useEffect(() => {
+    setSelectedIndex(0);
+    setProgress(0);
+    api?.scrollTo(0, true);
+  }, [slides, api]);
+
+  useEffect(() => {
     if (!api) return;
 
     const onSelect = () => {
@@ -96,9 +139,9 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
   }, [api]);
 
   useEffect(() => {
-    if (!api) return;
+    if (!api || slides.length === 0) return;
 
-    const slide = CATALOG_SLIDES[selectedIndex];
+    const slide = slides[selectedIndex];
     if (!slide) return;
 
     if (paused) {
@@ -157,6 +200,7 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
     };
   }, [
     api,
+    slides,
     selectedIndex,
     paused,
     startImageProgress,
@@ -165,15 +209,39 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
   ]);
 
   useEffect(() => () => stopProgressLoop(), [stopProgressLoop]);
+  useEffect(() => () => clearLongPress(), [clearLongPress]);
+
+  if (slides.length === 0) {
+    return (
+      <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black text-white">
+        <p className="font-light tracking-wide text-white/80">
+          Nenhuma mídia na pasta.
+        </p>
+        {onLogoLongPress && (
+          <button
+            type="button"
+            onClick={onLogoLongPress}
+            className="font-light tracking-wide text-sm text-white/60 underline-offset-4 hover:text-white hover:underline"
+          >
+            Configurar pasta
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-40 bg-black">
-      {onNavigateHome && (
+      {(onNavigateHome || onLogoLongPress) && (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-center p-5">
           <button
             type="button"
-            onClick={onNavigateHome}
-            className="pointer-events-auto font-heading text-xl font-light tracking-[0.35em] text-white/90 transition-opacity hover:text-white"
+            onClick={handleLogoClick}
+            onPointerDown={startLongPress}
+            onPointerUp={clearLongPress}
+            onPointerLeave={clearLongPress}
+            onPointerCancel={clearLongPress}
+            className="pointer-events-auto select-none font-heading text-xl font-light tracking-[0.35em] text-white/90 transition-opacity hover:text-white"
           >
             ZUE
           </button>
@@ -181,13 +249,14 @@ const CatalogCarousel = ({ paused = false, onNavigateHome }: CatalogCarouselProp
       )}
 
       <Carousel
+        key={slides.map((s) => s.id).join('|')}
         setApi={setApi}
         plugins={[autoplayRef.current]}
         opts={{ loop: true, duration: 28 }}
         className="h-full w-full"
       >
         <CarouselContent className="ml-0 h-full">
-          {CATALOG_SLIDES.map((slide, index) => (
+          {slides.map((slide, index) => (
             <CarouselItem
               key={slide.id}
               className="relative h-[100dvh] basis-full pl-0"
