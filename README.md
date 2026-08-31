@@ -48,6 +48,8 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[Lucide React](https://lucide.dev/)** — ícones
 - **[Capacitor 8](https://capacitorjs.com/)** — app Android a partir do build web
 - **ESLint** — qualidade de código
+- **Vitest** — testes unitários (`src/lib/utils.test.ts`, `src/lib/app-update.test.ts`)
+- **GitHub Actions** — CI de validação + release de APK
 
 ## Pré-requisitos
 
@@ -94,9 +96,23 @@ Arquivos: `src/lib/app-update.ts`, `src/components/UpdatePrompt.tsx`, `android/.
 
 ### CI/CD (GitHub Actions)
 
+#### Validação (push / PR)
+
+O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em push e pull request nas branches `main`/`master`:
+
+1. ESLint (`npm run lint`)
+2. TypeScript (`npm run typecheck`)
+3. Testes unitários Vitest (`npm run test`)
+4. Build de produção (`npm run build`)
+5. Alinhamento das specs vivas (`check-spec-drift`)
+
+Localmente, o mesmo pipeline: `npm run ci`.
+
+#### Release APK (tags `v*`)
+
 O workflow [`.github/workflows/android-release.yml`](.github/workflows/android-release.yml) gera um **APK release assinado** e publica em uma **GitHub Release** ao criar uma tag `v*` (ex.: `v1.0.0`).
 
-#### 1. Gerar o keystore (uma vez)
+##### 1. Gerar o keystore (uma vez)
 
 Com JDK instalado:
 
@@ -107,7 +123,7 @@ keytool -genkeypair -v -keystore zue-release.keystore -alias zue \
 
 Guarde o arquivo e as senhas em local seguro (não commitar).
 
-#### 2. Secrets no GitHub
+##### 2. Secrets no GitHub
 
 Em **Settings → Secrets and variables → Actions**, crie:
 
@@ -130,7 +146,7 @@ Base64 (Linux/macOS):
 base64 -i zue-release.keystore | pbcopy   # ou xclip / só imprimir
 ```
 
-#### 3. Publicar
+##### 3. Publicar
 
 ```bash
 git tag v1.0.0
@@ -149,6 +165,10 @@ git push origin v1.0.0
 - `npm run build` — build de produção em `dist/`
 - `npm run preview` — preview do build
 - `npm run lint` — ESLint
+- `npm run typecheck` — verificação TypeScript
+- `npm run test` — testes unitários (Vitest)
+- `npm run test:watch` — Vitest em modo watch
+- `npm run ci` — pipeline local (lint + typecheck + test + build + spec-drift)
 - `npm run cap:sync` — build + sync Capacitor Android
 - `npm run cap:open` — abre Android Studio
 - `npm run cap:android` — sync + abre Android Studio
@@ -170,15 +190,20 @@ src/
 │   └── WhatsAppButton.tsx
 ├── lib/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
+│   ├── app-update.test.ts # Vitest: compareSemver
 │   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
-│   └── utils.ts
+│   ├── utils.ts          # cn() — clsx + tailwind-merge
+│   └── utils.test.ts     # Vitest: cn
 ├── App.tsx               # Navegação por seções (estado)
 ├── index.css             # Tema Tailwind v4 + tokens
 └── main.tsx
 
 android/                  # Projeto nativo Capacitor
 capacitor.config.ts
+.github/workflows/
+├── ci.yml                # Lint, typecheck, test, build, spec-drift
+└── android-release.yml   # APK assinado em tags v*
 
 .cursor/
 ├── hooks.json            # Specs vivas (sessionStart / afterFileEdit / stop)

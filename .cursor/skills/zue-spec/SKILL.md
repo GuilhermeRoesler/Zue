@@ -80,6 +80,7 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
 | App info | `@capacitor/app` (versão nativa para checagem de update) |
 | Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
+| Testes | **Vitest** (`src/**/*.{test,spec}.{ts,tsx}`); hoje: `utils.test.ts` (`cn`), `app-update.test.ts` (`compareSemver`) |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
 ### Scripts npm
@@ -90,6 +91,10 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | `npm run build` | build de produção → `dist/` |
 | `npm run preview` | preview do build |
 | `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript (`tsc -b --noEmit`) |
+| `npm run test` | Vitest (uma execução, CI) |
+| `npm run test:watch` | Vitest em modo watch |
+| `npm run ci` | lint + typecheck + test + build + spec-drift |
 | `npm run cap:sync` | `build` + `npx cap sync android` |
 | `npm run cap:open` | abre o projeto no Android Studio |
 | `npm run cap:android` | sync + abre Android Studio |
@@ -200,7 +205,13 @@ Local (opcional):
 npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studio
 ```
 
-**CI (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-release.yml`
+**CI de validação:** GitHub Actions em `.github/workflows/ci.yml`
+
+- Dispara em `push`/`pull_request` nas branches `main`/`master`
+- Jobs: `lint` → `typecheck` → `test` → `build` → `check-spec-drift`
+- Equivalente local: `npm run ci`
+
+**CI de release (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-release.yml`
 
 - Dispara ao dar push em tag `v*` (ex.: `v1.0.0`)
 - Roda `npm run cap:sync` + `./gradlew assembleRelease` **assinado**
@@ -218,7 +229,8 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 ### Arquivos-chave
 
 - `src/lib/kiosk.ts` — init StatusBar + KeepAwake; `isNativeApp()`
-- `src/lib/app-update.ts` — checa `releases/latest` no GitHub em background; compara semver com `App.getInfo()`
+- `src/lib/utils.ts` / `utils.test.ts` — `cn()` (clsx + tailwind-merge) e testes Vitest
+- `src/lib/app-update.ts` / `app-update.test.ts` — checa `releases/latest` no GitHub; `compareSemver` + testes
 - `src/lib/apk-updater.ts` — bridge TS do plugin nativo `ApkUpdater`
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
@@ -276,7 +288,7 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 - [ ] Responsivo mobile + tablet
 - [ ] WhatsApp/mailto intactos e com mensagem contextual (web)
 - [ ] No nativo: sem newsletter popup / FAB WhatsApp a menos que o produto mude
-- [ ] `npm run lint` / build sem regressão óbvia
+- [ ] `npm run ci` (ou lint / typecheck / test / build) sem regressão
 - [ ] Se tocar em UI ou Capacitor: `npm run cap:sync` e fullscreen/kiosk preservados
 - [ ] **Specs vivas:** rule + skill + README alinhados ao código
 - [ ] `node .cursor/hooks/check-spec-drift.mjs` com exit 0
@@ -285,4 +297,6 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 
 - Spec curta (sempre ativa): `.cursor/rules/zue-spec.mdc`
 - README do projeto: `README.md`
+- CI validação: `.github/workflows/ci.yml`
+- CI release APK: `.github/workflows/android-release.yml`
 - Hooks de sync: `.cursor/hooks.json` e `.cursor/hooks/`
