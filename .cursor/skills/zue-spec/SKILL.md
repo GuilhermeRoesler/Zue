@@ -48,8 +48,6 @@ A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital
 
 Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 
-Roadmap de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`.
-
 ---
 
 ## Stack e tooling
@@ -119,7 +117,7 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
 - `CatalogPage` — página do catálogo: coleções empilhadas + morph fullscreen (mesmo player)
-- `CatalogPlayer` — player Embla (embedded ~70dvh ou fullscreen) + autoplay contínuo + barra de progresso; seta voltar com chrome auto-hide; animação enter/exit
+- `CatalogPlayer` — player Embla (embedded ~70dvh ou fullscreen) + autoplay contínuo + barra de progresso; drag/swipe nativo do Embla; seta voltar com chrome auto-hide; animação enter/exit
 - `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
 - `MediaFolderSheet` — UI discreta do gerente (selecionar / atualizar pasta)
 - `CustomCursor` — cursor fino (somente web + pointer fine)
@@ -315,7 +313,6 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 ## Recursos do repo
 
 - Spec curta (sempre ativa): `.cursor/rules/zue-spec.mdc`
-- Plano de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`
 - README do projeto: `README.md`
 - CI validação: `.github/workflows/ci.yml`
 - CI GitHub Pages: `.github/workflows/github-pages.yml`

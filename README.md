@@ -275,8 +275,6 @@ public/
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
 
-Plano de melhorias (histórico): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
-
 ## Design em resumo
 
 - Tipografia: Playfair Display (títulos) + Inter light (corpo)

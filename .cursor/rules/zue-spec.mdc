@@ -10,7 +10,6 @@ alwaysApply: true
 - Rule + skill + README devem espelhar o repo **agora**, não um plano antigo.
 - Em toda mudança de stack, arquitetura, Capacitor/kiosk, componentes de domínio ou scripts npm: atualizar **os três** na mesma entrega.
 - Validar com: `node .cursor/hooks/check-spec-drift.mjs` (exit 0).
-- Roadmap futuro: skill `.cursor/skills/zue-melhorias/SKILL.md`.
 
 ## Produto
 
@@ -49,4 +48,4 @@ alwaysApply: true
 - Preservar o design system existente; preferir componentes em `src/components/ui/`
 - UX de tablet/kiosk: fullscreen, tela ligada, idle/hibernate, UI de sistema oculta (ver skill `zue-spec`)
 - Após mudanças de UI do app: `npm run cap:sync` antes do APK
-- Para o guia completo, usar a skill **zue-spec**; para roadmap, **zue-melhorias**
+- Para o guia completo, usar a skill **zue-spec**
