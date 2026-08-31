@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -170,6 +171,7 @@ const CatalogPlayer = ({
   const rafRef = useRef<number>();
   const chromeHideTimer = useRef<ReturnType<typeof setTimeout>>();
   const hintHideTimer = useRef<ReturnType<typeof setTimeout>>();
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const prevFullscreenRef = useRef(isFullscreen);
   const autoplayRef = useRef<AutoplayType>(
@@ -181,14 +183,39 @@ const CatalogPlayer = ({
 
   const transition = reduceMotion ? INSTANT_TRANSITION : FULLSCREEN_TRANSITION;
 
-  // Dispara no mesmo commit em que `mode` muda — antes do motion medir o
-  // novo layout — para esconder chrome/hint/overlay já no primeiro frame.
-  useEffect(() => {
+  // useLayoutEffect (não useEffect): precisa aplicar isTransitioning=true
+  // ANTES do primeiro paint do novo `mode`, senão o navegador chega a pintar
+  // um frame com o container já `absolute` (contido/cortado pelo wrapper
+  // `overflow-hidden` da coleção) antes do wrapper trocar para
+  // `overflow-visible` (ver className do wrapper no return).
+  useLayoutEffect(() => {
     if (prevFullscreenRef.current === isFullscreen) return;
     prevFullscreenRef.current = isFullscreen;
     if (reduceMotion) return;
     setIsTransitioning(true);
-  }, [isFullscreen, reduceMotion]);
+    // Fallback determinístico: `onLayoutAnimationComplete` do `motion` nem
+    // sempre dispara de forma confiável para este container (projection
+    // aninhada com a mídia + re-renders contínuos da barra de progresso).
+    // Sem isso, `isTransitioning` pode ficar travado em `true` para sempre —
+    // escondendo o chrome permanentemente e travando o botão de voltar, o
+    // que é crítico no tablet (sem teclado/Escape). O timeout usa a duração
+    // real da transição + margem e é cancelado se o callback do `motion`
+    // chegar a disparar primeiro (ver `handleLayoutAnimationComplete`).
+    if (transitionTimeoutRef.current !== undefined) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    const durationMs = (transition.duration ?? 0.56) * 1000;
+    transitionTimeoutRef.current = setTimeout(() => {
+      transitionTimeoutRef.current = undefined;
+      handleLayoutAnimationCompleteRef.current();
+    }, durationMs + 120);
+    return () => {
+      if (transitionTimeoutRef.current !== undefined) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = undefined;
+      }
+    };
+  }, [isFullscreen, reduceMotion, transition]);
 
   const revealChrome = useCallback(() => {
     if (!isFullscreen || !onClose || isTransitioning) return;
@@ -202,10 +229,17 @@ const CatalogPlayer = ({
   revealChromeRef.current = revealChrome;
 
   const handleLayoutAnimationComplete = useCallback(() => {
+    if (transitionTimeoutRef.current !== undefined) {
+      clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = undefined;
+    }
     setIsTransitioning(false);
     if (api) api.reInit();
     if (isFullscreen) revealChromeRef.current();
   }, [api, isFullscreen]);
+
+  const handleLayoutAnimationCompleteRef = useRef(handleLayoutAnimationComplete);
+  handleLayoutAnimationCompleteRef.current = handleLayoutAnimationComplete;
 
   useEffect(() => {
     if (!isFullscreen || isTransitioning) return;
@@ -403,7 +437,19 @@ const CatalogPlayer = ({
 
   return (
     <div
-      className={cn('relative w-full overflow-hidden bg-neutral-200', shellHeight)}
+      className={cn(
+        'relative w-full bg-neutral-200',
+        // Durante o FLIP de fechamento o `motion.div` filho passa a
+        // `position: absolute` (sai de `fixed`) e é escalado via transform
+        // para simular o tamanho de tela cheia enquanto encolhe até este
+        // slot. Se este wrapper permanecesse `overflow-hidden` durante a
+        // transição, esse recorte cortaria a mídia antes do fim da
+        // animação (clipping). `overflow-visible` some só nesse período;
+        // volta a `overflow-hidden` (crop normal do card) assim que
+        // `onLayoutAnimationComplete` assenta o layout final.
+        isTransitioning ? 'overflow-visible' : 'overflow-hidden',
+        shellHeight
+      )}
       role="region"
       aria-roledescription="carrossel"
       aria-label="Deslize para navegar. Toque para ver em tela cheia."
