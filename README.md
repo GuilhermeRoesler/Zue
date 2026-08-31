@@ -11,7 +11,7 @@ O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código
 - **Início** — landing com hero, lançamentos e valores da marca
 - **Catálogo** — carrossel fullscreen de fotos e vídeos com barra de progresso
 - **Sobre** — história, valores e políticas da loja
-- **Hibernação** — após 2 min sem toque: tela branca com logo; ao interagir, retoma de onde parou
+- **Hibernação** — após 2 min sem toque (2 s em DEV): composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
 - **Pasta de mídia** — gerente escolhe uma pasta (ex.: Drive sincronizado) que alimenta o catálogo
 
 Sem checkout, WhatsApp ou CTAs de conversão.
@@ -77,7 +77,7 @@ Comportamento no tablet:
 
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
-- Hibernação após 2 min sem interação (logo centralizada em fundo branco)
+- Hibernação após 2 min sem interação (2 s em DEV; wordmark ZUE + tagline)
 - Catálogo em carrossel fullscreen (foto 5 s; vídeo = duração do arquivo)
 - Pasta de mídia selecionável (long-press na logo ZUE no catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
@@ -226,7 +226,7 @@ src/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
 │   ├── app-update.test.ts # Vitest: compareSemver
 │   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
-│   ├── idle-config.ts    # Timeout idle (2 min) e slide de imagem (5 s)
+│   ├── idle-config.ts    # Timeout idle (2 min / 2 s em DEV) e slide de imagem (5 s)
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
 │   ├── media-folder.ts   # Pick/restore pasta (web + Android)
 │   ├── media-types.ts    # Extensões → slides
@@ -268,7 +268,7 @@ public/
 
 - **Catálogo imersivo**: carrossel shadcn/embla fullscreen com autoplay e barra de progresso
 - **Pasta de mídia**: seletor discreto (long-press na logo); Drive sync operacional
-- **Hibernação**: idle de 2 min → logo com breathe; wake retoma estado
+- **Hibernação**: idle de 2 min (2 s em DEV) → wordmark tipográfico + tagline; wake retoma estado
 - **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
 - **Design responsivo**: desktop, tablet e mobile
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor

@@ -39,8 +39,8 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 ### M2 — Hibernação (idle)
 
-- [x] Timeout sem interação: **2 min** (`IDLE_TIMEOUT_MS` em `src/lib/idle-config.ts`)
-- [x] Ao idle: **tela 100% branca** com **logo Zue centralizada** (tela ligada)
+- [x] Timeout sem interação: **2 min** em produção / **2 s** em DEV (`IDLE_TIMEOUT_MS` em `src/lib/idle-config.ts`)
+- [x] Ao idle: composição tipográfica **ZUE** + tagline (tela ligada)
 - [x] Parar carrosséis, vídeos e animações pesadas ao hibernar
 - [x] Qualquer toque/gesto: sair da hibernação e **retomar de onde parou**
 

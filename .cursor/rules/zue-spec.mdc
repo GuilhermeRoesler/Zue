@@ -19,7 +19,7 @@ alwaysApply: true
 - Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 - **Landing** (início + sobre) + **catálogo** em carrossel fullscreen (foto/vídeo).
-- **Hibernação** após **2 min** sem interação: tela ligada, fundo branco + logo; ao toque **retoma de onde parou**.
+- **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; ao toque **retoma de onde parou**.
 - **Pasta de mídia**: gerente seleciona pasta (Drive sync) que alimenta o catálogo; long-press na logo ZUE no catálogo.
 
 ## Stack

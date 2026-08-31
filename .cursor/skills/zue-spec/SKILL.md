@@ -44,7 +44,7 @@ A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital
 
 1. **Landing** — início (`Hero`) e sobre (`About`): marca, lançamentos, valores.
 2. **Catálogo** — carrossel fullscreen de fotos e vídeos (`CatalogCarousel`).
-3. **Hibernação** — após **2 min** sem interação: tela ligada, fundo branco + logo; toque retoma o estado anterior.
+3. **Hibernação** — após **2 min** sem interação (DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; toque retoma o estado anterior.
 
 Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 
@@ -108,9 +108,9 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
 ### Hibernação (idle)
 
-- Constantes: `src/lib/idle-config.ts` (`IDLE_TIMEOUT_MS` = 2 min, `IMAGE_SLIDE_MS` = 5 s)
+- Constantes: `src/lib/idle-config.ts` (`IDLE_TIMEOUT_MS` = 2 min em produção / **2 s em DEV**, `IMAGE_SLIDE_MS` = 5 s)
 - Hook: `src/hooks/use-idle.ts` — eventos globais de atividade
-- Overlay: `src/components/HibernateOverlay.tsx` — branco + logo (`/favicon.svg`), pulse sutil
+- Overlay: `src/components/HibernateOverlay.tsx` — fundo off-white, wordmark tipográfico ZUE, tagline, cantos de galeria e aura suave
 - Ao hibernar: pausa carrossel/vídeo (`paused` em `CatalogCarousel`); ao acordar retoma índice e seção
 
 ### Componentes de domínio (`src/components/`)
@@ -119,7 +119,7 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
 - `CatalogCarousel` — carrossel fullscreen shadcn + autoplay + barra de progresso; long-press na logo abre pasta
-- `HibernateOverlay` — tela de hibernação (logo com breathe + rings)
+- `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
 - `MediaFolderSheet` — UI discreta do gerente (selecionar / atualizar pasta)
 - `CustomCursor` — cursor fino (somente web + pointer fine)
 - `Reveal` / `TextReveal` — fade/stagger e revelação de texto
@@ -167,7 +167,7 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 ### Motion
 
-- Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`
+- Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`, `animate-zue-hibernate-*`
 - Web: Lenis (`useLenis`) desligado no catálogo / hibernação / nativo / reduced-motion
 - Web: `CustomCursor` (mix-blend-difference); desligado em touch e nativo
 - Landing/Sobre: `Reveal` + `TextReveal` com stagger
@@ -276,7 +276,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 ### UX modo loja
 
 - Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
-- Hibernação após 2 min idle; wake retoma estado
+- Hibernação após 2 min idle (2 s em DEV); wake retoma estado
 - Catálogo: foto 5 s (autoplay embla); vídeo = duração do arquivo (mute)
 - Pasta de mídia via long-press na logo; fallback demo se não houver pasta
 - Touch targets generosos; validar em resolução de tablet
