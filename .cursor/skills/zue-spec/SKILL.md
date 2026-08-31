@@ -95,6 +95,7 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | `npm run test` | Vitest (uma execução, CI) |
 | `npm run test:watch` | Vitest em modo watch |
 | `npm run ci` | lint + typecheck + test + build + spec-drift |
+| `npm run icons:generate` | regenera favicons/PWA + mipmaps Android a partir de `resources/icon.png` |
 | `npm run cap:sync` | `build` + `npx cap sync android` |
 | `npm run cap:open` | abre o projeto no Android Studio |
 | `npm run cap:android` | sync + abre Android Studio |
@@ -188,6 +189,9 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 | `webDir` | `dist` |
 | Config | `capacitor.config.ts` |
 | Projeto nativo | pasta `android/` |
+| Ícone | monograma **Z** Didone (branco em fundo preto) |
+
+Master: `resources/icon.png` (1024²). Pipeline: `scripts/generate-icons.mjs` → `public/` (favicon SVG/PNG, apple-touch, PWA, `site.webmanifest`) + `android/.../mipmap-*` (`ic_launcher`, round, foreground) com `ic_launcher_background` `#000000`. Após trocar o master: `npm run icons:generate` e, para o app, `npm run cap:sync`.
 
 ### Requisitos de produto (kiosk) — implementados
 

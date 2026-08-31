@@ -16,6 +16,7 @@ alwaysApply: true
 
 - Vitrine digital da marca **Zue** (moda premium, tagline *Elegância Atemporal*).
 - Alvos: site web + **app Android** (tablet na loja) via **Capacitor 8** (`br.com.zue.vitrine`), mesmo código-fonte.
+- Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
 - Conversão principal: WhatsApp (`wa.me/5551989354834`) e `mailto` — sem checkout online.
 - No app nativo: sem newsletter popup e sem FAB WhatsApp (modo vitrine).
 
@@ -26,7 +27,7 @@ alwaysApply: true
 - Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
-- Scripts Android: `cap:sync` | `cap:open` | `cap:android`
+- Scripts: `icons:generate` | `cap:sync` | `cap:open` | `cap:android`
 - Qualidade: `lint` | `typecheck` | `test` (Vitest) | `ci` (pipeline local)
 - Testes unitários atuais: `src/lib/utils.test.ts` (`cn`) e `src/lib/app-update.test.ts` (`compareSemver`)
 - CI: `.github/workflows/ci.yml` — lint, typecheck, testes, build e spec-drift em push/PR; `.github/workflows/github-pages.yml` — deploy do `dist/` no **GitHub Pages**; `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Zue">
+  <rect width="512" height="512" fill="#000"/>
+  <!-- Corpo do Z (Didone) -->
+  <path
+    fill="#fff"
+    d="M150 130 H362 V155 L195 357 H362 V387 H150 V362 L317 155 H150 Z"
+  />
+  <!-- Serifa superior esquerda -->
+  <path fill="#fff" d="M128 130 L150 155 V130 Z"/>
+  <!-- Serifa inferior direita -->
+  <path fill="#fff" d="M362 362 L384 387 H362 Z"/>
+</svg>

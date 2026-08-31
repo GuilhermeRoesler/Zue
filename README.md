@@ -72,6 +72,8 @@ O terminal mostra a URL local (em geral `http://localhost:5173/`).
 
 Identidade: `br.com.zue.vitrine` · nome **Zue**.
 
+Ícone da marca: monograma **Z** (Didone / preto e branco) em `resources/icon.png`, propagado para favicon web, PWA e launcher Android. Regenerar com `npm run icons:generate` após trocar o master.
+
 Comportamento no tablet:
 
 - Tela cheia (barras do sistema ocultas)
@@ -177,6 +179,7 @@ git push origin v1.0.0
 - `npm run test` — testes unitários (Vitest)
 - `npm run test:watch` — Vitest em modo watch
 - `npm run ci` — pipeline local (lint + typecheck + test + build + spec-drift)
+- `npm run icons:generate` — gera favicons/PWA + mipmaps Android a partir de `resources/icon.png`
 - `npm run cap:sync` — build + sync Capacitor Android
 - `npm run cap:open` — abre Android Studio
 - `npm run cap:android` — sync + abre Android Studio
@@ -209,13 +212,22 @@ src/
 
 android/                  # Projeto nativo Capacitor
 capacitor.config.ts
+resources/
+└── icon.png              # Master do ícone (1024²) → web + Android
+scripts/
+└── generate-icons.mjs    # Pipeline de ícones (sharp)
 .github/workflows/
 ├── ci.yml                # Lint, typecheck, test, build, spec-drift
 ├── github-pages.yml      # Deploy do dist/ no GitHub Pages
 └── android-release.yml   # APK assinado em tags v*
 
 public/
-└── .nojekyll             # Desativa Jekyll no GitHub Pages
+├── .nojekyll             # Desativa Jekyll no GitHub Pages
+├── favicon.svg           # Favicon vetorial
+├── favicon-*.png         # Favicons raster
+├── apple-touch-icon.png
+├── icon-192.png / icon-512.png
+└── site.webmanifest
 
 .cursor/
 ├── hooks.json            # Specs vivas (sessionStart / afterFileEdit / stop)
