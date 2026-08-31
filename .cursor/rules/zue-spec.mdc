@@ -17,7 +17,7 @@ alwaysApply: true
 - **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** em **Playfair Display** (mesmo do hero); masters dark/light em `resources/icon-dark.png` / `icon-light.png` (`icon.png` = dark); favicon web com corner radius (~22%, alinhado ao mask Android) e `prefers-color-scheme`; PWA/Android usam dark quadrado; `npm run icons:generate`
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
-- **Landing**: início (`Hero` — hero full-bleed + looks da mídia do catálogo, nav discreta ao catálogo; Header em glassmorphism leve sobre o hero) + sobre (`About`); **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen**; deslize navega slides.
+- **Landing**: início (`Hero` — hero full-bleed + looks da mídia do catálogo, nav discreta ao catálogo; Header em glassmorphism leve sobre o hero) + sobre (`About`); **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen com transição fluida** (FLIP via `motion`); deslize navega slides.
 - **Hibernação** após **2 min** sem interação (em DEV: **2 s**), **exceto na Início**: tela ligada, composição tipográfica ZUE + tagline; carrosséis **visíveis seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
 - **Pasta de mídia**: gerente seleciona pasta (Drive sync); **subpastas = coleções**; ordenação nome/data; long-press na logo ZUE no Header (seção catálogo).
 
@@ -25,7 +25,7 @@ alwaysApply: true
 
 - React 18 + TypeScript + Vite (`base: './'`)
 - Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`) — carrossel: `embla-carousel-react` + `embla-carousel-autoplay`
-- Motion web: **Lenis** + cursor custom (`CustomCursor`); helpers em `src/lib/motion.ts`
+- Motion web: **Lenis** + cursor custom (`CustomCursor`); helpers em `src/lib/motion.ts`; **`motion`** (`motion/react`) para o FLIP fullscreen do catálogo (`CatalogPlayer`)
 - Capacitor 8 + StatusBar + Keep Awake + Filesystem + Preferences + `@capawesome/capacitor-file-picker`; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
@@ -39,7 +39,7 @@ alwaysApply: true
 - Tipografia: **Playfair Display** (títulos) + **Inter** light (corpo)
 - Paleta: preto / branco / cinzas; `rounded-none` nos elementos da marca
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
-- Catálogo: intro de marca + carrosséis; expand fullscreen instantâneo; índice; progresso; chrome auto-hide
+- Catálogo: intro de marca + carrosséis; expand fullscreen com transição fluida (FLIP `layout` via `motion`, sem salto/stretch); índice; progresso; chrome auto-hide
 - Sem scrollbar visível (scroll por Lenis/toque)
 - `user-select: none` global (`src/index.css`); inputs/textarea permitem seleção
 - Web: Lenis + cursor custom; stagger/reveal na landing e catálogo; respeitar `prefers-reduced-motion`

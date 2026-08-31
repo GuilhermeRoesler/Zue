@@ -7,6 +7,7 @@ import {
 } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 import type { AutoplayType } from 'embla-carousel-autoplay';
+import { motion, useReducedMotion, type Transition } from 'motion/react';
 import { ArrowLeft, Maximize2 } from 'lucide-react';
 import {
   Carousel,
@@ -26,6 +27,18 @@ const CHROME_HIDE_MS = 2000;
 const HINT_HIDE_MS = 4200;
 const CLICK_DRAG_THRESHOLD_PX = 8;
 
+/**
+ * Easing/duração da transição fullscreen (FLIP via `motion`).
+ * Curva de desaceleração suave (sem bounce) para manter o tom minimalista.
+ * A mesma transição é usada no container e na mídia para que ambos os
+ * projections (`layout`) fiquem sincronizados quadro a quadro.
+ */
+const FULLSCREEN_TRANSITION: Transition = {
+  duration: 0.56,
+  ease: [0.22, 1, 0.36, 1],
+};
+const INSTANT_TRANSITION: Transition = { duration: 0 };
+
 interface CatalogPlayerProps {
   slides: CatalogSlide[];
   mode: CatalogPlayerMode;
@@ -41,17 +54,29 @@ function resolveSrc(slide: CatalogSlide, enabled: boolean) {
   return resolveMediaUrl(slide.id, slide.src);
 }
 
-function MediaImage({ slide, eager }: { slide: CatalogSlide; eager: boolean }) {
+function MediaImage({
+  slide,
+  eager,
+  animateLayout,
+  transition,
+}: {
+  slide: CatalogSlide;
+  eager: boolean;
+  animateLayout: boolean;
+  transition: Transition;
+}) {
   const src = resolveSrc(slide, eager);
   if (!src) return <div className="h-full w-full bg-neutral-900" aria-hidden />;
   return (
-    <img
+    <motion.img
       src={src}
       alt={slide.alt ?? slide.title ?? ''}
       className="h-full w-full object-cover"
       draggable={false}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
+      layout={animateLayout}
+      transition={transition}
     />
   );
 }
@@ -60,11 +85,15 @@ function MediaVideo({
   slide,
   active,
   eager,
+  animateLayout,
+  transition,
   videoRef,
 }: {
   slide: CatalogSlide;
   active: boolean;
   eager: boolean;
+  animateLayout: boolean;
+  transition: Transition;
   videoRef: React.MutableRefObject<HTMLVideoElement | null>;
 }) {
   const src = resolveSrc(slide, eager);
@@ -98,13 +127,15 @@ function MediaVideo({
   if (!src) return <div className="h-full w-full bg-neutral-900" aria-hidden />;
 
   return (
-    <video
+    <motion.video
       ref={setRefs}
       src={src}
       className="h-full w-full object-cover"
       muted
       playsInline
       preload={eager ? 'auto' : 'metadata'}
+      layout={animateLayout}
+      transition={transition}
     />
   );
 }
@@ -125,6 +156,11 @@ const CatalogPlayer = ({
   const [progress, setProgress] = useState(0);
   const [chromeVisible, setChromeVisible] = useState(true);
   const [hintVisible, setHintVisible] = useState(true);
+  // true durante o FLIP de abertura/fechamento do fullscreen: mantém chrome,
+  // hint e overlay de título/progresso ocultos para que nada "salte" antes
+  // do fim da animação, e adia o reInit do Embla até o layout se estabilizar.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const reduceMotion = useReducedMotion() || prefersReducedMotion();
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const selectedIndexRef = useRef(0);
@@ -135,6 +171,7 @@ const CatalogPlayer = ({
   const chromeHideTimer = useRef<ReturnType<typeof setTimeout>>();
   const hintHideTimer = useRef<ReturnType<typeof setTimeout>>();
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const prevFullscreenRef = useRef(isFullscreen);
   const autoplayRef = useRef<AutoplayType>(
     Autoplay({ delay: IMAGE_SLIDE_MS, stopOnInteraction: false })
   );
@@ -142,27 +179,49 @@ const CatalogPlayer = ({
   const slidesKey = slides.map((s) => s.id).join('|');
   selectedIndexRef.current = selectedIndex;
 
+  const transition = reduceMotion ? INSTANT_TRANSITION : FULLSCREEN_TRANSITION;
+
+  // Dispara no mesmo commit em que `mode` muda — antes do motion medir o
+  // novo layout — para esconder chrome/hint/overlay já no primeiro frame.
   useEffect(() => {
-    if (!api || !isFullscreen) return;
-    const id = requestAnimationFrame(() => api.reInit());
-    return () => cancelAnimationFrame(id);
-  }, [api, isFullscreen]);
+    if (prevFullscreenRef.current === isFullscreen) return;
+    prevFullscreenRef.current = isFullscreen;
+    if (reduceMotion) return;
+    setIsTransitioning(true);
+  }, [isFullscreen, reduceMotion]);
 
   const revealChrome = useCallback(() => {
-    if (!isFullscreen || !onClose) return;
+    if (!isFullscreen || !onClose || isTransitioning) return;
     setChromeVisible(true);
     if (chromeHideTimer.current !== undefined) clearTimeout(chromeHideTimer.current);
-    if (prefersReducedMotion()) return;
+    if (reduceMotion) return;
     chromeHideTimer.current = setTimeout(() => setChromeVisible(false), CHROME_HIDE_MS);
-  }, [isFullscreen, onClose]);
+  }, [isFullscreen, isTransitioning, onClose, reduceMotion]);
+
+  const revealChromeRef = useRef(revealChrome);
+  revealChromeRef.current = revealChrome;
+
+  const handleLayoutAnimationComplete = useCallback(() => {
+    setIsTransitioning(false);
+    if (api) api.reInit();
+    if (isFullscreen) revealChromeRef.current();
+  }, [api, isFullscreen]);
 
   useEffect(() => {
-    if (!isFullscreen) return;
+    if (!isFullscreen || isTransitioning) return;
     revealChrome();
     return () => {
       if (chromeHideTimer.current !== undefined) clearTimeout(chromeHideTimer.current);
     };
-  }, [isFullscreen, revealChrome]);
+  }, [isFullscreen, isTransitioning, revealChrome]);
+
+  // Fallback: se o reduced-motion pular a animação (sem onLayoutAnimationComplete
+  // relevante) garante que o Embla ainda recalcule as dimensões do slide.
+  useEffect(() => {
+    if (!api || !reduceMotion) return;
+    const id = requestAnimationFrame(() => api.reInit());
+    return () => cancelAnimationFrame(id);
+  }, [api, isFullscreen, reduceMotion]);
 
   useEffect(() => {
     if (!isFullscreen || !onClose) return;
@@ -307,12 +366,12 @@ const CatalogPlayer = ({
   useEffect(() => () => stopProgress(), [stopProgress]);
 
   const onPointerDown = (e: ReactPointerEvent) => {
-    if (!onExpand || isFullscreen) return;
+    if (!onExpand || isFullscreen || isTransitioning) return;
     pointerStart.current = { x: e.clientX, y: e.clientY };
   };
 
   const onPointerUp = (e: ReactPointerEvent) => {
-    if (!onExpand || isFullscreen || !pointerStart.current) return;
+    if (!onExpand || isFullscreen || isTransitioning || !pointerStart.current) return;
     const dx = Math.abs(e.clientX - pointerStart.current.x);
     const dy = Math.abs(e.clientY - pointerStart.current.y);
     pointerStart.current = null;
@@ -349,7 +408,10 @@ const CatalogPlayer = ({
       aria-roledescription="carrossel"
       aria-label="Deslize para navegar. Toque para ver em tela cheia."
     >
-      <div
+      <motion.div
+        layout
+        transition={transition}
+        onLayoutAnimationComplete={handleLayoutAnimationComplete}
         className={cn(
           'zue-catalog-surface overflow-hidden overscroll-none bg-black',
           isFullscreen ? 'fixed inset-0 z-[100]' : 'absolute inset-0'
@@ -367,7 +429,7 @@ const CatalogPlayer = ({
           <div
             className={cn(
               'pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-start p-5 transition-opacity duration-300',
-              chromeVisible ? 'opacity-100' : 'opacity-0'
+              chromeVisible && !isTransitioning ? 'opacity-100' : 'opacity-0'
             )}
           >
             <button
@@ -378,7 +440,7 @@ const CatalogPlayer = ({
                 'pointer-events-auto flex size-11 items-center justify-center rounded-none',
                 'bg-black/40 text-white/90 backdrop-blur-sm transition-colors',
                 'hover:bg-black/55 hover:text-white',
-                !chromeVisible && 'pointer-events-none'
+                (!chromeVisible || isTransitioning) && 'pointer-events-none'
               )}
             >
               <ArrowLeft className="size-5" strokeWidth={1.25} />
@@ -390,7 +452,7 @@ const CatalogPlayer = ({
           <div
             className={cn(
               'pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between p-4 transition-opacity duration-500',
-              hintVisible ? 'opacity-100' : 'opacity-0'
+              hintVisible && !isTransitioning ? 'opacity-100' : 'opacity-0'
             )}
           >
             <p className="text-[10px] font-light tracking-[0.28em] text-white/70 uppercase">
@@ -414,18 +476,27 @@ const CatalogPlayer = ({
                 (selectedIndex === 0 && index === slides.length - 1) ||
                 (selectedIndex === slides.length - 1 && index === 0);
 
+              const eager = (canPlay && near) || isFullscreen;
+
               return (
                 <CarouselItem
                   key={slide.id}
                   className="relative h-full basis-full overflow-hidden pl-0"
                 >
                   {slide.type === 'image' ? (
-                    <MediaImage slide={slide} eager={(canPlay && near) || isFullscreen} />
+                    <MediaImage
+                      slide={slide}
+                      eager={eager}
+                      animateLayout={eager}
+                      transition={transition}
+                    />
                   ) : (
                     <MediaVideo
                       slide={slide}
                       active={index === selectedIndex}
-                      eager={(canPlay && near) || isFullscreen}
+                      eager={eager}
+                      animateLayout={eager}
+                      transition={transition}
                       videoRef={videoRef}
                     />
                   )}
@@ -435,7 +506,12 @@ const CatalogPlayer = ({
           </CarouselContent>
         </Carousel>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-opacity duration-300',
+            isTransitioning ? 'opacity-0' : 'opacity-100'
+          )}
+        >
           {activeSlide?.title ? (
             <p
               className={cn(
@@ -469,7 +545,7 @@ const CatalogPlayer = ({
             />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

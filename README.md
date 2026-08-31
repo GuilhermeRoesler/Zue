@@ -9,7 +9,7 @@ Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, 
 O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código):
 
 - **Início** — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE e looks em grade (toque leva ao catálogo); header em glassmorphism leve sobre o hero
-- **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen (autoplay nos visíveis + barra de progresso)
+- **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen com transição fluida (FLIP via `motion`, sem salto/stretch) (autoplay nos visíveis + barra de progresso)
 - **Sobre** — história, valores e políticas da loja
 - **Hibernação** — após 2 min sem toque (2 s em DEV), **exceto na Início**: composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
 - **Pasta de mídia** — pasta Drive sync; subpastas = coleções; ordenação nome/data; long-press na logo ZUE
@@ -45,6 +45,7 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[Lucide React](https://lucide.dev/)** — ícones
 - **[Capacitor 8](https://capacitorjs.com/)** — app Android a partir do build web
 - **[Lenis](https://github.com/darkroomengineering/lenis)** — smooth scroll (somente web)
+- **[motion](https://motion.dev/)** — transição fullscreen fluida do catálogo (FLIP via `layout`)
 - **ESLint** — qualidade de código
 - **Vitest** — testes unitários (`utils`, `app-update`, `media-types`, `motion`)
 - **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
@@ -274,7 +275,7 @@ public/
 - **Catálogo**: intro ZUE + carrosséis shadcn/embla (autoplay in-view, lazy, gestos) + expand fullscreen
 - **Pasta de mídia**: seletor discreto (long-press na logo no Header); Drive sync operacional
 - **Hibernação**: idle de 2 min (2 s em DEV), exceto na Início → wordmark tipográfico + tagline; wake retoma estado
-- **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
+- **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo); transição fullscreen do catálogo via `motion` (`layout` FLIP, sem stretch/salto)
 - **Design responsivo**: desktop, tablet e mobile
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação

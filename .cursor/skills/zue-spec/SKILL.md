@@ -58,7 +58,7 @@ Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web 
 | Build | Vite 5 (`base: './'` — obrigatório para o WebView) |
 | Estilo | Tailwind CSS **v4** (`@import "tailwindcss"` em `src/index.css`) |
 | Componentes | shadcn/ui — style `radix-nova`; carrossel: `embla-carousel-react` + `embla-carousel-autoplay` (`src/components/ui/carousel.tsx`) |
-| Motion (web) | **Lenis** smooth scroll; `CustomCursor`; `Reveal` / `TextReveal`; `src/lib/motion.ts` |
+| Motion (web) | **Lenis** smooth scroll; `CustomCursor`; `Reveal` / `TextReveal`; `src/lib/motion.ts`; **`motion`** (`motion/react`) — FLIP `layout` na transição fullscreen do catálogo |
 | Ícones | Lucide React |
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
@@ -118,7 +118,7 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `Hero` — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE, looks em grade (navega ao catálogo); sem valores Q/E/S
 - `About` — história, valores, políticas
 - `CatalogPage` — catálogo imersivo: coleções empilhadas (destaque + secundárias), estados loading/erro/vazio, expand fullscreen
-- `CatalogPlayer` — Embla embedded ou fullscreen (`fixed inset-0`); lazy; gestos; chrome auto-hide; índice + progresso
+- `CatalogPlayer` — Embla embedded ou fullscreen (`fixed inset-0`); transição fluida via `motion` (`layout` FLIP no container e na mídia ativa, mesma curva de easing, sem recálculo de crop `object-cover` durante a animação); lazy; gestos; chrome/hint/overlay só reaparecem após `onLayoutAnimationComplete`; Embla `reInit()` adiado até o layout assentar; índice + progresso
 - `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
 - `MediaFolderSheet` — UI discreta do gerente (pasta, ordenação nome/data, atualizar)
 - `CustomCursor` — cursor fino (somente web + pointer fine)
@@ -166,13 +166,14 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 ### Layout
 
-- Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh, demais ~58dvh); fullscreen instantâneo; barra de progresso; títulos acima da barra
+- Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh, demais ~58dvh); transição fullscreen fluida (FLIP via `motion`, ~560ms, easing sem bounce); barra de progresso; títulos acima da barra
 - Landing: hero full-bleed (imagem/vídeo da 1ª coleção) + grade de looks `aspect-3/4` da mídia real; hover `scale-105`; nav discreta ao catálogo
 - Seções com um propósito claro; copy curto e sofisticado (PT-BR)
 
 ### Motion
 
 - Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`, `animate-zue-hero-drift`, `animate-zue-hibernate-*`
+- Catálogo → fullscreen: `motion` (`motion/react`) com `layout` no container e na mídia ativa (mesma `transition`); FLIP mede o DOM real (sem `vw/vh` chutado), anima só `transform` (sem recálculo de crop `object-cover` por frame) e corrige distorção da imagem via projection aninhado; chrome/hint/título/progresso ficam ocultos durante a transição e só reaparecem em `onLayoutAnimationComplete` (nunca mudam antes da animação terminar); `useReducedMotion()` zera a duração
 - Web: Lenis (`useLenis`) desligado no expand fullscreen / hibernação / sheet / nativo / reduced-motion
 - Web: `CustomCursor` (mix-blend-difference); desligado em touch e nativo
 - Landing/Sobre/Catálogo: `Reveal` + stagger; catálogo também usa `useInView` para autoplay
