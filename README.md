@@ -49,8 +49,9 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[shadcn/ui](https://ui.shadcn.com/)** — componentes (`radix-nova`)
 - **[Lucide React](https://lucide.dev/)** — ícones
 - **[Capacitor 8](https://capacitorjs.com/)** — app Android a partir do build web
+- **[Lenis](https://github.com/darkroomengineering/lenis)** — smooth scroll (somente web)
 - **ESLint** — qualidade de código
-- **Vitest** — testes unitários (`utils`, `app-update`, `media-types`)
+- **Vitest** — testes unitários (`utils`, `app-update`, `media-types`, `motion`)
 - **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
 - **Capacitor plugins** — Filesystem, Preferences, File Picker (Capawesome), StatusBar, Keep Awake, App
 
@@ -211,17 +212,21 @@ src/
 │   ├── ui/               # Primitivos shadcn (incl. carousel)
 │   ├── About.tsx
 │   ├── CatalogCarousel.tsx
+│   ├── CustomCursor.tsx
 │   ├── Footer.tsx
 │   ├── Header.tsx
 │   ├── Hero.tsx
 │   ├── HibernateOverlay.tsx
 │   ├── MediaFolderSheet.tsx
+│   ├── Reveal.tsx
+│   ├── TextReveal.tsx
 │   └── UpdatePrompt.tsx
 ├── data/
 │   └── catalog-slides.ts
 ├── hooks/
 │   ├── use-catalog-slides.ts
-│   └── use-idle.ts
+│   ├── use-idle.ts
+│   └── use-lenis.ts
 ├── lib/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
 │   ├── app-update.test.ts # Vitest: compareSemver
@@ -231,6 +236,8 @@ src/
 │   ├── media-folder.ts   # Pick/restore pasta (web + Android)
 │   ├── media-types.ts    # Extensões → slides
 │   ├── media-types.test.ts
+│   ├── motion.ts         # Gates Lenis / cursor / reduced-motion
+│   ├── motion.test.ts
 │   ├── utils.ts          # cn() — clsx + tailwind-merge
 │   └── utils.test.ts     # Vitest: cn
 ├── App.tsx               # Navegação por seções (estado)
@@ -267,13 +274,13 @@ public/
 
 - **Catálogo imersivo**: carrossel shadcn/embla fullscreen com autoplay e barra de progresso
 - **Pasta de mídia**: seletor discreto (long-press na logo); Drive sync operacional
-- **Hibernação**: idle de 2 min → logo em fundo branco; wake retoma estado
+- **Hibernação**: idle de 2 min → logo com breathe; wake retoma estado
+- **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
 - **Design responsivo**: desktop, tablet e mobile
-- **Animações**: transições CSS em hover e menus; pulse sutil na hibernação
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
 
-Roadmap restante (Lenis, cursor custom, animações premium): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
+Plano de melhorias (histórico): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
 
 ## Design em resumo
 

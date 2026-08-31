@@ -59,12 +59,12 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 ### M5 — UX / motion premium (identidade Zue)
 
-- [ ] Popups/dialogs **fluidos, elegantes**, `rounded-none`, preto/branco — sem visual genérico
-- [ ] Web: **smooth scroll** estilo Lenis
-- [ ] Web: **custom cursor** (somente pointer fino; desligar em touch/tablet)
-- [ ] Animações: stagger, fade-in, efeitos de texto, hovers detalhados — **coerentes e impressionantes**, não barulhentos
-- [ ] Efeitos sutis: **wave** / **pulse** (respiração da logo na hibernação, por ex.)
-- [ ] Respeitar `prefers-reduced-motion`
+- [x] Popups/dialogs **fluidos, elegantes**, `rounded-none`, preto/branco
+- [x] Web: **smooth scroll** Lenis (`useLenis`)
+- [x] Web: **custom cursor** fino (desligado em touch/nativo)
+- [x] Animações: stagger (`Reveal`), texto (`TextReveal`), hovers na landing/sobre
+- [x] Efeitos sutis: wave no hero + breathe na hibernação
+- [x] Respeitar `prefers-reduced-motion`
 
 ### M6 — Pasta de mídia (gerente)
 
@@ -87,8 +87,8 @@ App
 
 | Superfície    | Landing | Catálogo carrossel | Hibernate | WhatsApp/CTA | Lenis + cursor |
 | ------------- | ------- | ------------------ | --------- | ------------ | -------------- |
-| Android kiosk | sim     | sim                | sim       | **não**      | não (touch)    |
-| Web           | sim     | sim                | sim       | **não**      | pendente       |
+| Android kiosk | sim     | sim                | sim       | **não**      | não (touch) |
+| Web           | sim     | sim                | sim       | **não**      | **sim**     |
 
 ---
 
@@ -120,12 +120,12 @@ App
 3. Instruções Drive no README
 4. API Drive nativa — adiada (pasta local sync suficiente)
 
-### Fase 4 — Polish web + motion
+### Fase 4 — Polish web + motion ✅
 
 1. Lenis + custom cursor (web only)
-2. Stagger / fade / texto / hovers na landing
-3. Popups fluidos no design system
-4. Wave/pulse sutis (hibernação + microinterações)
+2. Stagger / fade / texto / hovers na landing e sobre
+3. Dialogs/sheets fluidos (`rounded-none`, ~300ms)
+4. Wave/pulse (hero + hibernação)
 
 ---
 

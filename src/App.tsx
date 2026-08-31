@@ -7,10 +7,12 @@ import Footer from './components/Footer';
 import HibernateOverlay from './components/HibernateOverlay';
 import MediaFolderSheet from './components/MediaFolderSheet';
 import UpdatePrompt from './components/UpdatePrompt';
+import CustomCursor from './components/CustomCursor';
 import { isNativeApp } from './lib/kiosk';
 import { IDLE_TIMEOUT_MS } from './lib/idle-config';
 import { useIdle } from './hooks/use-idle';
 import { useCatalogSlides } from './hooks/use-catalog-slides';
+import { useLenis } from './hooks/use-lenis';
 import {
   type AvailableUpdate,
   scheduleUpdateCheck,
@@ -27,6 +29,8 @@ function App() {
   const catalog = useCatalogSlides();
 
   const isCatalog = currentSection === 'catalog';
+
+  useLenis(!isCatalog && !isHibernating && !mediaSheetOpen);
 
   useEffect(() => {
     if (!nativeApp) return;
@@ -48,6 +52,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
+      {!nativeApp && <CustomCursor />}
+
       {!isCatalog && (
         <>
           <Header currentSection={currentSection} onNavigate={setCurrentSection} />

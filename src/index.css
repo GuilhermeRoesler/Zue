@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -143,6 +144,75 @@
   }
 }
 
+@keyframes zue-breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.035);
+  }
+}
+
+@keyframes zue-wave {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.55;
+  }
+}
+
+@keyframes zue-line {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
+}
+
+.animate-zue-breathe {
+  animation: zue-breathe 4.5s ease-in-out infinite;
+}
+
+.animate-zue-wave {
+  animation: zue-wave 10s ease-in-out infinite;
+}
+
+.animate-zue-line {
+  animation: zue-line 1.2s ease-out 0.6s both;
+}
+
+html.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Cursor custom (web fine pointer) — esconde o nativo */
+html.zue-custom-cursor,
+html.zue-custom-cursor * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn,
+  .animate-zue-breathe,
+  .animate-zue-wave,
+  .animate-zue-line {
+    animation: none !important;
+  }
 }

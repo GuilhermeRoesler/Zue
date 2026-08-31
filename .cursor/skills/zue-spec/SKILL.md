@@ -68,6 +68,7 @@ Roadmap de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`.
 | Build | Vite 5 (`base: './'` — obrigatório para o WebView) |
 | Estilo | Tailwind CSS **v4** (`@import "tailwindcss"` em `src/index.css`) |
 | Componentes | shadcn/ui — style `radix-nova`; carrossel: `embla-carousel-react` + `embla-carousel-autoplay` (`src/components/ui/carousel.tsx`) |
+| Motion (web) | **Lenis** smooth scroll; `CustomCursor`; `Reveal` / `TextReveal`; `src/lib/motion.ts` |
 | Ícones | Lucide React |
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
@@ -75,7 +76,7 @@ Roadmap de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`.
 | Filesystem / pasta | `@capacitor/filesystem`, `@capacitor/preferences`, `@capawesome/capacitor-file-picker` |
 | App info | `@capacitor/app` (versão nativa para checagem de update) |
 | Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
-| Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts` |
+| Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts`, `motion.test.ts` |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
 ### Scripts npm
@@ -126,8 +127,10 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
 - `CatalogCarousel` — carrossel fullscreen shadcn + autoplay + barra de progresso; long-press na logo abre pasta
-- `HibernateOverlay` — tela de hibernação
+- `HibernateOverlay` — tela de hibernação (logo com breathe + rings)
 - `MediaFolderSheet` — UI discreta do gerente (selecionar / atualizar pasta)
+- `CustomCursor` — cursor fino (somente web + pointer fine)
+- `Reveal` / `TextReveal` — fade/stagger e revelação de texto
 - `Footer` — marca e navegação
 - `UpdatePrompt` — diálogo de nova versão (somente app Android)
 
@@ -172,8 +175,13 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 ### Motion
 
-- Transições CSS (`duration-300` / `500`); classe `animate-fadeIn` disponível
-- Preferir motion discreto (hover, sheet) — não sobrecarregar a vitrine do tablet
+- Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`
+- Web: Lenis (`useLenis`) desligado no catálogo / hibernação / nativo / reduced-motion
+- Web: `CustomCursor` (mix-blend-difference); desligado em touch e nativo
+- Landing/Sobre: `Reveal` + `TextReveal` com stagger
+- Dialog/Sheet: `rounded-none`, duração ~300ms, fade + slide suave
+- Preferir motion discreto — não sobrecarregar a vitrine do tablet
+- Sempre respeitar `prefers-reduced-motion`
 
 ---
 
@@ -251,8 +259,11 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/components/CatalogCarousel.tsx` — player fullscreen
 - `src/data/catalog-slides.ts` — manifesto de slides demo
 - `src/lib/media-folder.ts` / `media-types.ts` / `media-types.test.ts` — pasta de mídia
+- `src/lib/motion.ts` / `motion.test.ts` — gates Lenis/cursor/reduced-motion
 - `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta)
+- `src/hooks/use-lenis.ts` — smooth scroll web
 - `src/components/MediaFolderSheet.tsx` — UI do gerente
+- `src/components/CustomCursor.tsx` / `Reveal.tsx` / `TextReveal.tsx` — polish web
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
 - `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin`
