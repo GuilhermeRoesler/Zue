@@ -9,10 +9,10 @@ Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, 
 O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código):
 
 - **Início** — landing com hero, lançamentos e valores da marca
-- **Catálogo** — página com carrosséis empilhados (margens alinhadas); clique expande fullscreen com animação (autoplay contínuo + barra de progresso)
+- **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen (autoplay nos visíveis + barra de progresso)
 - **Sobre** — história, valores e políticas da loja
 - **Hibernação** — após 2 min sem toque (2 s em DEV): composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
-- **Pasta de mídia** — gerente escolhe uma pasta (ex.: Drive sincronizado) que alimenta o catálogo
+- **Pasta de mídia** — pasta Drive sync; subpastas = coleções; ordenação nome/data; long-press na logo ZUE
 
 Sem checkout, WhatsApp ou CTAs de conversão.
 
@@ -78,7 +78,7 @@ Comportamento no tablet:
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
 - Hibernação após 2 min sem interação (2 s em DEV; wordmark ZUE + tagline)
-- Catálogo em página com carrosséis; expand fullscreen (foto 5 s; vídeo = duração do arquivo)
+- Catálogo em página imersiva com carrosséis (destaque + secundários); expand fullscreen (foto 5 s; vídeo = duração + poster)
 - Pasta de mídia selecionável (long-press na logo ZUE no Header, seção catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
 
@@ -87,14 +87,16 @@ Comportamento no tablet:
 O catálogo pode usar arquivos reais da loja em vez dos slides de demonstração.
 
 1. No Google Drive, crie uma pasta (ex.: `Zue Vitrine`) e coloque fotos/vídeos nela
-2. No tablet (ou PC), sincronize essa pasta com o app **Google Drive** (disponível offline / pasta espelhada)
-3. Abra o catálogo na Zue e **pressione a logo ZUE por ~1 segundo**
-4. Em **Mídia da vitrine** → **Selecionar pasta** e escolha a pasta sincronizada
-5. Novos arquivos: envie pelo Drive de qualquer dispositivo; no tablet use **Atualizar pasta** (mesmo long-press)
+2. **Opcional:** crie **subpastas** (ex.: `Primavera`, `Editorial`) — cada uma vira uma coleção no app; arquivos na raiz formam a coleção com o nome da pasta
+3. No tablet (ou PC), sincronize essa pasta com o app **Google Drive** (disponível offline / pasta espelhada)
+4. Abra o catálogo na Zue e **pressione a logo ZUE por ~1 segundo**
+5. Em **Mídia da vitrine** → **Selecionar pasta** e escolha a pasta sincronizada
+6. Novos arquivos: envie pelo Drive de qualquer dispositivo; no tablet use **Atualizar pasta** (mesmo long-press)
+7. **Ordenação:** no sheet, escolha Nome ou Data (preferência salva no dispositivo)
 
-Formatos: `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc. Ordem = nome do arquivo (numérico).
+Formatos: `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc.
 
-Web: Chrome/Edge com File System Access API. Android: seletor nativo (SAF) via Capawesome.
+Web: Chrome/Edge com File System Access API (blobs sob demanda). Android: seletor nativo (SAF) via Capawesome.
 
 ```bash
 npm run cap:sync      # build web + sync no projeto android/
@@ -267,7 +269,7 @@ public/
 
 ## Funcionalidades
 
-- **Catálogo**: página com carrosséis shadcn/embla + expand fullscreen animado (autoplay contínuo, barra de progresso, seta voltar)
+- **Catálogo**: intro ZUE + carrosséis shadcn/embla (autoplay in-view, lazy, gestos) + expand fullscreen
 - **Pasta de mídia**: seletor discreto (long-press na logo no Header); Drive sync operacional
 - **Hibernação**: idle de 2 min (2 s em DEV) → wordmark tipográfico + tagline; wake retoma estado
 - **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
@@ -279,7 +281,7 @@ public/
 
 - Tipografia: Playfair Display (títulos) + Inter light (corpo)
 - Paleta: preto, branco e cinzas; cantos retos (`rounded-none`)
-- Scrollbar fina e angular (preto/cinza), alinhada ao restante da UI
+- Sem scrollbar visível (scroll por Lenis/toque)
 - Imagens de produto: URLs Pexels (aspecto ~3/4)
 
 Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).

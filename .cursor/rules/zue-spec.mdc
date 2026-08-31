@@ -17,9 +17,9 @@ alwaysApply: true
 - **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
 - **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
-- **Landing** (início + sobre) + **catálogo** como página com carrosséis empilhados; clique expande **fullscreen** (foto/vídeo, autoplay nos dois modos).
-- **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; carrosséis **seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
-- **Pasta de mídia**: gerente seleciona pasta (Drive sync) que alimenta o catálogo; long-press na logo ZUE no Header (seção catálogo).
+- **Landing** (início + sobre) + **catálogo** imersivo com carrosséis empilhados (1ª coleção em destaque); clique/toque expande **fullscreen**; deslize navega slides.
+- **Hibernação** após **2 min** sem interação (em DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; carrosséis **visíveis seguem rodando** por baixo; ao toque o overlay some sem reiniciar.
+- **Pasta de mídia**: gerente seleciona pasta (Drive sync); **subpastas = coleções**; ordenação nome/data; long-press na logo ZUE no Header (seção catálogo).
 
 ## Stack
 
@@ -39,13 +39,13 @@ alwaysApply: true
 - Tipografia: **Playfair Display** (títulos) + **Inter** light (corpo)
 - Paleta: preto / branco / cinzas; `rounded-none` nos elementos da marca
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
-- Catálogo: página com carrosséis (~70dvh, margens alinhadas); fullscreen com animação; seta voltar (chrome auto-hide); barra fina de progresso; autoplay contínuo (também sob hibernação)
-- Scrollbar: fina, angular, preto/cinza (`src/index.css`)
-- Web: Lenis + cursor custom; stagger/reveal na landing; respeitar `prefers-reduced-motion`
+- Catálogo: intro de marca + carrosséis; expand fullscreen instantâneo; índice; progresso; chrome auto-hide
+- Sem scrollbar visível (scroll por Lenis/toque)
+- Web: Lenis + cursor custom; stagger/reveal na landing e catálogo; respeitar `prefers-reduced-motion`
 
 ## Ao alterar código
 
 - Preservar o design system existente; preferir componentes em `src/components/ui/`
 - UX de tablet/kiosk: fullscreen, tela ligada, idle/hibernate, UI de sistema oculta (ver skill `zue-spec`)
 - Após mudanças de UI do app: `npm run cap:sync` antes do APK
-- Para o guia completo, usar a skill **zue-spec**
+- Para o guia completo, usar a skill **zue-spec**; para roadmap, **zue-melhorias**

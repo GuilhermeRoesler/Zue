@@ -43,7 +43,7 @@ Não inventar features nas specs: só documentar o que o repo realmente tem.
 A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital** — pensada como **app default de um tablet na loja**, ligado o dia inteiro, com o mesmo build na web.
 
 1. **Landing** — início (`Hero`) e sobre (`About`): marca, lançamentos, valores.
-2. **Catálogo** — página com carrosséis empilhados (`CatalogPage` + `CatalogPlayer`); clique expande fullscreen.
+2. **Catálogo** — página imersiva com carrosséis empilhados (`CatalogPage` + `CatalogPlayer`); 1ª coleção em destaque; toque expande fullscreen; deslize navega.
 3. **Hibernação** — após **2 min** sem interação (DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; toque retoma o estado anterior.
 
 Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
@@ -109,17 +109,17 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - Constantes: `src/lib/idle-config.ts` (`IDLE_TIMEOUT_MS` = 2 min em produção / **2 s em DEV**, `IMAGE_SLIDE_MS` = 5 s)
 - Hook: `src/hooks/use-idle.ts` — eventos globais de atividade
 - Overlay: `src/components/HibernateOverlay.tsx` — fundo off-white, wordmark tipográfico ZUE, tagline, cantos de galeria e aura suave
-- Ao hibernar: overlay cobre a UI; **carrosséis continuam rodando** por baixo (ao acordar não reiniciam)
+- Ao hibernar: overlay cobre a UI; **carrosséis visíveis continuam rodando** por baixo (ao acordar não reiniciam)
 
 ### Componentes de domínio (`src/components/`)
 
 - `Header` — nav (Início, Catálogo, Sobre) + sheet mobile; long-press na logo no catálogo abre pasta
 - `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
-- `CatalogPage` — página do catálogo: coleções empilhadas + morph fullscreen (mesmo player)
-- `CatalogPlayer` — player Embla (embedded ~70dvh ou fullscreen) + autoplay contínuo + barra de progresso; drag/swipe nativo do Embla; seta voltar com chrome auto-hide; animação enter/exit
+- `CatalogPage` — catálogo imersivo: coleções empilhadas (destaque + secundárias), estados loading/erro/vazio, expand fullscreen
+- `CatalogPlayer` — Embla embedded ou fullscreen (`fixed inset-0`); lazy; gestos; chrome auto-hide; índice + progresso
 - `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
-- `MediaFolderSheet` — UI discreta do gerente (selecionar / atualizar pasta)
+- `MediaFolderSheet` — UI discreta do gerente (pasta, ordenação nome/data, atualizar)
 - `CustomCursor` — cursor fino (somente web + pointer fine)
 - `Reveal` / `TextReveal` — fade/stagger e revelação de texto
 - `Footer` — marca e navegação
@@ -129,13 +129,16 @@ UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 
 ### Fonte de mídia (pasta)
 
-- Libs: `src/lib/media-folder.ts` (pick/restore/clear), `src/lib/media-types.ts` (extensões → slides)
-- Hook: `src/hooks/use-catalog-slides.ts` — pasta salva ou fallback demo; expõe `collections` + `slides`
-- **Web**: File System Access API (`showDirectoryPicker`) + IndexedDB para o handle
+- Libs: `src/lib/media-folder.ts` (pick/restore/clear + sort), `src/lib/media-types.ts` (extensões → slides/coleções), `src/lib/media-blob-cache.ts` (blob URLs lazy na web)
+- Hook: `src/hooks/use-catalog-slides.ts` — pasta salva ou fallback demo; expõe `collections` + `slides` + `sort`
+- **Web**: File System Access API (`showDirectoryPicker`) + IndexedDB para o handle; blobs sob demanda
 - **Android**: `@capawesome/capacitor-file-picker` `pickDirectory` + `Filesystem.readdir` + path em Preferences
+- **Árvore**: arquivos na raiz → coleção com o nome da pasta; **cada subpasta (1 nível)** → coleção própria
+- Ordenação persistida: **nome** (default) ou **data** (`Preferences` `zue.mediaSort`)
 - Extensões: jpg/jpeg/png/webp/gif/bmp/heic + mp4/webm/mov/m4v/mkv
+- Metadados: `alt`/`title` derivados do nome do arquivo
 - Acesso gerente: **pressionar logo ZUE ~1 s** no Header (seção catálogo) → sheet “Mídia da vitrine”
-- Sem pasta vinculada: coleções demo em `src/data/catalog-slides.ts` (`CATALOG_COLLECTIONS`); com pasta: uma coleção “Vitrine”
+- Sem pasta vinculada: coleções demo em `src/data/catalog-slides.ts` (`CATALOG_COLLECTIONS`)
 
 ---
 
@@ -156,21 +159,21 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 - CTAs de navegação discretos (nav, logo); sem botões de conversão
 - **`rounded-none`** em botões, cards e inputs da marca
 - `--radius: 0` no tema CSS — coerente com a estética angular
-- Scrollbar custom: fina (5px), angular, thumb preto translúcido (`src/index.css` — Firefox `scrollbar-*` + WebKit)
+- Sem scrollbar visível (`scrollbar-width: none` em `src/index.css`); scroll por Lenis/toque permanece
 - Sem purple gradients, glows ou visual genérico de template
 
 ### Layout
 
-- Catálogo: página com carrosséis embutidos (margens `max-w-7xl`); fullscreen sob demanda com fade/scale; barra fina de progresso na base do slide ativo
+- Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh, demais ~58dvh); fullscreen instantâneo; barra de progresso; títulos acima da barra
 - Landing: grid de lançamentos `aspect-[3/4]`, hover `scale-105`
 - Seções com um propósito claro; copy curto e sofisticado (PT-BR)
 
 ### Motion
 
-- Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`, `animate-zue-hibernate-*`, `animate-zue-catalog-enter` / `exit`
+- Transições CSS (`duration-300` / `500` / `700`); `animate-fadeIn`, `animate-zue-breathe`, `animate-zue-wave`, `animate-zue-line`, `animate-zue-hibernate-*`
 - Web: Lenis (`useLenis`) desligado no expand fullscreen / hibernação / sheet / nativo / reduced-motion
 - Web: `CustomCursor` (mix-blend-difference); desligado em touch e nativo
-- Landing/Sobre: `Reveal` + `TextReveal` com stagger
+- Landing/Sobre/Catálogo: `Reveal` + stagger; catálogo também usa `useInView` para autoplay
 - Dialog/Sheet: `rounded-none`, duração ~300ms, fade + slide suave
 - Preferir motion discreto — não sobrecarregar a vitrine do tablet
 - Sempre respeitar `prefers-reduced-motion`
@@ -248,14 +251,15 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/lib/idle-config.ts` — timeouts idle e slide de imagem
 - `src/hooks/use-idle.ts` — detecção de inatividade
 - `src/components/HibernateOverlay.tsx` — overlay de hibernação
-- `src/components/CatalogPage.tsx` — página do catálogo (coleções + expand)
-- `src/components/CatalogPlayer.tsx` — player embedded / fullscreen
+- `src/components/CatalogPage.tsx` — catálogo imersivo (coleções + expand + estados)
+- `src/components/CatalogPlayer.tsx` — player embedded / fullscreen (lazy, in-view autoplay)
 - `src/data/catalog-slides.ts` — manifesto de slides e coleções demo
-- `src/lib/media-folder.ts` / `media-types.ts` / `media-types.test.ts` — pasta de mídia
+- `src/lib/media-folder.ts` / `media-types.ts` / `media-blob-cache.ts` / `media-types.test.ts` — pasta de mídia
 - `src/lib/motion.ts` / `motion.test.ts` — gates Lenis/cursor/reduced-motion
-- `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta; `collections`)
+- `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta; `collections` + `sort`)
+- `src/hooks/use-in-view.ts` — IntersectionObserver para autoplay/lazy
 - `src/hooks/use-lenis.ts` — smooth scroll web
-- `src/components/MediaFolderSheet.tsx` — UI do gerente
+- `src/components/MediaFolderSheet.tsx` — UI do gerente (pasta + ordenação)
 - `src/components/CustomCursor.tsx` / `Reveal.tsx` / `TextReveal.tsx` — polish web
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
@@ -278,8 +282,8 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 
 - Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
 - Hibernação após 2 min idle (2 s em DEV); wake retoma estado
-- Catálogo: página com carrosséis (sempre em autoplay, inclusive sob hibernação); expand fullscreen; foto 5 s; vídeo = duração do arquivo (mute)
-- Pasta de mídia via long-press na logo do Header; fallback demo se não houver pasta
+- Catálogo: carrosséis com autoplay nos **visíveis** (também sob hibernação); expand fullscreen; foto 5 s; vídeo = duração (mute + poster); deslize/toque
+- Pasta: long-press na logo; subpastas → coleções; ordenação nome/data; fallback demo
 - Touch targets generosos; validar em resolução de tablet
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 - Update prompt discreto; download em background thread nativo
@@ -304,7 +308,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 - [ ] Visual alinhado (tipografia, preto/branco, `rounded-none`)
 - [ ] Responsivo mobile + tablet
 - [ ] Sem WhatsApp/CTAs de conversão (web = app)
-- [ ] Hibernação e carrossel pausam corretamente no idle
+- [ ] Hibernação: overlay some ao acordar; carrosséis visíveis não reiniciam
 - [ ] `npm run ci` (ou lint / typecheck / test / build) sem regressão
 - [ ] Se tocar em UI ou Capacitor: `npm run cap:sync` e fullscreen/kiosk preservados
 - [ ] **Specs vivas:** rule + skill + README alinhados ao código

@@ -7,7 +7,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import type { MediaSourceKind } from '@/lib/media-folder';
+import type { MediaSort, MediaSourceKind } from '@/lib/media-folder';
+import { cn } from '@/lib/utils';
 
 interface MediaFolderSheetProps {
   open: boolean;
@@ -15,11 +16,14 @@ interface MediaFolderSheetProps {
   source: MediaSourceKind;
   folderLabel: string | null;
   slideCount: number;
+  collectionCount: number;
+  sort: MediaSort;
   loading: boolean;
   error: string | null;
   onPickFolder: () => void;
   onUseDemo: () => void;
   onRefresh: () => void;
+  onSortChange: (sort: MediaSort) => void;
 }
 
 const MediaFolderSheet = ({
@@ -28,11 +32,14 @@ const MediaFolderSheet = ({
   source,
   folderLabel,
   slideCount,
+  collectionCount,
+  sort,
   loading,
   error,
   onPickFolder,
   onUseDemo,
   onRefresh,
+  onSortChange,
 }: MediaFolderSheetProps) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -49,8 +56,8 @@ const MediaFolderSheet = ({
             Mídia da vitrine
           </SheetTitle>
           <SheetDescription className="font-light text-gray-600">
-            Selecione a pasta sincronizada do Google Drive (imagens e vídeos).
-            Acesso discreto: pressione a logo ZUE por 1 segundo.
+            Pasta sincronizada do Drive: arquivos na raiz e subpastas viram
+            coleções. Acesso: pressione a logo ZUE por 1 segundo.
           </SheetDescription>
         </SheetHeader>
 
@@ -68,7 +75,39 @@ const MediaFolderSheet = ({
               </p>
               <p className="text-xs font-light text-gray-500">
                 {slideCount} {slideCount === 1 ? 'arquivo' : 'arquivos'}
+                {collectionCount > 0
+                  ? ` · ${collectionCount} ${collectionCount === 1 ? 'coleção' : 'coleções'}`
+                  : null}
               </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[10px] font-light tracking-[0.28em] text-gray-500 uppercase">
+              Ordenação
+            </p>
+            <div className="flex border border-gray-200">
+              {(
+                [
+                  { id: 'name', label: 'Nome' },
+                  { id: 'date', label: 'Data' },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  disabled={loading}
+                  onClick={() => onSortChange(option.id)}
+                  className={cn(
+                    'flex-1 px-4 py-3 text-xs font-light tracking-[0.2em] uppercase transition-colors',
+                    sort === option.id
+                      ? 'bg-black text-white'
+                      : 'bg-white text-gray-600 hover:text-black'
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
 

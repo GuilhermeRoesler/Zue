@@ -17,6 +17,7 @@ import {
   type AvailableUpdate,
   scheduleUpdateCheck,
 } from './lib/app-update';
+import { cn } from './lib/utils';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
@@ -36,17 +37,10 @@ function App() {
   useEffect(() => {
     if (!catalogFullscreen) return;
     const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlOverflow = html.style.overflow;
-    const prevBodyOverflow = body.style.overflow;
-    const prevHtmlOverscroll = html.style.overscrollBehavior;
+    const prev = html.style.overflow;
     html.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-    html.style.overscrollBehavior = 'none';
     return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevBodyOverflow;
-      html.style.overscrollBehavior = prevHtmlOverscroll;
+      html.style.overflow = prev;
     };
   }, [catalogFullscreen]);
 
@@ -73,8 +67,11 @@ function App() {
         return (
           <CatalogPage
             collections={catalog.collections}
+            loading={catalog.loading}
+            error={catalog.error}
             paused={mediaSheetOpen}
             onExpandChange={handleCatalogExpandChange}
+            onOpenMediaFolder={() => setMediaSheetOpen(true)}
           />
         );
       default:
@@ -86,7 +83,11 @@ function App() {
     <div className="min-h-screen bg-background">
       {!nativeApp && <CustomCursor />}
 
-      {!catalogFullscreen && (
+      {/* Header/Footer ficam montados; só desliga interação no expand */}
+      <div
+        className={cn(catalogFullscreen && 'pointer-events-none')}
+        aria-hidden={catalogFullscreen || undefined}
+      >
         <Header
           currentSection={currentSection}
           onNavigate={setCurrentSection}
@@ -94,13 +95,16 @@ function App() {
             isCatalog ? () => setMediaSheetOpen(true) : undefined
           }
         />
-      )}
+      </div>
 
-      <main className={catalogFullscreen ? 'contents' : undefined}>
-        {renderCurrentSection()}
-      </main>
+      <main>{renderCurrentSection()}</main>
 
-      {!catalogFullscreen && <Footer onNavigate={setCurrentSection} />}
+      <div
+        className={cn(catalogFullscreen && 'pointer-events-none')}
+        aria-hidden={catalogFullscreen || undefined}
+      >
+        <Footer onNavigate={setCurrentSection} />
+      </div>
 
       <MediaFolderSheet
         open={mediaSheetOpen}
@@ -108,6 +112,8 @@ function App() {
         source={catalog.source}
         folderLabel={catalog.folderLabel}
         slideCount={catalog.slides.length}
+        collectionCount={catalog.collections.length}
+        sort={catalog.sort}
         loading={catalog.loading}
         error={catalog.error}
         onPickFolder={() => {
@@ -118,6 +124,9 @@ function App() {
         }}
         onRefresh={() => {
           void catalog.refresh();
+        }}
+        onSortChange={(next) => {
+          void catalog.setSort(next);
         }}
       />
 

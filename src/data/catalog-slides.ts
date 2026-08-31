@@ -73,10 +73,3 @@ export const CATALOG_COLLECTIONS: CatalogCollection[] = [
     slides: [CATALOG_SLIDES[3], CATALOG_SLIDES[4], CATALOG_SLIDES[5]],
   },
 ];
-
-/** Agrupa slides planos numa única coleção (pasta vinculada). */
-export function slidesToVitrineCollection(
-  slides: CatalogSlide[]
-): CatalogCollection[] {
-  return [{ id: 'vitrine', title: 'Vitrine', slides }];
-}
