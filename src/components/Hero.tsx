@@ -1,17 +1,10 @@
-import { ArrowRight, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
-interface HeroProps {
-  onNavigate: (section: string) => void;
-}
 
 const launchImages = [
   'https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -37,18 +30,20 @@ const brandValues = [
   },
 ];
 
-const Hero = ({ onNavigate }: HeroProps) => {
-  const handleWhatsAppClick = () => {
-    const message = encodeURIComponent('Olá! Gostaria de conhecer a nova coleção da Zue.');
-    window.open(`https://wa.me/5551989354834?text=${message}`, '_blank');
-  };
-
+const Hero = () => {
   return (
     <div className="bg-white">
       <section className="relative flex h-screen items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-gray-50 to-white" />
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+          <p
+            className="mb-8 text-sm font-light tracking-[0.4em] text-gray-500 uppercase"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          >
+            Zue
+          </p>
+
           <h1
             className="mb-6 text-5xl font-light tracking-wide text-black md:text-7xl"
             style={{ fontFamily: 'Playfair Display, serif' }}
@@ -58,29 +53,9 @@ const Hero = ({ onNavigate }: HeroProps) => {
             <span className="italic font-normal">Atemporal</span>
           </h1>
 
-          <p className="mx-auto mb-12 max-w-2xl text-lg font-light leading-relaxed text-gray-600 md:text-xl">
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-gray-600 md:text-xl">
             Descubra peças exclusivas que celebram a feminilidade moderna com sofisticação e estilo únicos.
           </p>
-
-          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
-            <Button
-              onClick={handleWhatsAppClick}
-              className="h-auto gap-3 rounded-none bg-black px-8 py-4 font-light tracking-wide text-white hover:scale-105 hover:bg-gray-800"
-            >
-              <MessageCircle className="size-5" />
-              Conheça Nossa Coleção
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => onNavigate('catalog')}
-              className="h-auto gap-3 rounded-none border-black bg-transparent px-8 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
-            >
-              Ver Catálogo
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
-            </Button>
-          </div>
         </div>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 transform">
@@ -106,7 +81,7 @@ const Hero = ({ onNavigate }: HeroProps) => {
             {launchImages.map((image, index) => (
               <Card
                 key={image}
-                className="group cursor-pointer gap-0 rounded-none bg-transparent py-0 ring-0"
+                className="group gap-0 rounded-none bg-transparent py-0 ring-0"
               >
                 <div className="mb-6 aspect-[3/4] overflow-hidden bg-gray-200">
                   <img
@@ -123,15 +98,6 @@ const Hero = ({ onNavigate }: HeroProps) => {
                     Coleção Primavera/Verão 2025
                   </CardDescription>
                 </CardHeader>
-                <CardFooter className="justify-center rounded-none border-0 bg-transparent px-0 pt-4">
-                  <Button
-                    variant="ghost"
-                    onClick={handleWhatsAppClick}
-                    className="h-auto rounded-none border-b border-transparent px-0 font-light tracking-wide text-sm text-black hover:border-black hover:bg-transparent"
-                  >
-                    Consultar Disponibilidade
-                  </Button>
-                </CardFooter>
               </Card>
             ))}
           </div>

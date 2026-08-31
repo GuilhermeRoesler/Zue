@@ -22,7 +22,7 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Tablet = superfície principal | UX touch-first, fullscreen, idle/hibernate, pouca ou nenhuma ação “de site”                                      |
 | Sem CTA de venda              | Remover (ou ocultar no nativo) CTAs de “consultar”, “falar conosco”, etc.                                        |
-| Sem WhatsApp                  | Remover FAB, botões e mensagens `wa.me` do fluxo kiosk; web pode divergir só se o produto decidir explicitamente |
+| Sem WhatsApp                  | Removido em web e app — vitrine sem conversão online                              |
 | Conteúdo = mídia da loja      | Fotos e vídeos reais da pasta gerenciada pelo gerente; não stock genérico                                        |
 
 **Web** continua existindo (landing + polish), mas o desenho de produto prioriza o **modo loja**.
@@ -33,29 +33,29 @@ O app é o **launcher default de um tablet na loja**, ligado o dia inteiro. A ex
 
 ### M1 — Modo loja sem conversão
 
-- [ ] No app nativo: **zero** WhatsApp, newsletter popup e CTAs de contato/consulta
-- [ ] Navegação clara: **Landing** (marca / atmosfera) × **Catálogo** (carrosséis de mídia)
-- [ ] Header sem chrome falso (Search / User / Bag inativos)
+- [x] Web e app: **zero** WhatsApp, newsletter e CTAs de contato/consulta
+- [x] Navegação clara: **Landing** (marca / atmosfera) × **Catálogo** (carrosséis de mídia)
+- [x] Header sem chrome falso (Search / User / Bag inativos)
 
 ### M2 — Hibernação (idle)
 
-- [ ] Timeout sem interação: **2 ou 5 min** (decidir e fixar constante; default sugerido: **3 min** até validar na loja)
-- [ ] Ao idle: entrar em **tela 100% branca** com **logo Zue centralizada**
-- [ ] Ativar **economia de bateria** / reduzir trabalho (parar carrosséis, vídeos, animações pesadas; dim / keep-awake policy alinhada — ver decisões abertas)
-- [ ] Qualquer toque/gesto: sair da hibernação e voltar ao estado útil (landing ou último catálogo — decidir)
+- [x] Timeout sem interação: **2 min** (`IDLE_TIMEOUT_MS` em `src/lib/idle-config.ts`)
+- [x] Ao idle: **tela 100% branca** com **logo Zue centralizada** (tela ligada)
+- [x] Parar carrosséis, vídeos e animações pesadas ao hibernar
+- [x] Qualquer toque/gesto: sair da hibernação e **retomar de onde parou**
 
 ### M3 — Catálogo em carrosséis fullscreen
 
-- [ ] Catálogo = lista de carrosséis (coleções / pastas / temas), não só grid de cards
-- [ ] Player: **fullscreen**, barra **fina na base** (progresso / posição / título discreto)
-- [ ] Auto-avanço: **foto ≈ 5s**; **vídeo = duração do vídeo**
-- [ ] Avanço automático para o **próximo item da lista**; fim da lista → loop ou próximo carrossel (decidir)
-- [ ] Gestos: swipe / tap zones para anterior/próximo; barra não compete com a mídia
+- [ ] Catálogo = lista de carrosséis (coleções / pastas / temas), não só um player
+- [x] Player: **fullscreen**, barra **fina na base** (progresso do slide ativo)
+- [x] Auto-avanço: **foto ≈ 5s** (embla autoplay); **vídeo = duração do vídeo**
+- [x] Fim da lista → loop (`opts.loop`)
+- [ ] Gestos: swipe explícito documentado (embla já suporta drag)
 
 ### M4 — Landing refinada
 
-- [ ] Landing = composição de marca (hero, atmosfera), **sem** pressão de CTA WhatsApp no nativo
-- [ ] Pode manter narrativa curta; entrada óbvia para o catálogo (toque, não “compre agora”)
+- [x] Landing = composição de marca (hero, atmosfera), **sem** CTAs de conversão
+- [x] Entrada para o catálogo via navegação (header), não botão “compre agora”
 
 ### M5 — UX / motion premium (identidade Zue)
 
@@ -85,33 +85,33 @@ App
 └── MediaSource      → pasta local (Drive sync) → manifesto de slides
 ```
 
-| Superfície    | Landing | Catálogo carrossel     | Hibernate | WhatsApp/CTA | Lenis + cursor |
-| ------------- | ------- | ---------------------- | --------- | ------------ | -------------- |
-| Android kiosk | sim     | sim                    | sim       | **não**      | não (touch)    |
-| Web           | sim     | sim (se fizer sentido) | opcional  | decidir      | **sim**        |
+| Superfície    | Landing | Catálogo carrossel | Hibernate | WhatsApp/CTA | Lenis + cursor |
+| ------------- | ------- | ------------------ | --------- | ------------ | -------------- |
+| Android kiosk | sim     | sim                | sim       | **não**      | não (touch)    |
+| Web           | sim     | sim                | sim       | **não**      | pendente       |
 
 ---
 
 ## Roadmap sugerido
 
-### Fase 0 — Alinhamento (sem código grande)
+### Fase 0 — Alinhamento ✅
 
-1. Fixar timeout idle (2 / 3 / 5 min)
-2. Fixar política keep-awake vs economia na hibernação
-3. Fixar escopo web: sem WhatsApp também, ou só no nativo?
-4. Prototipar 1 carrossel fullscreen + barra inferior (UI estática)
+1. Timeout idle: **2 min**
+2. Hibernação: tela ligada, branco + logo
+3. Web = app: sem WhatsApp / CTA
+4. Wake: retoma estado (seção + slide do carrossel)
 
-### Fase 1 — Modo loja limpo
+### Fase 1 — Modo loja limpo ✅
 
-1. Remover WhatsApp / newsletter / CTAs no nativo (e limpar header morto)
-2. Separar rotas/seções: `landing` | `catalog`
-3. Idle → hibernate branco + logo (+ pulse sutil)
+1. Removidos WhatsApp / newsletter / CTAs
+2. Seções: `home` | `catalog` | `about`
+3. Idle → `HibernateOverlay` com pulse sutil
 
-### Fase 2 — Player de catálogo
+### Fase 2 — Player de catálogo ✅ (v1)
 
-1. Modelo de dados: `Carousel` → `Slide[]` (`image` | `video`, duração)
-2. Player fullscreen + barra base + auto-advance
-3. Gestos e loop; pausar tudo ao hibernar
+1. `src/data/catalog-slides.ts` + `CatalogCarousel.tsx`
+2. shadcn carousel + embla autoplay + barra de progresso
+3. Pausa ao hibernar; vídeo mute + duração nativa
 
 ### Fase 3 — Fonte de mídia
 
@@ -131,14 +131,14 @@ App
 
 ## Decisões abertas (não assumir no código sem confirmar)
 
-| Tema                   | Opções                                   | Nota                                                                    |
-| ---------------------- | ---------------------------------------- | ----------------------------------------------------------------------- |
-| Timeout idle           | 2 / 3 / 5 min                            | Validar na loja; constante única                                        |
-| Hibernação × KeepAwake | Manter tela ligada dim vs permitir sleep | “Economia” vs vitrine sempre acesa — conflito típico de kiosk           |
-| Pós-hibernate          | Voltar à landing vs retomar carrossel    | Landing é mais seguro para “atrair”                                     |
-| WhatsApp na web        | Remover total vs só nativo               | Produto pediu sem WhatsApp no modo loja; web TBD                        |
-| Drive                  | Pasta local sync vs Google Drive API     | Preferir **pasta local + Drive app** no tablet (simples para o gerente) |
-| Vídeos                 | Mute sempre? Loop do slide?              | Kiosk: mute on; sem UI de volume chamativa                              |
+| Tema                   | Decisão                                  |
+| ---------------------- | ---------------------------------------- |
+| Timeout idle           | **2 min** (`idle-config.ts`)             |
+| Hibernação             | Tela ligada; overlay branco + logo       |
+| Pós-hibernate          | **Retoma** seção e slide do carrossel    |
+| WhatsApp / CTA         | **Removidos** (web = app)                |
+| Drive                  | Pasta local sync — Fase 3                |
+| Vídeos                 | Mute; avanço no `ended`                  |
 
 ---
 

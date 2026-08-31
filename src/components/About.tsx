@@ -1,5 +1,3 @@
-import { MessageCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const values = [
@@ -39,16 +37,11 @@ const policies = [
   {
     letter: 'P',
     title: 'Pagamento',
-    description: 'Pix, cartão de crédito e débito. Negociação via WhatsApp para sua comodidade.',
+    description: 'Pix, cartão de crédito e débito. Atendimento presencial na loja.',
   },
 ];
 
 const About = () => {
-  const handleWhatsAppClick = () => {
-    const message = encodeURIComponent('Olá! Gostaria de saber mais sobre a Zue.');
-    window.open(`https://wa.me/5551989354834?text=${message}`, '_blank');
-  };
-
   return (
     <div className="min-h-screen bg-white pb-20 pt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -113,7 +106,7 @@ const About = () => {
           </div>
         </div>
 
-        <div className="-mx-4 mb-20 bg-gray-50 px-4 py-16 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="-mx-4 bg-gray-50 px-4 py-16 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="mx-auto max-w-4xl">
             <h2
               className="mb-12 text-center text-3xl font-light tracking-wide text-black"
@@ -138,23 +131,6 @@ const About = () => {
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="text-center">
-          <h2
-            className="mb-8 text-3xl font-light tracking-wide text-black"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Pronta para Descobrir sua Nova Peça Favorita?
-          </h2>
-          <Button
-            onClick={handleWhatsAppClick}
-            className="mx-auto h-auto gap-3 rounded-none bg-black px-8 py-4 font-light tracking-wide text-white hover:scale-105 hover:bg-gray-800"
-          >
-            <MessageCircle className="size-5" />
-            Fale Conosco
-            <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
-          </Button>
         </div>
       </div>
     </div>

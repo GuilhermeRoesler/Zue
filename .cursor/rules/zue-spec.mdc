@@ -1,5 +1,5 @@
 ---
-description: Spec condensada da Zue — vitrine web/tablet, stack, design e specs vivas.
+description: Spec condensada da Zue — vitrine web/tablet kiosk, stack, design e specs vivas.
 alwaysApply: true
 ---
 
@@ -8,22 +8,24 @@ alwaysApply: true
 ## Specs vivas (obrigatório)
 
 - Rule + skill + README devem espelhar o repo **agora**, não um plano antigo.
-- Em toda mudança de stack, arquitetura, Capacitor/kiosk, componentes de domínio, contatos ou scripts npm: atualizar **os três** na mesma entrega.
+- Em toda mudança de stack, arquitetura, Capacitor/kiosk, componentes de domínio ou scripts npm: atualizar **os três** na mesma entrega.
 - Hooks em `.cursor/hooks` marcam pendência (`afterFileEdit`) e forçam sync no `stop` se houver drift.
 - Validar com: `node .cursor/hooks/check-spec-drift.mjs` (exit 0).
+- Roadmap futuro: skill `.cursor/skills/zue-melhorias/SKILL.md`.
 
 ## Produto
 
 - Vitrine digital da marca **Zue** (moda premium, tagline *Elegância Atemporal*).
-- Alvos: site web + **app Android** (tablet na loja) via **Capacitor 8** (`br.com.zue.vitrine`), mesmo código-fonte.
+- **App default de tablet na loja** — ligado o dia inteiro, mesmo código web + **Capacitor 8** (`br.com.zue.vitrine`).
 - Ícone: monograma **Z** preto/branco (`resources/icon.png` → favicon, PWA, launcher Android; `npm run icons:generate`)
-- Conversão principal: WhatsApp (`wa.me/5551989354834`) e `mailto` — sem checkout online.
-- No app nativo: sem newsletter popup e sem FAB WhatsApp (modo vitrine).
+- **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
+- **Landing** (início + sobre) + **catálogo** em carrossel fullscreen (foto/vídeo).
+- **Hibernação** após **2 min** sem interação: tela ligada, fundo branco + logo; ao toque **retoma de onde parou**.
 
 ## Stack
 
 - React 18 + TypeScript + Vite (`base: './'`)
-- Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`)
+- Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`) — carrossel: `embla-carousel-react` + `embla-carousel-autoplay`
 - Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
@@ -35,14 +37,13 @@ alwaysApply: true
 ## Design (obrigatório)
 
 - Tipografia: **Playfair Display** (títulos) + **Inter** light (corpo)
-- Paleta: preto / branco / cinzas; `rounded-none` nos CTAs e cards da marca
+- Paleta: preto / branco / cinzas; `rounded-none` nos elementos da marca
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
-- Imagens: Pexels remotas (ou assets locais futuros); aspect ~3/4 em produtos
+- Catálogo: mídia fullscreen; barra fina de progresso na base do slide
 
 ## Ao alterar código
 
 - Preservar o design system existente; preferir componentes em `src/components/ui/`
-- Manter mensagens WhatsApp contextualizadas por produto/seção
-- UX de tablet/kiosk: fullscreen, tela ligada, UI de sistema oculta (ver skill `zue-spec`)
+- UX de tablet/kiosk: fullscreen, tela ligada, idle/hibernate, UI de sistema oculta (ver skill `zue-spec`)
 - Após mudanças de UI do app: `npm run cap:sync` antes do APK
-- Para o guia completo, usar a skill **zue-spec**
+- Para o guia completo, usar a skill **zue-spec**; para roadmap, **zue-melhorias**

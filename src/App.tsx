@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import ProductCatalog from './components/ProductCatalog';
+import CatalogCarousel from './components/CatalogCarousel';
 import About from './components/About';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
-import WhatsAppButton from './components/WhatsAppButton';
-import NewsletterPopup from './components/NewsletterPopup';
+import HibernateOverlay from './components/HibernateOverlay';
 import UpdatePrompt from './components/UpdatePrompt';
 import { isNativeApp } from './lib/kiosk';
+import { IDLE_TIMEOUT_MS } from './lib/idle-config';
+import { useIdle } from './hooks/use-idle';
 import {
   type AvailableUpdate,
   scheduleUpdateCheck,
@@ -16,24 +16,13 @@ import {
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
-  const [showNewsletter, setShowNewsletter] = useState(false);
   const [availableUpdate, setAvailableUpdate] = useState<AvailableUpdate | null>(
     null
   );
   const nativeApp = isNativeApp();
+  const isHibernating = useIdle(IDLE_TIMEOUT_MS);
 
-  useEffect(() => {
-    // Na vitrine (app nativo) o popup atrapalha o uso contínuo no tablet
-    if (nativeApp) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowNewsletter(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [nativeApp]);
+  const isCatalog = currentSection === 'catalog';
 
   useEffect(() => {
     if (!nativeApp) return;
@@ -43,28 +32,35 @@ function App() {
   const renderCurrentSection = () => {
     switch (currentSection) {
       case 'home':
-        return <Hero onNavigate={setCurrentSection} />;
-      case 'catalog':
-        return <ProductCatalog />;
+        return <Hero />;
       case 'about':
         return <About />;
-      case 'contact':
-        return <Contact />;
+      case 'catalog':
+        return null;
       default:
-        return <Hero onNavigate={setCurrentSection} />;
+        return <Hero />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header currentSection={currentSection} onNavigate={setCurrentSection} />
+      {!isCatalog && (
+        <>
+          <Header currentSection={currentSection} onNavigate={setCurrentSection} />
+          <main>{renderCurrentSection()}</main>
+          <Footer onNavigate={setCurrentSection} />
+        </>
+      )}
 
-      <main>{renderCurrentSection()}</main>
+      {isCatalog && (
+        <CatalogCarousel
+          paused={isHibernating}
+          onNavigateHome={() => setCurrentSection('home')}
+        />
+      )}
 
-      <Footer onNavigate={setCurrentSection} />
-      {!nativeApp && <WhatsAppButton />}
+      <HibernateOverlay visible={isHibernating} />
 
-      {showNewsletter && <NewsletterPopup onClose={() => setShowNewsletter(false)} />}
       {availableUpdate && (
         <UpdatePrompt
           update={availableUpdate}

@@ -1,9 +1,9 @@
 ---
 name: zue-spec
 description: >-
-  Spec detalhada e viva do projeto Zue — vitrine de moda web e app Android
-  (Capacitor) para tablet na loja. Use ao implementar features, Capacitor/kiosk,
-  UI, catálogo, WhatsApp/contato, arquitetura, ou ao sincronizar specs com o repo.
+  Spec detalhada e viva do projeto Zue — vitrine kiosk (tablet na loja) e web,
+  carrossel fullscreen, hibernação idle, Capacitor. Use ao implementar features,
+  UI, catálogo, kiosk, ou ao sincronizar specs com o repo.
 ---
 
 # Zue — Spec detalhada
@@ -48,21 +48,15 @@ Não inventar features nas specs: só documentar o que o repo realmente tem.
 
 ## Visão do produto
 
-A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital**:
+A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital** — pensada como **app default de um tablet na loja**, ligado o dia inteiro, com o mesmo build na web.
 
-1. **Web** — catálogo e presença online para clientes.
-2. **App Android (preferencial na loja)** — mesmo build web empacotado com **Capacitor 8**, rodando em tablet em modo vitrine/kiosk (tela cheia, sempre aberta).
+1. **Landing** — início (`Hero`) e sobre (`About`): marca, lançamentos, valores.
+2. **Catálogo** — carrossel fullscreen de fotos e vídeos (`CatalogCarousel`).
+3. **Hibernação** — após **2 min** sem interação: tela ligada, fundo branco + logo; toque retoma o estado anterior.
 
-Não é um e-commerce com carrinho/pagamento. Preços aparecem como “Consulte”; o fluxo de venda/consulta é **WhatsApp** ou **e-mail**.
+Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 
-### Contatos oficiais
-
-| Canal | Valor |
-|-------|--------|
-| WhatsApp | `https://wa.me/5551989354834` |
-| E-mail | `guiroesler2@gmail.com` |
-
-Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, produto, contato genérico).
+Roadmap de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`.
 
 ---
 
@@ -73,7 +67,7 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | UI | React 18 + TypeScript |
 | Build | Vite 5 (`base: './'` — obrigatório para o WebView) |
 | Estilo | Tailwind CSS **v4** (`@import "tailwindcss"` em `src/index.css`) |
-| Componentes | shadcn/ui — style `radix-nova`, `baseColor: neutral`, CSS variables |
+| Componentes | shadcn/ui — style `radix-nova`; carrossel: `embla-carousel-react` + `embla-carousel-autoplay` (`src/components/ui/carousel.tsx`) |
 | Ícones | Lucide React |
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
@@ -110,37 +104,37 @@ Aliases (tsconfig / Vite): `@/` → `src/`.
 
 Sem React Router. `App.tsx` controla `currentSection`:
 
-| `currentSection` | Componente |
-|------------------|------------|
-| `home` | `Hero` |
-| `catalog` | `ProductCatalog` |
-| `about` | `About` |
-| `contact` | `Contact` |
+| `currentSection` | Componente | Layout |
+|------------------|------------|--------|
+| `home` | `Hero` | Header + main + Footer |
+| `about` | `About` | Header + main + Footer |
+| `catalog` | `CatalogCarousel` | Fullscreen (sem Header/Footer) |
 
-Layout persistente: `Header` + `main` + `Footer`.
+Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
-| Superfície | `WhatsAppButton` | `NewsletterPopup` |
-|------------|------------------|-------------------|
-| Web | sim | sim (~3s) |
-| App nativo (Capacitor) | **não** | **não** |
+### Hibernação (idle)
 
-Detecção: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
+- Constantes: `src/lib/idle-config.ts` (`IDLE_TIMEOUT_MS` = 2 min, `IMAGE_SLIDE_MS` = 5 s)
+- Hook: `src/hooks/use-idle.ts` — eventos globais de atividade
+- Overlay: `src/components/HibernateOverlay.tsx` — branco + logo (`/favicon.svg`), pulse sutil
+- Ao hibernar: pausa carrossel/vídeo (`paused` em `CatalogCarousel`); ao acordar retoma índice e seção
 
 ### Componentes de domínio (`src/components/`)
 
-- `Header` — nav + sheet mobile
-- `Hero` — banner, lançamentos, valores Q/E/S
-- `ProductCatalog` — filtros por categoria + grid
+- `Header` — nav (Início, Catálogo, Sobre) + sheet mobile
+- `Hero` — landing: hero, lançamentos, valores Q/E/S
 - `About` — história, valores, políticas
-- `Contact` — formulário `mailto` + infos + WhatsApp
-- `Footer`, `WhatsAppButton`, `NewsletterPopup`
+- `CatalogCarousel` — carrossel fullscreen shadcn + autoplay + barra de progresso
+- `HibernateOverlay` — tela de hibernação
+- `Footer` — marca e navegação
 - `UpdatePrompt` — diálogo de nova versão (somente app Android)
 
-UI primitiva: `src/components/ui/*` (button, card, sheet, input, etc.). Preferir estes em vez de reinventar.
+UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 
-### Dados de produtos
+### Dados do catálogo
 
-Hoje: arrays estáticos nos componentes (ex.: `products` em `ProductCatalog`). Imagens via URLs **Pexels**. Ao evoluir, centralizar dados (módulo/`data/` ou Supabase) sem quebrar o layout do grid.
+- `src/data/catalog-slides.ts` — slides demo (`image` | `video`); substituir por pasta de mídia (roadmap Fase 3)
+- Imagens via URLs **Pexels** até haver assets locais
 
 ---
 
@@ -158,15 +152,15 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 
 - Fundo branco / cinza claro (`gray-50` em seções alternadas)
 - Texto preto / `gray-600` para secundário
-- CTAs sólidos pretos; outline preto; hover com inversão ou scale suave
-- **`rounded-none`** em botões, cards e inputs da marca (exceto FAB WhatsApp verde)
+- CTAs de navegação discretos (nav, logo); sem botões de conversão
+- **`rounded-none`** em botões, cards e inputs da marca
 - `--radius: 0` no tema CSS — coerente com a estética angular
 - Sem purple gradients, glows ou visual genérico de template
 
 ### Layout
 
-- Container: `max-w-7xl` + padding responsivo
-- Produtos: grid 1 → 2 → 3 colunas; imagem `aspect-[3/4]`, hover `scale-105`
+- Catálogo: fullscreen; barra fina de progresso na base do slide ativo
+- Landing: grid de lançamentos `aspect-[3/4]`, hover `scale-105`
 - Seções com um propósito claro; copy curto e sofisticado (PT-BR)
 
 ### Motion
@@ -244,6 +238,11 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/lib/utils.ts` / `utils.test.ts` — `cn()` (clsx + tailwind-merge) e testes Vitest
 - `src/lib/app-update.ts` / `app-update.test.ts` — checa `releases/latest` no GitHub; `compareSemver` + testes
 - `src/lib/apk-updater.ts` — bridge TS do plugin nativo `ApkUpdater`
+- `src/lib/idle-config.ts` — timeouts idle e slide de imagem
+- `src/hooks/use-idle.ts` — detecção de inatividade
+- `src/components/HibernateOverlay.tsx` — overlay de hibernação
+- `src/components/CatalogCarousel.tsx` — player fullscreen
+- `src/data/catalog-slides.ts` — manifesto de slides demo
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
 - `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin`
@@ -263,7 +262,9 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 
 ### UX modo loja
 
-- Sem `NewsletterPopup` e sem FAB WhatsApp no nativo
+- Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
+- Hibernação após 2 min idle; wake retoma estado
+- Catálogo: foto 5 s (autoplay embla); vídeo = duração do arquivo (mute)
 - Touch targets generosos; validar em resolução de tablet
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 - Update prompt discreto; download em background thread nativo
@@ -281,25 +282,14 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 7. Não commitar segredos; variáveis de ambiente para chaves (ex. Supabase) se forem usadas
 8. Após mudanças de UI relevantes ao app: rodar `npm run cap:sync` antes de gerar APK
 
-### WhatsApp — padrão
-
-```ts
-const message = encodeURIComponent('Olá! Gostaria de consultar...');
-window.open(`https://wa.me/5551989354834?text=${message}`, '_blank');
-```
-
-### Contato — padrão
-
-Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...`.
-
 ---
 
 ## Checklist ao entregar mudanças
 
 - [ ] Visual alinhado (tipografia, preto/branco, `rounded-none`)
 - [ ] Responsivo mobile + tablet
-- [ ] WhatsApp/mailto intactos e com mensagem contextual (web)
-- [ ] No nativo: sem newsletter popup / FAB WhatsApp a menos que o produto mude
+- [ ] Sem WhatsApp/CTAs de conversão (web = app)
+- [ ] Hibernação e carrossel pausam corretamente no idle
 - [ ] `npm run ci` (ou lint / typecheck / test / build) sem regressão
 - [ ] Se tocar em UI ou Capacitor: `npm run cap:sync` e fullscreen/kiosk preservados
 - [ ] **Specs vivas:** rule + skill + README alinhados ao código
@@ -308,6 +298,7 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 ## Recursos do repo
 
 - Spec curta (sempre ativa): `.cursor/rules/zue-spec.mdc`
+- Plano de melhorias: `.cursor/skills/zue-melhorias/SKILL.md`
 - README do projeto: `README.md`
 - CI validação: `.github/workflows/ci.yml`
 - CI GitHub Pages: `.github/workflows/github-pages.yml`

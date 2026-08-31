@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, ShoppingBag, User, Search } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -8,7 +8,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -20,7 +19,6 @@ const navigationItems = [
   { id: 'home', label: 'Início' },
   { id: 'catalog', label: 'Catálogo' },
   { id: 'about', label: 'Sobre' },
-  { id: 'contact', label: 'Contato' },
 ];
 
 const Header = ({ currentSection, onNavigate }: HeaderProps) => {
@@ -59,18 +57,6 @@ const Header = ({ currentSection, onNavigate }: HeaderProps) => {
             ))}
           </nav>
 
-          <div className="hidden items-center space-x-2 md:flex">
-            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
-              <Search className="size-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
-              <User className="size-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent hover:text-black">
-              <ShoppingBag className="size-5" />
-            </Button>
-          </div>
-
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -107,18 +93,6 @@ const Header = ({ currentSection, onNavigate }: HeaderProps) => {
                     {item.label}
                   </Button>
                 ))}
-                <Separator className="bg-gray-100" />
-                <div className="flex items-center space-x-2 pt-2">
-                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
-                    <Search className="size-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
-                    <User className="size-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="rounded-none text-gray-600 hover:bg-transparent">
-                    <ShoppingBag className="size-5" />
-                  </Button>
-                </div>
               </div>
             </SheetContent>
           </Sheet>

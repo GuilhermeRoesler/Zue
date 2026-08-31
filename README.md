@@ -6,13 +6,14 @@ Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, 
 
 ## Sobre o Projeto
 
-O site funciona como vitrine da marca:
+O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código):
 
-- Visualizar coleções e lançamentos na página inicial
-- Navegar pelo catálogo com filtros por categoria
-- Conhecer a história e os valores da marca
-- Entrar em contato via WhatsApp ou e-mail
-- Inscrever-se na newsletter (somente na web)
+- **Início** — landing com hero, lançamentos e valores da marca
+- **Catálogo** — carrossel fullscreen de fotos e vídeos com barra de progresso
+- **Sobre** — história, valores e políticas da loja
+- **Hibernação** — após 2 min sem toque: tela branca com logo; ao interagir, retoma de onde parou
+
+Sem checkout, WhatsApp ou CTAs de conversão.
 
 Na loja física, a mesma interface roda em tablet Android em modo vitrine (tela cheia / kiosk), reaproveitando animações, componentes e o fluxo de manutenção web.
 
@@ -78,7 +79,8 @@ Comportamento no tablet:
 
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
-- Sem popup de newsletter e sem botão flutuante de WhatsApp
+- Hibernação após 2 min sem interação (logo centralizada em fundo branco)
+- Catálogo em carrossel fullscreen (foto 5 s; vídeo = duração do arquivo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
 
 ```bash
@@ -189,20 +191,23 @@ git push origin v1.0.0
 ```text
 src/
 ├── components/           # Seções e UI da vitrine
-│   ├── ui/               # Primitivos shadcn
+│   ├── ui/               # Primitivos shadcn (incl. carousel)
 │   ├── About.tsx
-│   ├── Contact.tsx
+│   ├── CatalogCarousel.tsx
 │   ├── Footer.tsx
 │   ├── Header.tsx
 │   ├── Hero.tsx
-│   ├── NewsletterPopup.tsx
-│   ├── ProductCatalog.tsx
-│   ├── UpdatePrompt.tsx
-│   └── WhatsAppButton.tsx
+│   ├── HibernateOverlay.tsx
+│   └── UpdatePrompt.tsx
+├── data/
+│   └── catalog-slides.ts
+├── hooks/
+│   └── use-idle.ts
 ├── lib/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
 │   ├── app-update.test.ts # Vitest: compareSemver
 │   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
+│   ├── idle-config.ts    # Timeout idle (2 min) e slide de imagem (5 s)
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
 │   ├── utils.ts          # cn() — clsx + tailwind-merge
 │   └── utils.test.ts     # Vitest: cn
@@ -238,12 +243,14 @@ public/
 
 ## Funcionalidades
 
-- **WhatsApp**: CTAs com mensagens pré-definidas (coleção, produto, contato) — web
-- **Formulários**: contato e newsletter via `mailto`
+- **Catálogo imersivo**: carrossel shadcn/embla fullscreen com autoplay e barra de progresso
+- **Hibernação**: idle de 2 min → logo em fundo branco; wake retoma estado
 - **Design responsivo**: desktop, tablet e mobile
-- **Animações**: transições CSS em hover e menus
+- **Animações**: transições CSS em hover e menus; pulse sutil na hibernação
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
+
+Roadmap (Lenis, cursor custom, pasta Drive): [`.cursor/skills/zue-melhorias/SKILL.md`](.cursor/skills/zue-melhorias/SKILL.md).
 
 ## Design em resumo
 
