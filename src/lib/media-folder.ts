@@ -1,5 +1,4 @@
 import { Capacitor } from '@capacitor/core';
-import { Filesystem } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import type { CatalogCollection, CatalogSlide } from '@/data/catalog-slides';
@@ -11,6 +10,7 @@ import {
   type MediaFileEntry,
   type MediaSort,
 } from '@/lib/media-types';
+import SafDirectory from '@/lib/saf-directory';
 
 const PREF_FOLDER_PATH = 'zue.mediaFolderPath';
 const PREF_FOLDER_LABEL = 'zue.mediaFolderLabel';
@@ -33,11 +33,6 @@ export interface MediaFolderState {
 
 function isNative(): boolean {
   return Capacitor.isNativePlatform();
-}
-
-function joinPath(dir: string, name: string): string {
-  if (dir.endsWith('/')) return `${dir}${name}`;
-  return `${dir}/${name}`;
 }
 
 function slugify(name: string): string {
@@ -240,20 +235,19 @@ async function restoreWebDirectory(): Promise<{
   return { label: handle.name, groups };
 }
 
-// —— Native (Android): Capawesome pickDirectory + Filesystem ——
+// —— Native (Android): Capawesome pickDirectory + SafDirectory (SAF) ——
 
 async function scanNativeDirectoryFlat(path: string): Promise<MediaFileEntry[]> {
-  const { files } = await Filesystem.readdir({ path });
+  const { files } = await SafDirectory.readdir({ path });
   const entries: MediaFileEntry[] = [];
 
   for (const file of files) {
     const name = file.name;
     if (file.type === 'directory' || !isMediaFilename(name)) continue;
 
-    const absolute = file.uri ?? joinPath(path, name);
     entries.push({
       name,
-      src: Capacitor.convertFileSrc(absolute),
+      src: Capacitor.convertFileSrc(file.uri),
       lastModified: file.mtime ?? undefined,
     });
   }
@@ -265,22 +259,21 @@ async function scanNativeDirectoryTree(
   path: string,
   rootTitle: string
 ): Promise<MediaCollectionGroup[]> {
-  const { files } = await Filesystem.readdir({ path });
+  const { files } = await SafDirectory.readdir({ path });
   const rootEntries: MediaFileEntry[] = [];
   const subdirs: { name: string; path: string }[] = [];
 
   for (const file of files) {
     const name = file.name;
     if (file.type === 'directory') {
-      subdirs.push({ name, path: file.uri ?? joinPath(path, name) });
+      subdirs.push({ name, path: file.uri });
       continue;
     }
     if (!isMediaFilename(name)) continue;
 
-    const absolute = file.uri ?? joinPath(path, name);
     rootEntries.push({
       name,
-      src: Capacitor.convertFileSrc(absolute),
+      src: Capacitor.convertFileSrc(file.uri),
       lastModified: file.mtime ?? undefined,
     });
   }
@@ -322,7 +315,16 @@ async function pickNativeDirectory(): Promise<{
     throw new Error('Nenhuma pasta selecionada.');
   }
 
-  const label = path.split(/[/\\]/).filter(Boolean).pop() ?? path;
+  // Capawesome concede flags no Intent, mas não chama takePersistableUriPermission.
+  await SafDirectory.takePersistablePermission({ path });
+
+  let label: string;
+  try {
+    ({ name: label } = await SafDirectory.getDisplayName({ path }));
+  } catch {
+    label = path.split(/[/\\:]/).filter(Boolean).pop() ?? path;
+  }
+
   await Preferences.set({ key: PREF_FOLDER_PATH, value: path });
   await Preferences.set({ key: PREF_FOLDER_LABEL, value: label });
 

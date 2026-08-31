@@ -49,7 +49,7 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **ESLint** — qualidade de código
 - **Vitest** — testes unitários (`utils`, `app-update`, `media-types`, `motion`)
 - **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
-- **Capacitor plugins** — Filesystem, Preferences, File Picker (Capawesome), StatusBar, Keep Awake, App
+- **Capacitor plugins** — Preferences, File Picker (Capawesome), StatusBar, Keep Awake, App; plugins locais `ApkUpdater` e `SafDirectory` (listagem SAF)
 
 ## Pré-requisitos
 
@@ -97,7 +97,7 @@ O catálogo pode usar arquivos reais da loja em vez dos slides de demonstração
 
 Formatos: `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc.
 
-Web: Chrome/Edge com File System Access API (blobs sob demanda). Android: seletor nativo (SAF) via Capawesome.
+Web: Chrome/Edge com File System Access API (blobs sob demanda). Android: seletor nativo (SAF) via Capawesome + listagem com o plugin local `SafDirectory`.
 
 ```bash
 npm run cap:sync      # build web + sync no projeto android/
@@ -230,6 +230,7 @@ src/
 │   ├── app-update.ts     # Checagem GitHub Releases (Android)
 │   ├── app-update.test.ts # Vitest: compareSemver
 │   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
+│   ├── saf-directory.ts  # Bridge do plugin SafDirectory (SAF)
 │   ├── idle-config.ts    # Timeout idle (2 min / 2 s em DEV) e slide de imagem (5 s)
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
 │   ├── media-folder.ts   # Pick/restore pasta (web + Android)

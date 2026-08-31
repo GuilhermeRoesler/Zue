@@ -63,7 +63,7 @@ Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web 
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
 | Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
-| Filesystem / pasta | `@capacitor/filesystem`, `@capacitor/preferences`, `@capawesome/capacitor-file-picker` |
+| Filesystem / pasta | `@capacitor/preferences`, `@capawesome/capacitor-file-picker`, plugin local `SafDirectory` (`DocumentFile` / SAF) |
 | App info | `@capacitor/app` (versão nativa para checagem de update) |
 | Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
 | Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts`, `motion.test.ts` |
@@ -130,10 +130,10 @@ UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 
 ### Fonte de mídia (pasta)
 
-- Libs: `src/lib/media-folder.ts` (pick/restore/clear + sort), `src/lib/media-types.ts` (extensões → slides/coleções), `src/lib/media-blob-cache.ts` (blob URLs lazy na web)
+- Libs: `src/lib/media-folder.ts` (pick/restore/clear + sort), `src/lib/media-types.ts` (extensões → slides/coleções), `src/lib/media-blob-cache.ts` (blob URLs lazy na web), `src/lib/saf-directory.ts` (bridge Android SAF)
 - Hook: `src/hooks/use-catalog-slides.ts` — pasta salva ou fallback demo; expõe `collections` + `slides` + `sort`
 - **Web**: File System Access API (`showDirectoryPicker`) + IndexedDB para o handle; blobs sob demanda
-- **Android**: `@capawesome/capacitor-file-picker` `pickDirectory` + `Filesystem.readdir` + path em Preferences
+- **Android**: `@capawesome/capacitor-file-picker` `pickDirectory` + plugin `SafDirectory` (`readdir` via SAF/`DocumentFile`, permissão persistente) + path em Preferences
 - **Árvore**: arquivos na raiz → coleção com o nome da pasta; **cada subpasta (1 nível)** → coleção própria
 - Ordenação persistida: **nome** (default) ou **data** (`Preferences` `zue.mediaSort`)
 - Extensões: jpg/jpeg/png/webp/gif/bmp/heic + mp4/webm/mov/m4v/mkv
@@ -251,6 +251,7 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/lib/utils.ts` / `utils.test.ts` — `cn()` (clsx + tailwind-merge) e testes Vitest
 - `src/lib/app-update.ts` / `app-update.test.ts` — checa `releases/latest` no GitHub; `compareSemver` + testes
 - `src/lib/apk-updater.ts` — bridge TS do plugin nativo `ApkUpdater`
+- `src/lib/saf-directory.ts` — bridge TS do plugin nativo `SafDirectory` (listagem SAF)
 - `src/lib/idle-config.ts` — timeouts idle e slide de imagem
 - `src/hooks/use-idle.ts` — detecção de inatividade
 - `src/components/HibernateOverlay.tsx` — overlay de hibernação
@@ -266,8 +267,9 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/components/CustomCursor.tsx` / `Reveal.tsx` / `TextReveal.tsx` — polish web
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
-- `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin`
+- `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin` e `SafDirectoryPlugin`
 - `android/.../ApkUpdaterPlugin.java` — download do APK + intent de instalação
+- `android/.../SafDirectoryPlugin.java` — `readdir` / permissão persistente em `content://` (SAF)
 - `android/.../AndroidManifest.xml` — `INTERNET` + `REQUEST_INSTALL_PACKAGES`; tema fullscreen
 
 ### Auto-update (GitHub Releases)
