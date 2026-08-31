@@ -211,6 +211,14 @@ npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studi
 - Jobs: `lint` → `typecheck` → `test` → `build` → `check-spec-drift`
 - Equivalente local: `npm run ci`
 
+**CI GitHub Pages (vitrine web):** `.github/workflows/github-pages.yml`
+
+- Dispara em `push` nas branches `main`/`master` (e `workflow_dispatch`)
+- Build Vite (`base: './'`) e publica o `dist/` no GitHub Pages
+- URL típica do projeto: `https://guilhermeroesler.github.io/Zue/`
+- Requer **Settings → Pages → Source: GitHub Actions** (uma vez)
+- `public/.nojekyll` evita o processamento Jekyll no Pages
+
 **CI de release (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-release.yml`
 
 - Dispara ao dar push em tag `v*` (ex.: `v1.0.0`)
@@ -298,5 +306,6 @@ Formulário monta body e abre `mailto:guiroesler2@gmail.com?subject=...&body=...
 - Spec curta (sempre ativa): `.cursor/rules/zue-spec.mdc`
 - README do projeto: `README.md`
 - CI validação: `.github/workflows/ci.yml`
+- CI GitHub Pages: `.github/workflows/github-pages.yml`
 - CI release APK: `.github/workflows/android-release.yml`
 - Hooks de sync: `.cursor/hooks.json` e `.cursor/hooks/`

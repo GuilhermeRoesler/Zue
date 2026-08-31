@@ -29,7 +29,7 @@ alwaysApply: true
 - Scripts Android: `cap:sync` | `cap:open` | `cap:android`
 - Qualidade: `lint` | `typecheck` | `test` (Vitest) | `ci` (pipeline local)
 - Testes unitários atuais: `src/lib/utils.test.ts` (`cn`) e `src/lib/app-update.test.ts` (`compareSemver`)
-- CI: `.github/workflows/ci.yml` — lint, typecheck, testes, build e spec-drift em push/PR; `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)
+- CI: `.github/workflows/ci.yml` — lint, typecheck, testes, build e spec-drift em push/PR; `.github/workflows/github-pages.yml` — deploy do `dist/` no **GitHub Pages**; `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)
 
 ## Design (obrigatório)
 

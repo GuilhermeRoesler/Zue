@@ -49,7 +49,7 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[Capacitor 8](https://capacitorjs.com/)** — app Android a partir do build web
 - **ESLint** — qualidade de código
 - **Vitest** — testes unitários (`src/lib/utils.test.ts`, `src/lib/app-update.test.ts`)
-- **GitHub Actions** — CI de validação + release de APK
+- **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
 
 ## Pré-requisitos
 
@@ -107,6 +107,14 @@ O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em push e
 5. Alinhamento das specs vivas (`check-spec-drift`)
 
 Localmente, o mesmo pipeline: `npm run ci`.
+
+#### GitHub Pages (vitrine web)
+
+O workflow [`.github/workflows/github-pages.yml`](.github/workflows/github-pages.yml) faz o build Vite e publica o `dist/` no **GitHub Pages** a cada push em `main`/`master` (também via *Run workflow*).
+
+1. Em **Settings → Pages**, defina **Source: GitHub Actions** (uma vez)
+2. Após o deploy, o site fica em `https://guilhermeroesler.github.io/Zue/`
+3. O `base: './'` do Vite serve Capacitor e o Pages (assets relativos); `public/.nojekyll` evita o Jekyll
 
 #### Release APK (tags `v*`)
 
@@ -203,7 +211,11 @@ android/                  # Projeto nativo Capacitor
 capacitor.config.ts
 .github/workflows/
 ├── ci.yml                # Lint, typecheck, test, build, spec-drift
+├── github-pages.yml      # Deploy do dist/ no GitHub Pages
 └── android-release.yml   # APK assinado em tags v*
+
+public/
+└── .nojekyll             # Desativa Jekyll no GitHub Pages
 
 .cursor/
 ├── hooks.json            # Specs vivas (sessionStart / afterFileEdit / stop)
