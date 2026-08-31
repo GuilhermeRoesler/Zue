@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,56 @@ const navigationItems = [
 
 const Header = ({ currentSection, onNavigate }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
+  const [indicator, setIndicator] = useState({
+    left: 0,
+    width: 0,
+    ready: false,
+  });
+  const [animateIndicator, setAnimateIndicator] = useState(false);
+
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const item = itemRefs.current.get(currentSection);
+    if (!nav || !item) {
+      setIndicator((prev) => ({ ...prev, ready: false }));
+      return;
+    }
+
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    setIndicator({
+      left: itemRect.left - navRect.left,
+      width: itemRect.width,
+      ready: true,
+    });
+  }, [currentSection]);
+
+  useEffect(() => {
+    if (!indicator.ready) return;
+    // Evita animar do 0 no primeiro paint; desliza só nas trocas seguintes
+    const id = requestAnimationFrame(() => setAnimateIndicator(true));
+    return () => cancelAnimationFrame(id);
+  }, [indicator.ready]);
+
+  useEffect(() => {
+    const sync = () => {
+      const nav = navRef.current;
+      const item = itemRefs.current.get(currentSection);
+      if (!nav || !item) return;
+      const navRect = nav.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+      setIndicator({
+        left: itemRect.left - navRect.left,
+        width: itemRect.width,
+        ready: true,
+      });
+    };
+
+    window.addEventListener('resize', sync);
+    return () => window.removeEventListener('resize', sync);
+  }, [currentSection]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
@@ -39,22 +89,44 @@ const Header = ({ currentSection, onNavigate }: HeaderProps) => {
             </Button>
           </div>
 
-          <nav className="hidden space-x-8 md:flex">
+          <nav
+            ref={navRef}
+            className="relative hidden items-center gap-8 md:flex"
+          >
             {navigationItems.map((item) => (
-              <Button
+              <span
                 key={item.id}
-                variant="ghost"
-                onClick={() => onNavigate(item.id)}
-                className={cn(
-                  'h-auto rounded-none border-b px-0 pb-0.5 text-sm font-light tracking-wide hover:bg-transparent',
-                  currentSection === item.id
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-600 hover:text-black'
-                )}
+                ref={(node) => {
+                  if (node) itemRefs.current.set(item.id, node);
+                  else itemRefs.current.delete(item.id);
+                }}
+                className="inline-flex"
               >
-                {item.label}
-              </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate(item.id)}
+                  className={cn(
+                    'h-auto rounded-none border-0 px-0 pb-1 text-sm font-light tracking-wide hover:bg-transparent focus-visible:ring-0',
+                    currentSection === item.id
+                      ? 'text-black'
+                      : 'text-gray-600 hover:text-black'
+                  )}
+                >
+                  {item.label}
+                </Button>
+              </span>
             ))}
+
+            <span
+              aria-hidden
+              className={cn(
+                'pointer-events-none absolute bottom-0 h-px bg-black',
+                animateIndicator &&
+                  'motion-safe:transition-[left,width,opacity] motion-safe:duration-300 motion-safe:ease-in-out',
+                indicator.ready ? 'opacity-100' : 'opacity-0'
+              )}
+              style={{ left: indicator.left, width: indicator.width }}
+            />
           </nav>
 
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -86,7 +158,7 @@ const Header = ({ currentSection, onNavigate }: HeaderProps) => {
                       setIsMobileMenuOpen(false);
                     }}
                     className={cn(
-                      'h-auto w-full justify-start rounded-none px-0 text-lg font-light tracking-wide hover:bg-transparent',
+                      'h-auto w-full justify-start rounded-none px-0 text-lg font-light tracking-wide hover:bg-transparent focus-visible:border-transparent focus-visible:ring-0',
                       currentSection === item.id ? 'text-black' : 'text-gray-600'
                     )}
                   >

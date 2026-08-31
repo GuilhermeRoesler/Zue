@@ -41,6 +41,7 @@ alwaysApply: true
 - Paleta: preto / branco / cinzas; `rounded-none` nos elementos da marca
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
 - Catálogo: mídia fullscreen; barra fina de progresso na base do slide
+- Scrollbar: fina, angular, preto/cinza (`src/index.css`)
 - Web: Lenis + cursor custom; stagger/reveal na landing; respeitar `prefers-reduced-motion`
 
 ## Ao alterar código

@@ -280,6 +280,7 @@ Plano de melhorias (histórico): [`.cursor/skills/zue-melhorias/SKILL.md`](.curs
 
 - Tipografia: Playfair Display (títulos) + Inter light (corpo)
 - Paleta: preto, branco e cinzas; cantos retos (`rounded-none`)
+- Scrollbar fina e angular (preto/cinza), alinhada ao restante da UI
 - Imagens de produto: URLs Pexels (aspecto ~3/4)
 
 Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).

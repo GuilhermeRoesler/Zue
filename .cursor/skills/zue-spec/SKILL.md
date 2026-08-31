@@ -157,6 +157,7 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 - CTAs de navegação discretos (nav, logo); sem botões de conversão
 - **`rounded-none`** em botões, cards e inputs da marca
 - `--radius: 0` no tema CSS — coerente com a estética angular
+- Scrollbar custom: fina (5px), angular, thumb preto translúcido (`src/index.css` — Firefox `scrollbar-*` + WebKit)
 - Sem purple gradients, glows ou visual genérico de template
 
 ### Layout
