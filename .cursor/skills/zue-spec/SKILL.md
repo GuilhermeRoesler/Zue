@@ -81,7 +81,7 @@ Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web 
 | `npm run test` | Vitest (uma execução, CI) |
 | `npm run test:watch` | Vitest em modo watch |
 | `npm run ci` | lint + typecheck + test + build + spec-drift |
-| `npm run icons:generate` | regenera favicons/PWA + mipmaps Android a partir de `resources/icon.png` |
+| `npm run icons:generate` | gera masters Playfair Z (dark/light) + favicons com radius + PWA/mipmaps Android |
 | `npm run cap:sync` | `build` + `npx cap sync android` |
 | `npm run cap:open` | abre o projeto no Android Studio |
 | `npm run cap:android` | sync + abre Android Studio |
@@ -195,9 +195,9 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 | `webDir` | `dist` |
 | Config | `capacitor.config.ts` |
 | Projeto nativo | pasta `android/` |
-| Ícone | monograma **Z** Didone (branco em fundo preto) |
+| Ícone | monograma **Z** Playfair Display (mesmo do hero); dark = branco em preto, light = preto em branco |
 
-Master: `resources/icon.png` (1024²). Pipeline: `scripts/generate-icons.mjs` → `public/` (favicon SVG/PNG, apple-touch, PWA, `site.webmanifest`) + `android/.../mipmap-*` (`ic_launcher`, round, foreground) com `ic_launcher_background` `#000000`. Após trocar o master: `npm run icons:generate` e, para o app, `npm run cap:sync`.
+Masters: `resources/icon-dark.png` / `icon-light.png` (1024²; `icon.png` alias do dark). Fonte: `resources/fonts/PlayfairDisplay.ttf`. Pipeline: `scripts/generate-icons.mjs` → `public/` (favicon SVG/PNG dark+light com **corner radius ~22%**, apple-touch/PWA quadrados, `site.webmanifest`) + `android/.../mipmap-*` (master dark quadrado — o launcher aplica o mask). Após regenerar: `npm run icons:generate` e, para o app, `npm run cap:sync`.
 
 ### Requisitos de produto (kiosk) — implementados
 

@@ -71,7 +71,7 @@ O terminal mostra a URL local (em geral `http://localhost:5173/`).
 
 Identidade: `br.com.zue.vitrine` · nome **Zue**.
 
-Ícone da marca: monograma **Z** (Didone / preto e branco) em `resources/icon.png`, propagado para favicon web, PWA e launcher Android. Regenerar com `npm run icons:generate` após trocar o master.
+Ícone da marca: monograma **Z** em **Playfair Display** (o mesmo do hero). Masters dark/light em `resources/icon-dark.png` e `resources/icon-light.png` (`icon.png` = dark). Favicons web ganham corner radius (~22%, visual próximo ao crop do launcher Android) e trocam com `prefers-color-scheme`; PWA e Android usam o master dark quadrado. Regenerar com `npm run icons:generate`.
 
 Comportamento no tablet:
 
@@ -196,7 +196,7 @@ git push origin v1.0.0
 - `npm run test` — testes unitários (Vitest)
 - `npm run test:watch` — Vitest em modo watch
 - `npm run ci` — pipeline local (lint + typecheck + test + build + spec-drift)
-- `npm run icons:generate` — gera favicons/PWA + mipmaps Android a partir de `resources/icon.png`
+- `npm run icons:generate` — gera masters Playfair Z (dark/light), favicons com radius, PWA e mipmaps Android
 - `npm run cap:sync` — build + sync Capacitor Android
 - `npm run cap:open` — abre Android Studio
 - `npm run cap:android` — sync + abre Android Studio
@@ -245,9 +245,11 @@ src/
 android/                  # Projeto nativo Capacitor
 capacitor.config.ts
 resources/
-└── icon.png              # Master do ícone (1024²) → web + Android
+├── fonts/PlayfairDisplay.ttf  # Fonte do monograma Z (= hero)
+├── icon-dark.png / icon-light.png  # Masters 1024²
+└── icon.png              # Alias do dark → Android / PWA
 scripts/
-└── generate-icons.mjs    # Pipeline de ícones (sharp)
+└── generate-icons.mjs    # Pipeline de ícones (sharp + opentype.js)
 .github/workflows/
 ├── ci.yml                # Lint, typecheck, test, build, spec-drift
 ├── github-pages.yml      # Deploy do dist/ no GitHub Pages
@@ -255,10 +257,10 @@ scripts/
 
 public/
 ├── .nojekyll             # Desativa Jekyll no GitHub Pages
-├── favicon.svg           # Favicon vetorial
-├── favicon-*.png         # Favicons raster
+├── favicon.svg           # Favicon vetorial (radius + dark/light via CSS)
+├── favicon-*.png         # Favicons raster (radius; *-light = white-mode)
 ├── apple-touch-icon.png
-├── icon-192.png / icon-512.png
+├── icon-192.png / icon-512.png / icon-light.png
 └── site.webmanifest
 
 .cursor/
