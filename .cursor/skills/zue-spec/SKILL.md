@@ -44,7 +44,7 @@ A **Zue** é uma marca de moda premium. Este repositório é a **vitrine digital
 
 1. **Landing** — início (`Hero`: hero full-bleed + looks da vitrine) e sobre (`About`: história, valores, políticas).
 2. **Catálogo** — página imersiva com carrosséis empilhados (`CatalogPage` + `CatalogPlayer`); 1ª coleção em destaque; toque expande fullscreen; deslize navega.
-3. **Hibernação** — após **2 min** sem interação (DEV: **2 s**): tela ligada, composição tipográfica ZUE + tagline; toque retoma o estado anterior.
+3. **Hibernação** — após **2 min** sem interação (DEV: **2 s**), **exceto na Início**: tela ligada, composição tipográfica ZUE + tagline; toque retoma o estado anterior.
 
 Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web = app).
 
@@ -109,6 +109,7 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - Constantes: `src/lib/idle-config.ts` (`IDLE_TIMEOUT_MS` = 2 min em produção / **2 s em DEV**, `IMAGE_SLIDE_MS` = 5 s)
 - Hook: `src/hooks/use-idle.ts` — eventos globais de atividade
 - Overlay: `src/components/HibernateOverlay.tsx` — fundo off-white, wordmark tipográfico ZUE, tagline, cantos de galeria e aura suave
+- **Não aplica na Início** (`currentSection === 'home'`) — só Catálogo e Sobre
 - Ao hibernar: overlay cobre a UI; **carrosséis visíveis continuam rodando** por baixo (ao acordar não reiniciam)
 
 ### Componentes de domínio (`src/components/`)
@@ -281,7 +282,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 ### UX modo loja
 
 - Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
-- Hibernação após 2 min idle (2 s em DEV); wake retoma estado
+- Hibernação após 2 min idle (2 s em DEV), exceto na Início; wake retoma estado
 - Catálogo: carrosséis com autoplay nos **visíveis** (também sob hibernação); expand fullscreen; foto 5 s; vídeo = duração (mute + poster); deslize/toque
 - Pasta: long-press na logo; subpastas → coleções; ordenação nome/data; fallback demo
 - Touch targets generosos; validar em resolução de tablet

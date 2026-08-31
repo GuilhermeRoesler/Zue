@@ -11,7 +11,7 @@ O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código
 - **Início** — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE e looks em grade (toque leva ao catálogo); header em glassmorphism leve sobre o hero
 - **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen (autoplay nos visíveis + barra de progresso)
 - **Sobre** — história, valores e políticas da loja
-- **Hibernação** — após 2 min sem toque (2 s em DEV): composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
+- **Hibernação** — após 2 min sem toque (2 s em DEV), **exceto na Início**: composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
 - **Pasta de mídia** — pasta Drive sync; subpastas = coleções; ordenação nome/data; long-press na logo ZUE
 
 Sem checkout, WhatsApp ou CTAs de conversão.
@@ -77,7 +77,7 @@ Comportamento no tablet:
 
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
-- Hibernação após 2 min sem interação (2 s em DEV; wordmark ZUE + tagline)
+- Hibernação após 2 min sem interação (2 s em DEV; wordmark ZUE + tagline), exceto na Início
 - Catálogo em página imersiva com carrosséis (destaque + secundários); expand fullscreen (foto 5 s; vídeo = duração + poster)
 - Pasta de mídia selecionável (long-press na logo ZUE no Header, seção catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
@@ -271,7 +271,7 @@ public/
 
 - **Catálogo**: intro ZUE + carrosséis shadcn/embla (autoplay in-view, lazy, gestos) + expand fullscreen
 - **Pasta de mídia**: seletor discreto (long-press na logo no Header); Drive sync operacional
-- **Hibernação**: idle de 2 min (2 s em DEV) → wordmark tipográfico + tagline; wake retoma estado
+- **Hibernação**: idle de 2 min (2 s em DEV), exceto na Início → wordmark tipográfico + tagline; wake retoma estado
 - **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo)
 - **Design responsivo**: desktop, tablet e mobile
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor

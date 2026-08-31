@@ -27,10 +27,12 @@ function App() {
   const [mediaSheetOpen, setMediaSheetOpen] = useState(false);
   const [catalogFullscreen, setCatalogFullscreen] = useState(false);
   const nativeApp = isNativeApp();
-  const isHibernating = useIdle(IDLE_TIMEOUT_MS);
+  const isIdle = useIdle(IDLE_TIMEOUT_MS);
   const catalog = useCatalogSlides();
 
   const isCatalog = currentSection === 'catalog';
+  /** Hibernação só fora da Início — o Hero já é a composição de marca. */
+  const isHibernating = isIdle && currentSection !== 'home';
 
   useLenis(!catalogFullscreen && !isHibernating && !mediaSheetOpen);
 
