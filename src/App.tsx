@@ -7,11 +7,19 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import NewsletterPopup from './components/NewsletterPopup';
+import UpdatePrompt from './components/UpdatePrompt';
 import { isNativeApp } from './lib/kiosk';
+import {
+  type AvailableUpdate,
+  scheduleUpdateCheck,
+} from './lib/app-update';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [availableUpdate, setAvailableUpdate] = useState<AvailableUpdate | null>(
+    null
+  );
   const nativeApp = isNativeApp();
 
   useEffect(() => {
@@ -25,6 +33,11 @@ function App() {
     }, 3000);
 
     return () => clearTimeout(timer);
+  }, [nativeApp]);
+
+  useEffect(() => {
+    if (!nativeApp) return;
+    scheduleUpdateCheck(setAvailableUpdate);
   }, [nativeApp]);
 
   const renderCurrentSection = () => {
@@ -52,6 +65,12 @@ function App() {
       {!nativeApp && <WhatsAppButton />}
 
       {showNewsletter && <NewsletterPopup onClose={() => setShowNewsletter(false)} />}
+      {availableUpdate && (
+        <UpdatePrompt
+          update={availableUpdate}
+          onClose={() => setAvailableUpdate(null)}
+        />
+      )}
     </div>
   );
 }

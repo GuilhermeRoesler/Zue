@@ -75,6 +75,7 @@ Comportamento no tablet:
 - Tela cheia (barras do sistema ocultas)
 - Tela permanece ligada
 - Sem popup de newsletter e sem botão flutuante de WhatsApp
+- Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
 
 ```bash
 npm run cap:sync      # build web + sync no projeto android/
@@ -84,6 +85,12 @@ npm run cap:android   # sync + abre o Studio
 ```
 
 No Android Studio: rode no tablet ou **Build → Build Bundle(s) / APK(s)**.
+
+### Atualização automática (tablet)
+
+O app consulta a latest release do repositório (`GuilhermeRoesler/Zue`), compara a tag com a versão instalada e, se houver APK mais novo, exibe um diálogo para baixar e instalar. Na primeira vez o Android pode pedir permissão para “instalar apps desconhecidos”.
+
+Arquivos: `src/lib/app-update.ts`, `src/components/UpdatePrompt.tsx`, `android/.../ApkUpdaterPlugin.java`.
 
 ### CI/CD (GitHub Actions)
 
@@ -159,8 +166,11 @@ src/
 │   ├── Hero.tsx
 │   ├── NewsletterPopup.tsx
 │   ├── ProductCatalog.tsx
+│   ├── UpdatePrompt.tsx
 │   └── WhatsAppButton.tsx
 ├── lib/
+│   ├── app-update.ts     # Checagem GitHub Releases (Android)
+│   ├── apk-updater.ts    # Bridge do plugin ApkUpdater
 │   ├── kiosk.ts          # StatusBar + KeepAwake + isNativeApp()
 │   └── utils.ts
 ├── App.tsx               # Navegação por seções (estado)
@@ -184,6 +194,7 @@ capacitor.config.ts
 - **Design responsivo**: desktop, tablet e mobile
 - **Animações**: transições CSS em hover e menus
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
+- **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
 
 ## Design em resumo
 

@@ -78,6 +78,8 @@ Mensagens WhatsApp devem ser pré-preenchidas e contextualizadas (coleção, pro
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
 | Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
+| App info | `@capacitor/app` (versão nativa para checagem de update) |
+| Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
 ### Scripts npm
@@ -126,6 +128,7 @@ Detecção: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `About` — história, valores, políticas
 - `Contact` — formulário `mailto` + infos + WhatsApp
 - `Footer`, `WhatsAppButton`, `NewsletterPopup`
+- `UpdatePrompt` — diálogo de nova versão (somente app Android)
 
 UI primitiva: `src/components/ui/*` (button, card, sheet, input, etc.). Preferir estes em vez de reinventar.
 
@@ -215,15 +218,31 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 ### Arquivos-chave
 
 - `src/lib/kiosk.ts` — init StatusBar + KeepAwake; `isNativeApp()`
+- `src/lib/app-update.ts` — checa `releases/latest` no GitHub em background; compara semver com `App.getInfo()`
+- `src/lib/apk-updater.ts` — bridge TS do plugin nativo `ApkUpdater`
+- `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
-- `android/.../MainActivity.java` — imersivo sticky + keep screen on
-- `android/.../AndroidManifest.xml` / `res/values/styles.xml` — tema fullscreen
+- `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin`
+- `android/.../ApkUpdaterPlugin.java` — download do APK + intent de instalação
+- `android/.../AndroidManifest.xml` — `INTERNET` + `REQUEST_INSTALL_PACKAGES`; tema fullscreen
+
+### Auto-update (GitHub Releases)
+
+No app Android, após o start (idle / ~1,5s), o cliente:
+
+1. Consulta `https://api.github.com/repos/GuilhermeRoesler/Zue/releases/latest` (sem travar a UI)
+2. Compara a tag (`v*`) com o `versionName` instalado
+3. Se houver APK mais novo e o usuário não tiver adiado essa tag, mostra `UpdatePrompt`
+4. Ao confirmar: pede permissão de “instalar apps desconhecidos” se preciso, baixa o asset `.apk` e abre o instalador do sistema
+
+Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` para não repetir o prompt até a próxima release.
 
 ### UX modo loja
 
 - Sem `NewsletterPopup` e sem FAB WhatsApp no nativo
 - Touch targets generosos; validar em resolução de tablet
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
+- Update prompt discreto; download em background thread nativo
 
 ---
 

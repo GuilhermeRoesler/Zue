@@ -24,6 +24,7 @@ alwaysApply: true
 - React 18 + TypeScript + Vite (`base: './'`)
 - Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`)
 - Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
+- No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
 - Scripts Android: `cap:sync` | `cap:open` | `cap:android`
 - CI: `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)
