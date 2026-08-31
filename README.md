@@ -87,7 +87,43 @@ No Android Studio: rode no tablet ou **Build → Build Bundle(s) / APK(s)**.
 
 ### CI/CD (GitHub Actions)
 
-O workflow [`.github/workflows/android-release.yml`](.github/workflows/android-release.yml) gera um **APK** e publica em uma **GitHub Release** quando você cria uma tag `v*` (ex.: `v1.0.0`).
+O workflow [`.github/workflows/android-release.yml`](.github/workflows/android-release.yml) gera um **APK release assinado** e publica em uma **GitHub Release** ao criar uma tag `v*` (ex.: `v1.0.0`).
+
+#### 1. Gerar o keystore (uma vez)
+
+Com JDK instalado:
+
+```bash
+keytool -genkeypair -v -keystore zue-release.keystore -alias zue \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Guarde o arquivo e as senhas em local seguro (não commitar).
+
+#### 2. Secrets no GitHub
+
+Em **Settings → Secrets and variables → Actions**, crie:
+
+| Secret | Conteúdo |
+|--------|----------|
+| `ANDROID_KEYSTORE_BASE64` | Keystore em Base64 |
+| `ANDROID_KEYSTORE_PASSWORD` | Senha do keystore |
+| `ANDROID_KEY_ALIAS` | Alias (ex.: `zue`) |
+| `ANDROID_KEY_PASSWORD` | Senha da chave |
+
+Base64 (PowerShell):
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("zue-release.keystore")) | Set-Clipboard
+```
+
+Base64 (Linux/macOS):
+
+```bash
+base64 -i zue-release.keystore | pbcopy   # ou xclip / só imprimir
+```
+
+#### 3. Publicar
 
 ```bash
 git tag v1.0.0
@@ -95,10 +131,10 @@ git push origin v1.0.0
 ```
 
 1. Aguarde a Action da tag concluir
-2. Abra **Releases** no repositório
-3. Baixe `zue-v1.0.0.apk` e instale no tablet (sideload)
+2. Abra **Releases** e baixe `zue-v1.0.0.apk`
+3. Instale no tablet (sideload; ainda pode pedir “fonte desconhecida”)
 
-O SDK Android fica **no runner** — não é preciso ter SDK local só para obter o APK. Build local com Android Studio continua opcional.
+`versionName` vem da tag; `versionCode` é calculado (ex.: `1.2.3` → `10203`). Build local com Android Studio continua opcional (`android/key.properties.example`).
 
 ## Scripts
 

@@ -26,7 +26,7 @@ alwaysApply: true
 - Capacitor 8 + StatusBar + Keep Awake; kiosk em `src/lib/kiosk.ts` e `MainActivity`
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
 - Scripts Android: `cap:sync` | `cap:open` | `cap:android`
-- CI: `.github/workflows/android-release.yml` — APK em GitHub Release ao taguear `v*`
+- CI: `.github/workflows/android-release.yml` — APK **release assinado** em GitHub Release ao taguear `v*` (secrets do keystore)
 
 ## Design (obrigatório)
 

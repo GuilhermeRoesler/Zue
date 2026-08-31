@@ -1,5 +1,20 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file('key.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def keystorePath = System.getenv('ANDROID_KEYSTORE_PATH') ?: keystoreProperties['storeFile']
+def keystorePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD') ?: keystoreProperties['storePassword']
+def keyAliasName = System.getenv('ANDROID_KEY_ALIAS') ?: keystoreProperties['keyAlias']
+def keyPasswordValue = System.getenv('ANDROID_KEY_PASSWORD') ?: keystoreProperties['keyPassword']
+def hasReleaseKeystore = keystorePath != null && !keystorePath.toString().trim().isEmpty()
+
+def versionNameValue = (System.getenv('VERSION_NAME') ?: '1.0.0').replaceFirst(/^v/, '')
+def versionCodeValue = (System.getenv('VERSION_CODE') ?: '1').toInteger()
+
 android {
     namespace = "br.com.zue.vitrine"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +22,8 @@ android {
         applicationId "br.com.zue.vitrine"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode versionCodeValue
+        versionName versionNameValue
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +31,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                storeFile file(keystorePath)
+                storePassword keystorePassword
+                keyAlias keyAliasName
+                keyPassword keyPasswordValue
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }

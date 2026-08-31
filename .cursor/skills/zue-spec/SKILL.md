@@ -200,15 +200,17 @@ npm run cap:sync   →   npm run cap:open   →   Build APK/AAB no Android Studi
 **CI (preferencial para tablet da loja):** GitHub Actions em `.github/workflows/android-release.yml`
 
 - Dispara ao dar push em tag `v*` (ex.: `v1.0.0`)
-- Roda `npm run cap:sync` + `./gradlew assembleDebug`
+- Roda `npm run cap:sync` + `./gradlew assembleRelease` **assinado**
 - Cria **GitHub Release** com o asset `zue-<tag>.apk`
-- SDK/JDK ficam no runner (`ubuntu-latest`); não exige SDK na máquina do time
+- Secrets obrigatórios: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
+- `versionName` = tag sem `v`; `versionCode` derivado do semver
+- SDK/JDK no runner; keystore nunca versionado (ver README)
 
 ```bash
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
-Pré-requisitos locais só se for abrir o Android Studio: SDK Android e JDK 17/21.
+Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21 e opcionalmente `android/key.properties`.
 
 ### Arquivos-chave
 

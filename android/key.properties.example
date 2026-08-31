@@ -1,0 +1,6 @@
+# Copie para key.properties (não versionado) para assinar release localmente.
+# Caminhos relativos à pasta android/
+storeFile=../zue-release.keystore
+storePassword=sua-senha-do-keystore
+keyAlias=zue
+keyPassword=sua-senha-da-chave
