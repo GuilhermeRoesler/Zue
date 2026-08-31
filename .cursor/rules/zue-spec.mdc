@@ -41,6 +41,7 @@ alwaysApply: true
 - Tom: minimalista, elegante, tracking amplo, sem visual “genérico AI”
 - Catálogo: intro de marca + carrosséis; expand fullscreen instantâneo; índice; progresso; chrome auto-hide
 - Sem scrollbar visível (scroll por Lenis/toque)
+- `user-select: none` global (`src/index.css`); inputs/textarea permitem seleção
 - Web: Lenis + cursor custom; stagger/reveal na landing e catálogo; respeitar `prefers-reduced-motion`
 
 ## Ao alterar código

@@ -282,6 +282,7 @@ public/
 - Tipografia: Playfair Display (títulos) + Inter light (corpo)
 - Paleta: preto, branco e cinzas; cantos retos (`rounded-none`)
 - Sem scrollbar visível (scroll por Lenis/toque)
+- Sem seleção de texto (`user-select: none`; campos de formulário continuam selecionáveis)
 - Imagens de produto: URLs Pexels (aspecto ~3/4)
 
 Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).

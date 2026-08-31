@@ -161,6 +161,7 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 - **`rounded-none`** em botões, cards e inputs da marca
 - `--radius: 0` no tema CSS — coerente com a estética angular
 - Sem scrollbar visível (`scrollbar-width: none` em `src/index.css`); scroll por Lenis/toque permanece
+- `user-select: none` global + `-webkit-tap-highlight-color: transparent` (evita highlight azul em miss click / toque); `input` / `textarea` / `[contenteditable]` usam `select-text`
 - Sem purple gradients, glows ou visual genérico de template
 
 ### Layout
