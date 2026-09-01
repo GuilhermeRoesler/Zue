@@ -135,7 +135,7 @@ const DriveFolderPicker = ({
                   key={folder.id}
                   type="button"
                   onClick={() => enterFolder(folder)}
-                  className="flex w-full items-center gap-3 border-b border-gray-50 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-gray-50"
+                  className="flex min-h-11 w-full items-center gap-3 border-b border-gray-50 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-gray-50 active:bg-gray-100"
                 >
                   <Folder className="size-4 shrink-0 text-gray-500" />
                   <span className="min-w-0 flex-1 truncate text-sm font-light text-black">
@@ -155,7 +155,7 @@ const DriveFolderPicker = ({
                 onSelect({ id: current.id, name: current.name });
                 onOpenChange(false);
               }}
-              className="h-auto w-full gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800 disabled:opacity-40"
+              className="h-auto min-h-11 w-full gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800 active:bg-gray-900 disabled:opacity-40"
             >
               <HardDrive className="size-4" />
               Usar “{current.name}”

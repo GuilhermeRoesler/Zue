@@ -44,24 +44,36 @@ const HibernateOverlay = ({ visible }: HibernateOverlayProps) => {
         }}
       />
 
-      {/* Cantos de galeria — linguagem angular da marca */}
-      <Corner className="top-7 left-7 md:top-12 md:left-12" borders="border-t border-l" />
-      <Corner className="top-7 right-7 md:top-12 md:right-12" borders="border-t border-r" />
-      <Corner className="bottom-7 left-7 md:bottom-12 md:left-12" borders="border-b border-l" />
-      <Corner className="right-7 bottom-7 md:right-12 md:bottom-12" borders="border-r border-b" />
+      {/* Cantos de galeria — linguagem angular + safe-area */}
+      <Corner
+        className="top-[max(1.75rem,env(safe-area-inset-top))] left-[max(1.75rem,env(safe-area-inset-left))] md:top-[max(3rem,env(safe-area-inset-top))] md:left-[max(3rem,env(safe-area-inset-left))]"
+        borders="border-t border-l"
+      />
+      <Corner
+        className="top-[max(1.75rem,env(safe-area-inset-top))] right-[max(1.75rem,env(safe-area-inset-right))] md:top-[max(3rem,env(safe-area-inset-top))] md:right-[max(3rem,env(safe-area-inset-right))]"
+        borders="border-t border-r"
+      />
+      <Corner
+        className="bottom-[max(1.75rem,env(safe-area-inset-bottom))] left-[max(1.75rem,env(safe-area-inset-left))] md:bottom-[max(3rem,env(safe-area-inset-bottom))] md:left-[max(3rem,env(safe-area-inset-left))]"
+        borders="border-b border-l"
+      />
+      <Corner
+        className="right-[max(1.75rem,env(safe-area-inset-right))] bottom-[max(1.75rem,env(safe-area-inset-bottom))] md:right-[max(3rem,env(safe-area-inset-right))] md:bottom-[max(3rem,env(safe-area-inset-bottom))]"
+        borders="border-r border-b"
+      />
 
       {/* Composição central */}
-      <div className="relative z-10 flex flex-col items-center px-8 text-center">
-        <h1 className="font-heading text-5xl font-light tracking-[0.42em] text-black motion-safe:animate-zue-hibernate-mark md:text-7xl md:tracking-[0.48em]">
+      <div className="relative z-10 flex flex-col items-center px-8 text-center short-landscape:scale-90">
+        <h1 className="font-heading text-5xl font-light tracking-[0.42em] text-black motion-safe:animate-zue-hibernate-mark md:text-7xl md:tracking-[0.48em] short-landscape:text-4xl">
           ZUE
         </h1>
 
-        <div className="mt-9 flex items-center gap-4 md:mt-11 md:gap-5">
+        <div className="mt-9 flex items-center gap-4 md:mt-11 md:gap-5 short-landscape:mt-5">
           <span
             className="h-px w-7 bg-black/15 motion-safe:animate-zue-hibernate-rule md:w-10"
             aria-hidden
           />
-          <p className="font-sans text-[10px] font-light tracking-[0.38em] text-black/40 uppercase md:text-xs md:tracking-[0.42em]">
+          <p className="font-sans text-[11px] font-light tracking-[0.38em] text-black/40 uppercase md:text-xs md:tracking-[0.42em]">
             Elegância Atemporal
           </p>
           <span
@@ -72,7 +84,7 @@ const HibernateOverlay = ({ visible }: HibernateOverlayProps) => {
         </div>
       </div>
 
-      <p className="absolute bottom-10 left-1/2 -translate-x-1/2 font-sans text-[9px] font-light tracking-[0.4em] text-black/22 uppercase md:bottom-14 md:text-[10px]">
+      <p className="absolute bottom-[max(2.5rem,calc(env(safe-area-inset-bottom)+1.25rem))] left-1/2 -translate-x-1/2 font-sans text-[11px] font-light tracking-[0.4em] text-black/22 uppercase md:text-xs">
         Toque para continuar
       </p>
     </div>

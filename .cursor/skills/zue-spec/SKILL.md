@@ -115,7 +115,7 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
 ### Componentes de domínio (`src/components/`)
 
-- `Header` — nav (Início, Catálogo, Sobre) + sheet mobile; long-press na logo no catálogo abre pasta; na Início e Sobre usa glassmorphism leve sobre o hero full-bleed e solidifica ao rolar
+- `Header` — nav (Início, Catálogo, Sobre; inline a partir de `min-[900px]`) + sheet abaixo disso; long-press na logo no catálogo abre pasta; na Início e Sobre usa glassmorphism leve sobre o hero full-bleed e solidifica ao rolar; `pt-safe` + `zue-px*`
 - `Hero` — porta de entrada: hero full-bleed com mídia do catálogo, wordmark ZUE, looks em grade (navega ao catálogo); sem valores Q/E/S
 - `About` — hero full-bleed (mídia da vitrine), essência editorial, pilares tipográficos (sem cards), info prática da loja, ponte discreta ao catálogo; conteúdo em `src/data/about.ts`
 - `CatalogPage` — catálogo imersivo: coleções empilhadas (destaque + secundárias), estados loading/erro/vazio, expand fullscreen
@@ -167,13 +167,14 @@ Usar `font-heading` / `font-sans` do tema quando possível; evitar misturar outr
 - `--radius: 0` no tema CSS — coerente com a estética angular
 - Sem scrollbar visível (`scrollbar-width: none` em `src/index.css`); scroll por Lenis/toque permanece
 - `user-select: none` global + `-webkit-tap-highlight-color: transparent` (evita highlight azul em miss click / toque); `input` / `textarea` / `[contenteditable]` usam `select-text`
+- **Safe-area / toque** (`src/index.css`): utilitários `pt-safe` / `pb-safe` / `px-safe` / `zue-px` (+ md/lg) / `touch-target`; variantes `@custom-variant landscape` e `short-landscape` (landscape + `max-height: 560px`); botões default `h-11` / icon `size-11`; CTAs e nav com `active:` além de `hover:`; Header nav inline a partir de `min-[900px]` (sheet abaixo disso)
 - Sem purple gradients, glows ou visual genérico de template
 
 ### Layout
 
-- Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh, demais ~58dvh); transição fullscreen fluida (FLIP via `motion`, ~560ms, easing sem bounce); barra de progresso; títulos acima da barra
-- Landing: hero full-bleed (imagem/vídeo da 1ª coleção) + grade de looks `aspect-3/4` da mídia real; hover `scale-105`; nav discreta ao catálogo
-- Sobre: hero full-bleed com mídia distinta da Início quando possível; essência + imagem; pilares tipográficos com hairlines (`rounded-none`, sem cards); info da loja em lista; ponte tipográfica ao catálogo
+- Catálogo: intro de marca (ZUE); carrosséis com hierarquia (1ª ~82dvh / landscape mais baixo, demais ~58dvh); transição fullscreen fluida (FLIP via `motion`, ~560ms, easing sem bounce); barra de progresso; títulos acima da barra
+- Landing: hero full-bleed (imagem/vídeo da 1ª coleção) + grade de looks `aspect-3/4` (landscape `4/5`) da mídia real; hover/active `scale-105`; nav discreta ao catálogo; em `short-landscape` tipografia e paddings compactos
+- Sobre: hero full-bleed com mídia distinta da Início quando possível; essência + imagem (2 colunas também em landscape); pilares tipográficos com hairlines (`rounded-none`, sem cards); info da loja em lista; ponte tipográfica ao catálogo
 - Seções com um propósito claro; copy curto e sofisticado (PT-BR)
 
 ### Motion
@@ -298,7 +299,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 - Hibernação após 2 min idle (2 s em DEV), exceto na Início; wake retoma estado
 - Catálogo: carrosséis com autoplay nos **visíveis** (também sob hibernação); expand fullscreen; foto 5 s; vídeo = duração (mute + poster); deslize/toque
 - Pasta: long-press na logo; subpastas → coleções; ordenação nome/data; pasta local **ou** Google Drive (sync → cache); fallback demo
-- Touch targets generosos; validar em resolução de tablet
+- Touch targets ≥44px no chrome; safe-area nos fixed/sticky (Header, fullscreen, hibernate, Footer); feedback `:active` em CTAs; layout `landscape` / `short-landscape` para tablet deitado
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 - Update prompt discreto; download em background thread nativo
 

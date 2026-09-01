@@ -7,9 +7,9 @@ interface FooterProps {
 
 const Footer = ({ onNavigate }: FooterProps) => {
   return (
-    <footer className="bg-black text-white">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+    <footer className="bg-black text-white pb-safe">
+      <div className="mx-auto max-w-7xl zue-px py-16 sm:zue-px-md lg:zue-px-lg landscape:py-12">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 landscape:grid-cols-2 landscape:gap-10">
           <div>
             <h3
               className="mb-6 text-3xl font-light tracking-widest"
@@ -24,7 +24,7 @@ const Footer = ({ onNavigate }: FooterProps) => {
 
           <div>
             <h4 className="mb-6 text-lg font-light tracking-wide">Navegação</h4>
-            <nav className="flex flex-col items-start gap-2">
+            <nav className="flex flex-col items-start gap-1">
               {[
                 { id: 'home', label: 'Início' },
                 { id: 'catalog', label: 'Catálogo' },
@@ -34,7 +34,7 @@ const Footer = ({ onNavigate }: FooterProps) => {
                   key={item.id}
                   variant="ghost"
                   onClick={() => onNavigate(item.id)}
-                  className="h-auto rounded-none px-0 text-sm font-light text-gray-300 hover:bg-transparent hover:text-white"
+                  className="h-11 min-h-11 rounded-none px-0 text-sm font-light text-gray-300 hover:bg-transparent hover:text-white active:bg-transparent active:text-white"
                 >
                   {item.label}
                 </Button>

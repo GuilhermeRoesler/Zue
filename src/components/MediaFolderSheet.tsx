@@ -138,7 +138,7 @@ const MediaFolderSheet = ({
                       'flex-1 px-4 py-3 text-xs font-light tracking-[0.2em] uppercase transition-colors',
                       sort === option.id
                         ? 'bg-black text-white'
-                        : 'bg-white text-gray-600 hover:text-black'
+                        : 'bg-white text-gray-600 hover:text-black active:text-black'
                     )}
                   >
                     {option.label}
@@ -161,7 +161,7 @@ const MediaFolderSheet = ({
                 type="button"
                 disabled={loading}
                 onClick={onPickFolder}
-                className="h-auto w-full gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800"
+                className="h-auto min-h-11 w-full gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800 active:bg-gray-900"
               >
                 <FolderOpen className="size-4" />
                 Selecionar pasta do aparelho
@@ -190,7 +190,7 @@ const MediaFolderSheet = ({
                   type="button"
                   disabled={loading}
                   onClick={onConnectDrive}
-                  className="h-auto w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
+                  className="h-auto min-h-11 w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white active:bg-black active:text-white"
                 >
                   <Cloud className="size-4" />
                   Conectar Google Drive
@@ -202,7 +202,7 @@ const MediaFolderSheet = ({
                     type="button"
                     disabled={loading}
                     onClick={() => setDrivePickerOpen(true)}
-                    className="h-auto w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
+                    className="h-auto min-h-11 w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white active:bg-black active:text-white"
                   >
                     <Cloud className="size-4" />
                     Escolher pasta no Drive
@@ -212,7 +212,7 @@ const MediaFolderSheet = ({
                     variant="ghost"
                     disabled={loading}
                     onClick={onDisconnectDrive}
-                    className="h-auto w-full rounded-none px-6 py-3 font-light tracking-wide text-gray-600 hover:bg-transparent hover:text-black"
+                    className="h-auto min-h-11 w-full rounded-none px-6 py-3 font-light tracking-wide text-gray-600 hover:bg-transparent hover:text-black active:bg-transparent active:text-black"
                   >
                     Desconectar Google
                   </Button>
@@ -227,7 +227,7 @@ const MediaFolderSheet = ({
                   variant="outline"
                   disabled={loading}
                   onClick={onRefresh}
-                  className="h-auto gap-3 rounded-none border-black px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
+                  className="h-auto min-h-11 gap-3 rounded-none border-black px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white active:bg-black active:text-white"
                 >
                   <RotateCcw className="size-4" />
                   {source === 'drive' ? 'Sincronizar Drive' : 'Atualizar pasta'}
@@ -238,7 +238,7 @@ const MediaFolderSheet = ({
                   variant="ghost"
                   disabled={loading}
                   onClick={onUseDemo}
-                  className="h-auto rounded-none px-6 py-3 font-light tracking-wide text-gray-600 hover:bg-transparent hover:text-black"
+                  className="h-auto min-h-11 rounded-none px-6 py-3 font-light tracking-wide text-gray-600 hover:bg-transparent hover:text-black active:bg-transparent active:text-black"
                 >
                   Usar catálogo demonstração
                 </Button>

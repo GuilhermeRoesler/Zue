@@ -43,6 +43,7 @@ alwaysApply: true
 - Catálogo: intro de marca + carrosséis; expand fullscreen com transição fluida (FLIP `layout` via `motion`, sem salto/stretch); índice; progresso; chrome auto-hide
 - Sem scrollbar visível (scroll por Lenis/toque)
 - `user-select: none` global (`src/index.css`); inputs/textarea permitem seleção
+- **Tablet/toque**: safe-area (`pt-safe` / `zue-px*` / `env(safe-area-inset-*)`); alvos ≥44px (`touch-target`, botões `h-11`/`size-11`); feedback `:active` além de `hover`; variantes `landscape` / `short-landscape` para vitrine deitada
 - Web: Lenis + cursor custom; stagger/reveal na landing e catálogo; respeitar `prefers-reduced-motion`
 
 ## Ao alterar código

@@ -112,12 +112,12 @@ const CatalogPage = ({
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(0,0,0,0.04),_transparent_55%)]"
           aria-hidden
         />
-        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 sm:pt-12 lg:px-8">
+        <div className="relative mx-auto max-w-7xl zue-px pb-10 pt-10 sm:zue-px-md sm:pt-12 lg:zue-px-lg landscape:pb-8 landscape:pt-8">
           <Reveal>
             <p className="text-[10px] font-light tracking-[0.4em] text-gray-500 uppercase">
               Vitrine
             </p>
-            <h1 className="mt-3 font-heading text-5xl font-light tracking-[0.22em] text-black sm:text-6xl">
+            <h1 className="mt-3 font-heading text-5xl font-light tracking-[0.22em] text-black sm:text-6xl short-landscape:text-4xl">
               ZUE
             </h1>
             <div className="mt-5 h-px w-16 bg-black/80 animate-zue-line" />
@@ -129,7 +129,7 @@ const CatalogPage = ({
       </section>
 
       {showInitialLoading && (
-        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl zue-px py-24 sm:zue-px-md lg:zue-px-lg">
           <p className="text-center text-sm font-light tracking-[0.2em] text-gray-500 uppercase">
             Carregando mídia…
           </p>
@@ -137,7 +137,7 @@ const CatalogPage = ({
       )}
 
       {!showInitialLoading && error && collections.length === 0 && (
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl zue-px py-16 sm:zue-px-md lg:zue-px-lg">
           <div className="border border-black/10 bg-gray-50 px-6 py-8 text-center">
             <p className="text-sm font-light text-red-700" role="alert">
               {error}
@@ -146,7 +146,7 @@ const CatalogPage = ({
               <button
                 type="button"
                 onClick={onOpenMediaFolder}
-                className="mt-6 text-xs font-light tracking-[0.25em] text-black uppercase underline-offset-4 hover:underline"
+                className="mt-6 min-h-11 touch-manipulation text-xs font-light tracking-[0.25em] text-black uppercase underline-offset-4 hover:underline active:underline"
               >
                 Abrir mídia da vitrine
               </button>
@@ -156,7 +156,7 @@ const CatalogPage = ({
       )}
 
       {!showInitialLoading && isEmpty && (
-        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl zue-px py-24 sm:zue-px-md lg:zue-px-lg">
           <div className="mx-auto max-w-lg border border-black/10 px-8 py-14 text-center">
             <p className="font-heading text-2xl font-light tracking-[0.18em] text-black">
               Sem mídia
@@ -169,7 +169,7 @@ const CatalogPage = ({
               <button
                 type="button"
                 onClick={onOpenMediaFolder}
-                className="mt-8 border border-black bg-black px-6 py-3 text-xs font-light tracking-[0.28em] text-white uppercase transition-colors hover:bg-gray-800"
+                className="mt-8 min-h-11 touch-manipulation border border-black bg-black px-6 py-3 text-xs font-light tracking-[0.28em] text-white uppercase transition-colors hover:bg-gray-800 active:bg-gray-900"
               >
                 Abrir mídia da vitrine
               </button>
@@ -179,7 +179,7 @@ const CatalogPage = ({
       )}
 
       {collections.length > 0 && (
-        <div className="mx-auto flex max-w-7xl flex-col gap-24 px-4 pb-28 pt-12 sm:gap-28 sm:px-6 sm:pt-16 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-24 zue-px pb-[max(7rem,calc(env(safe-area-inset-bottom)+4rem))] pt-12 sm:gap-28 sm:zue-px-md sm:pt-16 lg:zue-px-lg landscape:gap-16 landscape:pt-10">
           {error && (
             <p className="text-center text-sm font-light text-red-700" role="alert">
               {error}

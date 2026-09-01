@@ -415,8 +415,8 @@ const CatalogPlayer = ({
   };
 
   const shellHeight = featured
-    ? 'h-[min(82dvh,58rem)]'
-    : 'h-[min(58dvh,42rem)]';
+    ? 'h-[min(82dvh,58rem)] landscape:h-[min(88dvh,36rem)] short-landscape:h-[min(92dvh,28rem)]'
+    : 'h-[min(58dvh,42rem)] landscape:h-[min(70dvh,28rem)] short-landscape:h-[min(78dvh,22rem)]';
   const activeSlide = slides[selectedIndex];
   const showChrome = isFullscreen && !!onClose;
 
@@ -474,7 +474,7 @@ const CatalogPlayer = ({
         {showChrome && (
           <div
             className={cn(
-              'pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-start p-5 transition-opacity duration-300',
+              'pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-start px-[max(1.25rem,env(safe-area-inset-left))] pt-[max(1.25rem,env(safe-area-inset-top))] transition-opacity duration-300',
               chromeVisible && !isTransitioning ? 'opacity-100' : 'opacity-0'
             )}
           >
@@ -483,9 +483,9 @@ const CatalogPlayer = ({
               onClick={onClose}
               aria-label="Voltar ao catálogo"
               className={cn(
-                'pointer-events-auto flex size-11 items-center justify-center rounded-none',
+                'pointer-events-auto flex size-11 min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-none',
                 'bg-black/40 text-white/90 backdrop-blur-sm transition-colors',
-                'hover:bg-black/55 hover:text-white',
+                'hover:bg-black/55 hover:text-white active:bg-black/65 active:text-white',
                 (!chromeVisible || isTransitioning) && 'pointer-events-none'
               )}
             >
@@ -497,11 +497,11 @@ const CatalogPlayer = ({
         {!isFullscreen && onExpand && (
           <div
             className={cn(
-              'pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between p-4 transition-opacity duration-500',
+              'pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between px-[max(1rem,env(safe-area-inset-left))] pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] transition-opacity duration-500',
               hintVisible && !isTransitioning ? 'opacity-100' : 'opacity-0'
             )}
           >
-            <p className="text-[10px] font-light tracking-[0.28em] text-white/70 uppercase">
+            <p className="text-[11px] font-light tracking-[0.28em] text-white/70 uppercase">
               Deslize · toque para ampliar
             </p>
             <Maximize2 className="size-4 text-white/65" strokeWidth={1.25} aria-hidden />
@@ -554,7 +554,7 @@ const CatalogPlayer = ({
 
         <div
           className={cn(
-            'pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-opacity duration-300',
+            'pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-safe transition-opacity duration-300',
             isTransitioning ? 'opacity-0' : 'opacity-100'
           )}
         >
@@ -562,7 +562,7 @@ const CatalogPlayer = ({
             <p
               className={cn(
                 'px-4 text-center font-light tracking-[0.32em] text-white/80 uppercase',
-                isFullscreen ? 'text-[10px]' : 'text-[9px] sm:text-[10px]',
+                isFullscreen ? 'text-[11px]' : 'text-[10px] sm:text-[11px]',
                 slides.length > 1 ? 'mb-3' : 'mb-2'
               )}
             >

@@ -308,7 +308,7 @@ public/
 - **Pasta de mídia**: seletor discreto (long-press na logo no Header); Drive sync operacional
 - **Hibernação**: idle de 2 min (2 s em DEV), exceto na Início → wordmark tipográfico + tagline; wake retoma estado
 - **Motion web**: Lenis, cursor custom, stagger/reveal (desligado no tablet nativo); transição fullscreen do catálogo via `motion` (`layout` FLIP, sem stretch/salto)
-- **Design responsivo**: desktop, tablet e mobile
+- **Design responsivo**: mobile, tablet (incl. landscape de vitrine) e desktop; safe-area + alvos de toque ≥44px
 - **Vitrine tablet**: fullscreen, tela ligada e modo kiosk via Capacitor
 - **Auto-update Android**: checa GitHub Releases e instala o novo APK sob confirmação
 
@@ -318,6 +318,7 @@ public/
 - Paleta: preto, branco e cinzas; cantos retos (`rounded-none`)
 - Sem scrollbar visível (scroll por Lenis/toque)
 - Sem seleção de texto (`user-select: none`; campos de formulário continuam selecionáveis)
+- Toque/kiosk: safe-area, `:active` além de hover, layout compacto em landscape curto
 - Imagens de produto: URLs Pexels (aspecto ~3/4)
 
 Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).

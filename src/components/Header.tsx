@@ -24,6 +24,9 @@ const navigationItems = [
 ];
 
 const LONG_PRESS_MS = 1000;
+/** Nav inline a partir de ~900px — evita nav apertada em phones landscape. */
+const NAV_INLINE = 'min-[900px]:flex';
+const NAV_SHEET = 'min-[900px]:hidden';
 
 const Header = ({
   currentSection,
@@ -103,8 +106,8 @@ const Header = ({
           setOverHero(Boolean(entry?.isIntersecting));
         },
         {
-          // Sai do overlay quando o hero deixa a faixa sob o header
-          rootMargin: '-72px 0px 0px 0px',
+          // Sai do overlay quando o hero deixa a faixa sob o header (~h-16 + safe-area)
+          rootMargin: '-88px 0px 0px 0px',
           threshold: 0,
         }
       );
@@ -173,15 +176,15 @@ const Header = ({
   return (
     <header
       className={cn(
-        'z-50 transition-[background-color,border-color,backdrop-filter,color] duration-300',
+        'z-50 pt-safe transition-[background-color,border-color,backdrop-filter,color] duration-300',
         hasHeroOverlay ? 'fixed inset-x-0 top-0' : 'sticky top-0',
         overlay
           ? 'border-b border-white/20 bg-white/10 shadow-[inset_0_1px_0_0_rgb(255_255_255_/0.12)] backdrop-blur-md supports-backdrop-filter:bg-white/10'
           : 'border-b border-gray-100 bg-white/95 backdrop-blur-sm'
       )}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+      <div className="mx-auto max-w-7xl zue-px sm:zue-px-md lg:zue-px-lg">
+        <div className="flex h-14 items-center justify-between sm:h-16">
           <div className="shrink-0">
             <Button
               variant="ghost"
@@ -191,10 +194,10 @@ const Header = ({
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               className={cn(
-                'h-auto select-none rounded-none px-0 font-heading text-2xl font-light tracking-widest hover:bg-transparent',
+                'h-11 min-h-11 select-none rounded-none px-1 font-heading text-2xl font-light tracking-widest hover:bg-transparent active:bg-transparent',
                 overlay
-                  ? 'text-white hover:text-white/75'
-                  : 'text-black hover:text-gray-600'
+                  ? 'text-white hover:text-white/75 active:text-white/70'
+                  : 'text-black hover:text-gray-600 active:text-gray-500'
               )}
             >
               ZUE
@@ -203,7 +206,7 @@ const Header = ({
 
           <nav
             ref={navRef}
-            className="relative hidden items-center gap-8 md:flex"
+            className={cn('relative hidden items-center gap-6 lg:gap-8', NAV_INLINE)}
           >
             {navigationItems.map((item) => (
               <span
@@ -218,14 +221,14 @@ const Header = ({
                   variant="ghost"
                   onClick={() => onNavigate(item.id)}
                   className={cn(
-                    'h-auto rounded-none border-0 px-0 pb-1 text-sm font-light tracking-wide hover:bg-transparent focus-visible:ring-0',
+                    'h-11 min-h-11 rounded-none border-0 px-2 pb-1 text-sm font-light tracking-wide hover:bg-transparent active:bg-transparent focus-visible:ring-0',
                     overlay
                       ? currentSection === item.id
                         ? 'text-white'
-                        : 'text-white/65 hover:text-white'
+                        : 'text-white/65 hover:text-white active:text-white'
                       : currentSection === item.id
                         ? 'text-black'
-                        : 'text-gray-600 hover:text-black'
+                        : 'text-gray-600 hover:text-black active:text-black'
                   )}
                 >
                   {item.label}
@@ -252,10 +255,11 @@ const Header = ({
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  'rounded-none hover:bg-transparent md:hidden',
+                  'rounded-none hover:bg-transparent active:bg-transparent',
+                  NAV_SHEET,
                   overlay
-                    ? 'text-white hover:text-white/75'
-                    : 'text-gray-600 hover:text-black'
+                    ? 'text-white hover:text-white/75 active:text-white/70'
+                    : 'text-gray-600 hover:text-black active:text-black'
                 )}
               >
                 <Menu className="size-6" />
@@ -264,13 +268,13 @@ const Header = ({
             </SheetTrigger>
             <SheetContent
               side="top"
-              className="top-16 gap-0 border-b border-gray-100 bg-white p-0 shadow-none"
+              className="top-[calc(3.5rem+env(safe-area-inset-top,0px))] gap-0 border-b border-gray-100 bg-white p-0 shadow-none sm:top-[calc(4rem+env(safe-area-inset-top,0px))]"
               showCloseButton={false}
             >
               <SheetHeader className="sr-only">
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
-              <div className="space-y-4 px-4 py-6">
+              <div className="space-y-1 zue-px py-4 sm:zue-px-md">
                 {navigationItems.map((item) => (
                   <Button
                     key={item.id}
@@ -280,8 +284,10 @@ const Header = ({
                       setIsMobileMenuOpen(false);
                     }}
                     className={cn(
-                      'h-auto w-full justify-start rounded-none px-0 text-lg font-light tracking-wide hover:bg-transparent focus-visible:border-transparent focus-visible:ring-0',
-                      currentSection === item.id ? 'text-black' : 'text-gray-600'
+                      'h-12 min-h-12 w-full justify-start rounded-none px-0 text-lg font-light tracking-wide hover:bg-transparent active:bg-transparent focus-visible:border-transparent focus-visible:ring-0',
+                      currentSection === item.id
+                        ? 'text-black'
+                        : 'text-gray-600 active:text-black'
                     )}
                   >
                     {item.label}
