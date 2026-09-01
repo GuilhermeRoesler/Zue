@@ -5,17 +5,27 @@ import {
   type CatalogCollection,
   type CatalogSlide,
 } from '@/data/catalog-slides';
-import { releaseAllMediaUrls } from '@/lib/media-blob-cache';
 import {
+  clearDriveMediaSource,
   clearMediaFolder,
   getMediaSort,
+  pickDriveFolder,
   pickMediaFolder,
   refreshMediaFolderWithSort,
   restoreMediaFolder,
   setMediaSort,
+  type DriveSyncProgress,
   type MediaSort,
   type MediaSourceKind,
 } from '@/lib/media-folder';
+import {
+  isGoogleDriveConfigured,
+  isGoogleSignedIn,
+  signInWithGoogle,
+  signOutGoogle,
+  completePendingGoogleOAuth,
+} from '@/lib/google-drive';
+import { releaseAllMediaUrls } from '@/lib/media-blob-cache';
 
 export interface UseCatalogSlidesResult {
   slides: CatalogSlide[];
@@ -24,11 +34,25 @@ export interface UseCatalogSlidesResult {
   folderLabel: string | null;
   sort: MediaSort;
   loading: boolean;
+  syncProgress: string | null;
   error: string | null;
+  driveConfigured: boolean;
+  driveSignedIn: boolean;
   pickFolder: () => Promise<void>;
+  connectDrive: () => Promise<void>;
+  pickDriveFolder: (folder: { id: string; name: string }) => Promise<void>;
+  disconnectDrive: () => Promise<void>;
   useDemo: () => Promise<void>;
   refresh: () => Promise<void>;
   setSort: (sort: MediaSort) => Promise<void>;
+}
+
+function formatSyncProgress(progress: DriveSyncProgress): string | null {
+  if (progress.phase === 'planning') return 'Consultando Google Drive…';
+  if (progress.phase === 'done') return null;
+  if (progress.total <= 0) return 'Sincronizando…';
+  const name = progress.fileName ? ` · ${progress.fileName}` : '';
+  return `Baixando ${progress.current}/${progress.total}${name}`;
 }
 
 export function useCatalogSlides(): UseCatalogSlidesResult {
@@ -39,11 +63,28 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
   const [folderLabel, setFolderLabel] = useState<string | null>(null);
   const [sort, setSortState] = useState<MediaSort>('name');
   const [loading, setLoading] = useState(true);
+  const [syncProgress, setSyncProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [driveConfigured] = useState(() => isGoogleDriveConfigured());
+  const [driveSignedIn, setDriveSignedIn] = useState(false);
   const mountedRef = useRef(true);
 
-  const applyFolder = useCallback(
+  const refreshDriveAuth = useCallback(async () => {
+    if (!isGoogleDriveConfigured()) {
+      setDriveSignedIn(false);
+      return;
+    }
+    try {
+      await completePendingGoogleOAuth();
+    } catch (err) {
+      console.warn('[useCatalogSlides] oauth pending:', err);
+    }
+    setDriveSignedIn(await isGoogleSignedIn());
+  }, []);
+
+  const applyLinked = useCallback(
     (
+      kind: 'folder' | 'drive',
       nextSlides: CatalogSlide[],
       nextCollections: CatalogCollection[],
       label: string,
@@ -51,10 +92,11 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
     ) => {
       setSlides(nextSlides);
       setCollections(nextCollections);
-      setSource('folder');
+      setSource(kind);
       setFolderLabel(label);
       setSortState(nextSort);
       setError(null);
+      setSyncProgress(null);
     },
     []
   );
@@ -68,19 +110,27 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
     setFolderLabel(null);
     setSortState(savedSort);
     setError(null);
+    setSyncProgress(null);
   }, []);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setSyncProgress(null);
     try {
-      const restored = await restoreMediaFolder();
+      await refreshDriveAuth();
+      const restored = await restoreMediaFolder({
+        onDriveProgress: (p) => {
+          if (mountedRef.current) setSyncProgress(formatSyncProgress(p));
+        },
+      });
       if (!mountedRef.current) return;
       if (restored && restored.collections.length > 0) {
-        applyFolder(
+        applyLinked(
+          restored.kind === 'drive' ? 'drive' : 'folder',
           restored.slides,
           restored.collections,
-          restored.label ?? 'Pasta',
+          restored.label ?? (restored.kind === 'drive' ? 'Drive' : 'Pasta'),
           restored.sort
         );
       } else {
@@ -88,11 +138,19 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
       }
     } catch (err) {
       console.warn('[useCatalogSlides]', err);
-      if (mountedRef.current) await applyDemo();
+      if (mountedRef.current) {
+        const message =
+          err instanceof Error ? err.message : 'Falha ao carregar mídia.';
+        setError(message);
+        await applyDemo();
+      }
     } finally {
-      if (mountedRef.current) setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setSyncProgress(null);
+      }
     }
-  }, [applyDemo, applyFolder]);
+  }, [applyDemo, applyLinked, refreshDriveAuth]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -109,7 +167,8 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
     try {
       const result = await pickMediaFolder();
       if (!mountedRef.current) return;
-      applyFolder(
+      applyLinked(
+        'folder',
         result.slides,
         result.collections,
         result.label ?? 'Pasta',
@@ -126,7 +185,73 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, [applyFolder]);
+  }, [applyLinked]);
+
+  const connectDrive = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await signInWithGoogle();
+      if (mountedRef.current) setDriveSignedIn(true);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível conectar ao Google.';
+      if (!/redirecionando/i.test(message)) {
+        setError(message);
+      }
+    } finally {
+      if (mountedRef.current) setLoading(false);
+    }
+  }, []);
+
+  const pickDriveFolderAction = useCallback(
+    async (folder: { id: string; name: string }) => {
+      setLoading(true);
+      setError(null);
+      setSyncProgress('Consultando Google Drive…');
+      try {
+        const result = await pickDriveFolder(folder.id, folder.name, (p) => {
+          if (mountedRef.current) setSyncProgress(formatSyncProgress(p));
+        });
+        if (!mountedRef.current) return;
+        applyLinked(
+          'drive',
+          result.slides,
+          result.collections,
+          result.label ?? folder.name,
+          result.sort
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : 'Não foi possível sincronizar o Drive.';
+        setError(message);
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+          setSyncProgress(null);
+        }
+      }
+    },
+    [applyLinked]
+  );
+
+  const disconnectDrive = useCallback(async () => {
+    setLoading(true);
+    try {
+      await signOutGoogle();
+      await clearDriveMediaSource();
+      if (mountedRef.current) {
+        setDriveSignedIn(false);
+        if (source === 'drive') await applyDemo();
+      }
+    } finally {
+      if (mountedRef.current) setLoading(false);
+    }
+  }, [applyDemo, source]);
 
   const useDemo = useCallback(async () => {
     setLoading(true);
@@ -151,7 +276,8 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
         const refreshed = await refreshMediaFolderWithSort(next);
         if (!mountedRef.current) return;
         if (refreshed && refreshed.collections.length > 0) {
-          applyFolder(
+          applyLinked(
+            refreshed.kind === 'drive' ? 'drive' : 'folder',
             refreshed.slides,
             refreshed.collections,
             refreshed.label ?? 'Pasta',
@@ -168,7 +294,7 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
         if (mountedRef.current) setLoading(false);
       }
     },
-    [applyFolder, source]
+    [applyLinked, source]
   );
 
   return {
@@ -178,8 +304,14 @@ export function useCatalogSlides(): UseCatalogSlidesResult {
     folderLabel,
     sort,
     loading,
+    syncProgress,
     error,
+    driveConfigured,
+    driveSignedIn,
     pickFolder,
+    connectDrive,
+    pickDriveFolder: pickDriveFolderAction,
+    disconnectDrive,
     useDemo,
     refresh,
     setSort,

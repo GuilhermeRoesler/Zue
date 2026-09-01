@@ -1,4 +1,6 @@
-import { FolderOpen, ImageIcon, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { Cloud, FolderOpen, ImageIcon, RotateCcw } from 'lucide-react';
+import DriveFolderPicker from '@/components/DriveFolderPicker';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -19,11 +21,32 @@ interface MediaFolderSheetProps {
   collectionCount: number;
   sort: MediaSort;
   loading: boolean;
+  syncProgress: string | null;
   error: string | null;
+  driveConfigured: boolean;
+  driveSignedIn: boolean;
   onPickFolder: () => void;
+  onConnectDrive: () => void;
+  onPickDriveFolder: (folder: { id: string; name: string }) => void;
+  onDisconnectDrive: () => void;
   onUseDemo: () => void;
   onRefresh: () => void;
   onSortChange: (sort: MediaSort) => void;
+}
+
+function sourceTitle(source: MediaSourceKind): string {
+  if (source === 'folder') return 'Pasta local';
+  if (source === 'drive') return 'Google Drive';
+  return 'Catálogo demonstração';
+}
+
+function sourceSubtitle(
+  source: MediaSourceKind,
+  folderLabel: string | null
+): string {
+  if (source === 'folder') return folderLabel ?? 'Pasta selecionada';
+  if (source === 'drive') return folderLabel ?? 'Pasta do Drive';
+  return 'Slides de exemplo (Pexels)';
 }
 
 const MediaFolderSheet = ({
@@ -35,101 +58,164 @@ const MediaFolderSheet = ({
   collectionCount,
   sort,
   loading,
+  syncProgress,
   error,
+  driveConfigured,
+  driveSignedIn,
   onPickFolder,
+  onConnectDrive,
+  onPickDriveFolder,
+  onDisconnectDrive,
   onUseDemo,
   onRefresh,
   onSortChange,
 }: MediaFolderSheetProps) => {
+  const [drivePickerOpen, setDrivePickerOpen] = useState(false);
+  const hasLinkedSource = source === 'folder' || source === 'drive';
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="bottom"
-        className="gap-0 rounded-none border-t border-gray-200 bg-white p-0"
-        showCloseButton
-      >
-        <SheetHeader className="border-b border-gray-100 px-6 py-5 text-left">
-          <SheetTitle
-            className="text-xl font-light tracking-wide text-black"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Mídia da vitrine
-          </SheetTitle>
-          <SheetDescription className="font-light text-gray-600">
-            Pasta sincronizada do Drive: arquivos na raiz e subpastas viram
-            coleções. Acesso: pressione a logo ZUE por 1 segundo.
-          </SheetDescription>
-        </SheetHeader>
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent
+          side="bottom"
+          className="max-h-[92dvh] gap-0 overflow-y-auto rounded-none border-t border-gray-200 bg-white p-0"
+          showCloseButton
+        >
+          <SheetHeader className="border-b border-gray-100 px-6 py-5 text-left">
+            <SheetTitle
+              className="text-xl font-light tracking-wide text-black"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Mídia da vitrine
+            </SheetTitle>
+            <SheetDescription className="font-light text-gray-600">
+              Pasta local (Drive sync no tablet) ou integração direta com o
+              Google Drive. Acesso: pressione a logo ZUE por 1 segundo.
+            </SheetDescription>
+          </SheetHeader>
 
-        <div className="space-y-6 px-6 py-6">
-          <div className="flex items-start gap-3 border border-gray-100 bg-gray-50 px-4 py-4">
-            <ImageIcon className="mt-0.5 size-5 shrink-0 text-gray-500" />
-            <div className="min-w-0 space-y-1">
-              <p className="text-sm font-light tracking-wide text-black">
-                {source === 'folder' ? 'Pasta ativa' : 'Catálogo demonstração'}
-              </p>
-              <p className="truncate text-sm font-light text-gray-600">
-                {source === 'folder'
-                  ? folderLabel ?? 'Pasta selecionada'
-                  : 'Slides de exemplo (Pexels)'}
-              </p>
-              <p className="text-xs font-light text-gray-500">
-                {slideCount} {slideCount === 1 ? 'arquivo' : 'arquivos'}
-                {collectionCount > 0
-                  ? ` · ${collectionCount} ${collectionCount === 1 ? 'coleção' : 'coleções'}`
-                  : null}
-              </p>
+          <div className="space-y-6 px-6 py-6">
+            <div className="flex items-start gap-3 border border-gray-100 bg-gray-50 px-4 py-4">
+              <ImageIcon className="mt-0.5 size-5 shrink-0 text-gray-500" />
+              <div className="min-w-0 space-y-1">
+                <p className="text-sm font-light tracking-wide text-black">
+                  {sourceTitle(source)}
+                </p>
+                <p className="truncate text-sm font-light text-gray-600">
+                  {sourceSubtitle(source, folderLabel)}
+                </p>
+                <p className="text-xs font-light text-gray-500">
+                  {slideCount} {slideCount === 1 ? 'arquivo' : 'arquivos'}
+                  {collectionCount > 0
+                    ? ` · ${collectionCount} ${collectionCount === 1 ? 'coleção' : 'coleções'}`
+                    : null}
+                </p>
+                {syncProgress && (
+                  <p className="text-xs font-light text-gray-500">
+                    {syncProgress}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <p className="text-[10px] font-light tracking-[0.28em] text-gray-500 uppercase">
-              Ordenação
-            </p>
-            <div className="flex border border-gray-200">
-              {(
-                [
-                  { id: 'name', label: 'Nome' },
-                  { id: 'date', label: 'Data' },
-                ] as const
-              ).map((option) => (
-                <button
-                  key={option.id}
+            <div className="space-y-2">
+              <p className="text-[10px] font-light tracking-[0.28em] text-gray-500 uppercase">
+                Ordenação
+              </p>
+              <div className="flex border border-gray-200">
+                {(
+                  [
+                    { id: 'name', label: 'Nome' },
+                    { id: 'date', label: 'Data' },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => onSortChange(option.id)}
+                    className={cn(
+                      'flex-1 px-4 py-3 text-xs font-light tracking-[0.2em] uppercase transition-colors',
+                      sort === option.id
+                        ? 'bg-black text-white'
+                        : 'bg-white text-gray-600 hover:text-black'
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {error && (
+              <p className="text-sm font-light text-red-700" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className="space-y-3">
+              <p className="text-[10px] font-light tracking-[0.28em] text-gray-500 uppercase">
+                Pasta local
+              </p>
+              <Button
+                type="button"
+                disabled={loading}
+                onClick={onPickFolder}
+                className="h-auto w-full gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800"
+              >
+                <FolderOpen className="size-4" />
+                Selecionar pasta do aparelho
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-[10px] font-light tracking-[0.28em] text-gray-500 uppercase">
+                Google Drive
+              </p>
+              {!driveConfigured && (
+                <p className="text-sm font-light text-gray-500">
+                  Integração disponível após configurar{' '}
+                  <span className="text-gray-700">VITE_GOOGLE_OAUTH_CLIENT_ID</span>{' '}
+                  (ver README).
+                </p>
+              )}
+              {driveConfigured && !driveSignedIn && (
+                <Button
                   type="button"
                   disabled={loading}
-                  onClick={() => onSortChange(option.id)}
-                  className={cn(
-                    'flex-1 px-4 py-3 text-xs font-light tracking-[0.2em] uppercase transition-colors',
-                    sort === option.id
-                      ? 'bg-black text-white'
-                      : 'bg-white text-gray-600 hover:text-black'
-                  )}
+                  onClick={onConnectDrive}
+                  className="h-auto w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
                 >
-                  {option.label}
-                </button>
-              ))}
+                  <Cloud className="size-4" />
+                  Conectar Google Drive
+                </Button>
+              )}
+              {driveConfigured && driveSignedIn && (
+                <>
+                  <Button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => setDrivePickerOpen(true)}
+                    className="h-auto w-full gap-3 rounded-none border border-black bg-white px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
+                  >
+                    <Cloud className="size-4" />
+                    Escolher pasta no Drive
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={loading}
+                    onClick={onDisconnectDrive}
+                    className="h-auto w-full rounded-none px-6 py-3 font-light tracking-wide text-gray-600 hover:bg-transparent hover:text-black"
+                  >
+                    Desconectar Google
+                  </Button>
+                </>
+              )}
             </div>
-          </div>
 
-          {error && (
-            <p className="text-sm font-light text-red-700" role="alert">
-              {error}
-            </p>
-          )}
-
-          <div className="flex flex-col gap-3">
-            <Button
-              type="button"
-              disabled={loading}
-              onClick={onPickFolder}
-              className="h-auto gap-3 rounded-none bg-black px-6 py-4 font-light tracking-wide text-white hover:bg-gray-800"
-            >
-              <FolderOpen className="size-4" />
-              Selecionar pasta
-            </Button>
-
-            {source === 'folder' && (
-              <>
+            {hasLinkedSource && (
+              <div className="flex flex-col gap-3 border-t border-gray-100 pt-4">
                 <Button
                   type="button"
                   variant="outline"
@@ -138,7 +224,7 @@ const MediaFolderSheet = ({
                   className="h-auto gap-3 rounded-none border-black px-6 py-4 font-light tracking-wide text-black hover:bg-black hover:text-white"
                 >
                   <RotateCcw className="size-4" />
-                  Atualizar pasta
+                  {source === 'drive' ? 'Sincronizar Drive' : 'Atualizar pasta'}
                 </Button>
 
                 <Button
@@ -150,12 +236,18 @@ const MediaFolderSheet = ({
                 >
                   Usar catálogo demonstração
                 </Button>
-              </>
+              </div>
             )}
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+
+      <DriveFolderPicker
+        open={drivePickerOpen}
+        onOpenChange={setDrivePickerOpen}
+        onSelect={onPickDriveFolder}
+      />
+    </>
   );
 };
 

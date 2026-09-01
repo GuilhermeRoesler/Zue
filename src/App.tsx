@@ -132,9 +132,21 @@ function App() {
         collectionCount={catalog.collections.length}
         sort={catalog.sort}
         loading={catalog.loading}
+        syncProgress={catalog.syncProgress}
         error={catalog.error}
+        driveConfigured={catalog.driveConfigured}
+        driveSignedIn={catalog.driveSignedIn}
         onPickFolder={() => {
           void catalog.pickFolder();
+        }}
+        onConnectDrive={() => {
+          void catalog.connectDrive();
+        }}
+        onPickDriveFolder={(folder) => {
+          void catalog.pickDriveFolder(folder);
+        }}
+        onDisconnectDrive={() => {
+          void catalog.disconnectDrive();
         }}
         onUseDemo={() => {
           void catalog.useDemo();

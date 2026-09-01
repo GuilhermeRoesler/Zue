@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zue — Google</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Inter, system-ui, sans-serif;
+        font-weight: 300;
+        color: #111;
+        background: #fff;
+      }
+      p {
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Conectando…</p>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        var payload = {
+          type: 'zue-google-oauth',
+          code: params.get('code') || hash.get('code'),
+          error: params.get('error') || hash.get('error'),
+          state: params.get('state') || hash.get('state'),
+        };
+
+        try {
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(payload, '*');
+            window.close();
+            return;
+          }
+        } catch (_) {
+          /* ignore */
+        }
+
+        try {
+          localStorage.setItem('zue.googleOAuthResult', JSON.stringify(payload));
+        } catch (_) {
+          /* ignore */
+        }
+
+        var qs = new URLSearchParams();
+        if (payload.code) qs.set('code', payload.code);
+        if (payload.error) qs.set('error', payload.error);
+        if (payload.state) qs.set('state', payload.state);
+
+        var ua = navigator.userAgent || '';
+        var isAndroidWebView = /; wv\)/i.test(ua) || /Capacitor/i.test(ua);
+
+        if (isAndroidWebView || /Android/i.test(ua)) {
+          window.location.href = 'br.com.zue.vitrine://oauth?' + qs.toString();
+        }
+
+        // Web (e fallback): volta à app na mesma pasta.
+        setTimeout(function () {
+          var base = window.location.pathname.replace(/[^/]+$/, '');
+          window.location.replace(base + (base.endsWith('/') ? '' : '/') + '?oauth=1');
+        }, isAndroidWebView ? 400 : 0);
+      })();
+    </script>
+  </body>
+</html>

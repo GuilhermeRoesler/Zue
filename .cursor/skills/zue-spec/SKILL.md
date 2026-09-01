@@ -63,10 +63,11 @@ Não é e-commerce. **Sem checkout, sem WhatsApp, sem CTAs de conversão** (web 
 | Utils | `clsx` + `tailwind-merge` via `cn()` em `src/lib/utils.ts` |
 | App nativo | **Capacitor 8** + `@capacitor/android` |
 | Kiosk | `@capacitor/status-bar`, `@capacitor-community/keep-awake` + `MainActivity` imersivo |
-| Filesystem / pasta | `@capacitor/preferences`, `@capawesome/capacitor-file-picker`, plugin local `SafDirectory` (`DocumentFile` / SAF) |
+| Filesystem / pasta | `@capacitor/preferences`, `@capacitor/filesystem`, `@capacitor/browser`, `@capawesome/capacitor-file-picker`, plugin local `SafDirectory` (`DocumentFile` / SAF) |
+| Google Drive (opcional) | OAuth PKCE (`google-oauth.ts`) + Drive API (`google-drive-api.ts`) + cache local (`google-drive-cache.ts`); env `VITE_GOOGLE_OAUTH_CLIENT_ID` |
 | App info | `@capacitor/app` (versão nativa para checagem de update) |
 | Auto-update | Plugin local `ApkUpdater` + `src/lib/app-update.ts` (GitHub Releases) |
-| Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts`, `motion.test.ts` |
+| Testes | **Vitest** — `utils.test.ts`, `app-update.test.ts`, `media-types.test.ts`, `motion.test.ts`, `google-drive-cache.test.ts` |
 | Backend (opcional) | `@supabase/supabase-js` no package — ainda não é o centro do fluxo |
 
 ### Scripts npm
@@ -120,7 +121,8 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 - `CatalogPage` — catálogo imersivo: coleções empilhadas (destaque + secundárias), estados loading/erro/vazio, expand fullscreen
 - `CatalogPlayer` — Embla embedded ou fullscreen (`fixed inset-0`); transição fluida via `motion` (`layout` FLIP no container e na mídia ativa, mesma curva de easing, sem recálculo de crop `object-cover` durante a animação); lazy; gestos; chrome/hint/overlay só reaparecem após `onLayoutAnimationComplete`; Embla `reInit()` adiado até o layout assentar; índice + progresso
 - `HibernateOverlay` — tela de hibernação (wordmark tipográfico + tagline + aura)
-- `MediaFolderSheet` — UI discreta do gerente (pasta, ordenação nome/data, atualizar)
+- `MediaFolderSheet` — UI discreta do gerente (pasta local, Google Drive, ordenação nome/data, atualizar/sincronizar)
+- `DriveFolderPicker` — navegador de pastas remotas do Drive (após OAuth)
 - `CustomCursor` — cursor fino (somente web + pointer fine)
 - `Reveal` / `TextReveal` — fade/stagger e revelação de texto
 - `Footer` — marca e navegação
@@ -128,18 +130,21 @@ Detecção nativa: `isNativeApp()` / `initKioskMode()` em `src/lib/kiosk.ts`.
 
 UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 
-### Fonte de mídia (pasta)
+### Fonte de mídia (pasta local ou Google Drive)
 
-- Libs: `src/lib/media-folder.ts` (pick/restore/clear + sort), `src/lib/media-types.ts` (extensões → slides/coleções), `src/lib/media-blob-cache.ts` (blob URLs lazy na web), `src/lib/saf-directory.ts` (bridge Android SAF)
-- Hook: `src/hooks/use-catalog-slides.ts` — pasta salva ou fallback demo; expõe `collections` + `slides` + `sort`
+- Libs: `src/lib/media-folder.ts` (pick/restore/clear + sort + fonte ativa), `src/lib/media-types.ts` (extensões → slides/coleções), `src/lib/media-blob-cache.ts` (blob URLs lazy na web), `src/lib/saf-directory.ts` (bridge Android SAF), `src/lib/google-oauth.ts` / `google-drive-api.ts` / `google-drive-cache.ts` / `google-drive.ts` (Drive opcional)
+- Hook: `src/hooks/use-catalog-slides.ts` — demo | pasta local | Drive; expõe `collections` + `slides` + `sort` + sync progress
 - **Web**: File System Access API (`showDirectoryPicker`) + IndexedDB para o handle; blobs sob demanda
 - **Android**: `@capawesome/capacitor-file-picker` `pickDirectory` + plugin `SafDirectory` (`readdir` via SAF/`DocumentFile`, permissão persistente) + path em Preferences
+- **Google Drive (extra)**: OAuth 2.0 PKCE (`drive.readonly`) → escolha de pasta remota → download incremental para cache local (Filesystem no nativo / IndexedDB na web); no boot, sync + fallback offline ao cache; deep link `br.com.zue.vitrine://oauth` + `public/oauth-callback.html`
+- Fonte ativa em Preferences (`zue.mediaSource`: `folder` | `drive`); as duas opções coexistem na UI — uma ativa por vez
 - **Árvore**: arquivos na raiz → coleção com o nome da pasta; **cada subpasta (1 nível)** → coleção própria
 - Ordenação persistida: **nome** (default) ou **data** (`Preferences` `zue.mediaSort`)
 - Extensões: jpg/jpeg/png/webp/gif/bmp/heic + mp4/webm/mov/m4v/mkv
 - Metadados: `alt`/`title` derivados do nome do arquivo
 - Acesso gerente: **pressionar logo ZUE ~1 s** no Header (seção catálogo) → sheet “Mídia da vitrine”
-- Sem pasta vinculada: coleções demo em `src/data/catalog-slides.ts` (`CATALOG_COLLECTIONS`)
+- Sem pasta/Drive: coleções demo em `src/data/catalog-slides.ts` (`CATALOG_COLLECTIONS`)
+- Config Drive: `.env` com `VITE_GOOGLE_OAUTH_CLIENT_ID` (ver `.env.example` / README); em CI o mesmo valor via secret `VITE_GOOGLE_OAUTH_CLIENT_ID` (Pages + release APK)
 
 ---
 
@@ -260,18 +265,21 @@ Pré-requisitos locais só se for abrir o Android Studio: SDK Android, JDK 17/21
 - `src/components/CatalogPlayer.tsx` — player embedded / fullscreen (lazy, in-view autoplay)
 - `src/data/catalog-slides.ts` — manifesto de slides e coleções demo
 - `src/lib/media-folder.ts` / `media-types.ts` / `media-blob-cache.ts` / `media-types.test.ts` — pasta de mídia
+- `src/lib/google-oauth.ts` / `google-drive-api.ts` / `google-drive-cache.ts` / `google-drive.ts` / `google-drive-cache.test.ts` — Google Drive opcional
 - `src/lib/motion.ts` / `motion.test.ts` — gates Lenis/cursor/reduced-motion
-- `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta; `collections` + `sort`)
+- `src/hooks/use-catalog-slides.ts` — estado do catálogo (demo | pasta | drive; `collections` + `sort`)
 - `src/hooks/use-in-view.ts` — IntersectionObserver para autoplay/lazy
 - `src/hooks/use-lenis.ts` — smooth scroll web
-- `src/components/MediaFolderSheet.tsx` — UI do gerente (pasta + ordenação)
+- `src/components/MediaFolderSheet.tsx` — UI do gerente (pasta local + Drive)
+- `src/components/DriveFolderPicker.tsx` — escolha de pasta remota no Drive
 - `src/components/CustomCursor.tsx` / `Reveal.tsx` / `TextReveal.tsx` — polish web
 - `src/components/UpdatePrompt.tsx` — UI de atualização (só nativo)
 - `src/main.tsx` — chama `initKioskMode()` na subida
 - `android/.../MainActivity.java` — imersivo sticky + keep screen on + registra `ApkUpdaterPlugin` e `SafDirectoryPlugin`
 - `android/.../ApkUpdaterPlugin.java` — download do APK + intent de instalação
 - `android/.../SafDirectoryPlugin.java` — `readdir` / permissão persistente em `content://` (SAF)
-- `android/.../AndroidManifest.xml` — `INTERNET` + `REQUEST_INSTALL_PACKAGES`; tema fullscreen
+- `android/.../AndroidManifest.xml` — `INTERNET` + `REQUEST_INSTALL_PACKAGES` + deep link OAuth `br.com.zue.vitrine://oauth`; tema fullscreen
+- `public/oauth-callback.html` — bridge OAuth (postMessage / deep link / retorno à app)
 
 ### Auto-update (GitHub Releases)
 
@@ -289,7 +297,7 @@ Web não participa desse fluxo. “Agora não” grava a tag em `localStorage` p
 - Sem WhatsApp, newsletter ou CTAs de conversão (web = app)
 - Hibernação após 2 min idle (2 s em DEV), exceto na Início; wake retoma estado
 - Catálogo: carrosséis com autoplay nos **visíveis** (também sob hibernação); expand fullscreen; foto 5 s; vídeo = duração (mute + poster); deslize/toque
-- Pasta: long-press na logo; subpastas → coleções; ordenação nome/data; fallback demo
+- Pasta: long-press na logo; subpastas → coleções; ordenação nome/data; pasta local **ou** Google Drive (sync → cache); fallback demo
 - Touch targets generosos; validar em resolução de tablet
 - Não reescrever UI em React Native — evoluir o front web e `cap:sync`
 - Update prompt discreto; download em background thread nativo

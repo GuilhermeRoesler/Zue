@@ -163,7 +163,7 @@ const CatalogPage = ({
             </p>
             <p className="mt-4 text-sm font-light leading-relaxed tracking-wide text-gray-600">
               Nenhuma coleção para exibir. Pressione a logo ZUE por cerca de 1
-              segundo para selecionar a pasta da vitrine.
+              segundo para escolher pasta local ou Google Drive.
             </p>
             {onOpenMediaFolder && (
               <button
@@ -171,7 +171,7 @@ const CatalogPage = ({
                 onClick={onOpenMediaFolder}
                 className="mt-8 border border-black bg-black px-6 py-3 text-xs font-light tracking-[0.28em] text-white uppercase transition-colors hover:bg-gray-800"
               >
-                Selecionar pasta
+                Abrir mídia da vitrine
               </button>
             )}
           </div>

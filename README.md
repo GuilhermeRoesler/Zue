@@ -12,7 +12,7 @@ O site funciona como vitrine da marca no tablet da loja (e na web, mesmo código
 - **Catálogo** — intro de marca + carrosséis empilhados (1ª coleção em destaque); deslize navega, toque expande fullscreen com transição fluida (FLIP via `motion`, sem salto/stretch) (autoplay nos visíveis + barra de progresso)
 - **Sobre** — hero full-bleed com mídia da vitrine, essência da marca, pilares tipográficos, info prática da loja e ponte discreta ao catálogo (copy em `src/data/about.ts`); header em glass sobre o hero
 - **Hibernação** — após 2 min sem toque (2 s em DEV), **exceto na Início**: composição tipográfica ZUE + tagline; ao interagir, retoma de onde parou
-- **Pasta de mídia** — pasta Drive sync; subpastas = coleções; ordenação nome/data; long-press na logo ZUE
+- **Pasta de mídia** — pasta local (Drive sync) **ou** Google Drive direto (OAuth + cache local no boot); subpastas = coleções; ordenação nome/data; long-press na logo ZUE
 
 Sem checkout, WhatsApp ou CTAs de conversão.
 
@@ -47,9 +47,10 @@ Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
 - **[Lenis](https://github.com/darkroomengineering/lenis)** — smooth scroll (somente web)
 - **[motion](https://motion.dev/)** — transição fullscreen fluida do catálogo (FLIP via `layout`)
 - **ESLint** — qualidade de código
-- **Vitest** — testes unitários (`utils`, `app-update`, `media-types`, `motion`)
+- **Vitest** — testes unitários (`utils`, `app-update`, `media-types`, `motion`, `google-drive-cache`)
 - **GitHub Actions** — CI de validação, deploy GitHub Pages e release de APK
-- **Capacitor plugins** — Preferences, File Picker (Capawesome), StatusBar, Keep Awake, App; plugins locais `ApkUpdater` e `SafDirectory` (listagem SAF)
+- **Capacitor plugins** — Preferences, Filesystem, Browser, File Picker (Capawesome), StatusBar, Keep Awake, App; plugins locais `ApkUpdater` e `SafDirectory` (listagem SAF)
+- **Google Drive (opcional)** — OAuth PKCE + sync da pasta remota para cache local
 
 ## Pré-requisitos
 
@@ -83,21 +84,44 @@ Comportamento no tablet:
 - Pasta de mídia selecionável (long-press na logo ZUE no Header, seção catálogo)
 - Ao abrir, verifica em background se há nova **GitHub Release** e oferece atualizar o APK
 
-### Pasta de mídia (gerente / Google Drive)
+### Pasta de mídia (gerente)
 
-O catálogo pode usar arquivos reais da loja em vez dos slides de demonstração.
+O catálogo pode usar arquivos reais da loja em vez dos slides de demonstração. Há **duas formas** (uma ativa por vez):
+
+#### A) Pasta local (Drive sync no tablet) — padrão operacional
 
 1. No Google Drive, crie uma pasta (ex.: `Zue Vitrine`) e coloque fotos/vídeos nela
 2. **Opcional:** crie **subpastas** (ex.: `Primavera`, `Editorial`) — cada uma vira uma coleção no app; arquivos na raiz formam a coleção com o nome da pasta
 3. No tablet (ou PC), sincronize essa pasta com o app **Google Drive** (disponível offline / pasta espelhada)
 4. Abra o catálogo na Zue e **pressione a logo ZUE por ~1 segundo**
-5. Em **Mídia da vitrine** → **Selecionar pasta** e escolha a pasta sincronizada
+5. Em **Mídia da vitrine** → **Selecionar pasta do aparelho** e escolha a pasta sincronizada
 6. Novos arquivos: envie pelo Drive de qualquer dispositivo; no tablet use **Atualizar pasta** (mesmo long-press)
 7. **Ordenação:** no sheet, escolha Nome ou Data (preferência salva no dispositivo)
 
-Formatos: `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc.
+#### B) Google Drive direto (integração) — para feedback / sem sync local
 
-Web: Chrome/Edge com File System Access API (blobs sob demanda). Android: seletor nativo (SAF) via Capawesome + listagem com o plugin local `SafDirectory`.
+Requer configuração OAuth no Google Cloud (API Drive + Client ID tipo Web). Copie `.env.example` → `.env` e preencha:
+
+```bash
+VITE_GOOGLE_OAUTH_CLIENT_ID=seu-client-id.apps.googleusercontent.com
+```
+
+Redirect URIs autorizados (Console Google):
+
+- `http://localhost:5173/oauth-callback.html` (dev)
+- `https://guilhermeroesler.github.io/Zue/oauth-callback.html` (produção web + bridge do app Android)
+
+No sheet **Mídia da vitrine**:
+
+1. **Conectar Google Drive** (OAuth, escopo somente leitura)
+2. **Escolher pasta no Drive** (navegador de pastas)
+3. O app baixa o conteúdo para um **cache local** e exibe; a cada start (e em **Sincronizar Drive**) faz fetch incremental; sem rede, usa o último cache
+
+Deep link Android: `br.com.zue.vitrine://oauth` (via `oauth-callback.html`). Arquivos: `src/lib/google-oauth.ts`, `google-drive*.ts`, `DriveFolderPicker.tsx`.
+
+Formatos (ambos os modos): `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc.
+
+Web pasta local: Chrome/Edge com File System Access API. Android pasta local: SAF via Capawesome + `SafDirectory`.
 
 ```bash
 npm run cap:sync      # build web + sync no projeto android/
@@ -135,6 +159,7 @@ O workflow [`.github/workflows/github-pages.yml`](.github/workflows/github-pages
 1. Em **Settings → Pages**, defina **Source: GitHub Actions** (uma vez)
 2. Após o deploy, o site fica em `https://guilhermeroesler.github.io/Zue/`
 3. O `base: './'` do Vite serve Capacitor e o Pages (assets relativos); `public/.nojekyll` evita o Jekyll
+4. Para Google Drive na web: secret `VITE_GOOGLE_OAUTH_CLIENT_ID` (mesmo valor do `.env` local)
 
 #### Release APK (tags `v*`)
 
@@ -153,10 +178,11 @@ Guarde o arquivo e as senhas em local seguro (não commitar).
 
 ##### 2. Secrets no GitHub
 
-Em **Settings → Secrets and variables → Actions**, crie:
+Em **Settings → Secrets and variables → Actions → New repository secret**, crie:
 
 | Secret | Conteúdo |
 |--------|----------|
+| `VITE_GOOGLE_OAUTH_CLIENT_ID` | Client ID OAuth (Drive) — o mesmo do `.env` |
 | `ANDROID_KEYSTORE_BASE64` | Keystore em Base64 |
 | `ANDROID_KEYSTORE_PASSWORD` | Senha do keystore |
 | `ANDROID_KEY_ALIAS` | Alias (ex.: `zue`) |

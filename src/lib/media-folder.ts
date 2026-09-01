@@ -2,6 +2,12 @@ import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import type { CatalogCollection, CatalogSlide } from '@/data/catalog-slides';
+import {
+  clearDriveFolderSelection,
+  restoreDriveFolderFromCache,
+  syncAndLoadDriveFolder,
+  type DriveSyncProgress,
+} from '@/lib/google-drive';
 import { releaseAllMediaUrls } from '@/lib/media-blob-cache';
 import {
   collectionsFromMediaGroups,
@@ -12,14 +18,17 @@ import {
 } from '@/lib/media-types';
 import SafDirectory from '@/lib/saf-directory';
 
+export type { DriveSyncProgress };
+
 const PREF_FOLDER_PATH = 'zue.mediaFolderPath';
 const PREF_FOLDER_LABEL = 'zue.mediaFolderLabel';
 const PREF_MEDIA_SORT = 'zue.mediaSort';
+const PREF_MEDIA_SOURCE = 'zue.mediaSource';
 const IDB_NAME = 'zue-media';
 const IDB_STORE = 'handles';
 const IDB_KEY = 'directory';
 
-export type MediaSourceKind = 'demo' | 'folder';
+export type MediaSourceKind = 'demo' | 'folder' | 'drive';
 
 export type { MediaSort };
 
@@ -29,6 +38,8 @@ export interface MediaFolderState {
   slides: CatalogSlide[];
   collections: CatalogCollection[];
   sort: MediaSort;
+  /** Só para fonte Drive: timestamp do último sync bem-sucedido. */
+  syncedAt?: number | null;
 }
 
 function isNative(): boolean {
@@ -53,6 +64,22 @@ export async function getMediaSort(): Promise<MediaSort> {
 
 export async function setMediaSort(sort: MediaSort): Promise<void> {
   await Preferences.set({ key: PREF_MEDIA_SORT, value: sort });
+}
+
+async function setActiveMediaSource(
+  source: 'folder' | 'drive'
+): Promise<void> {
+  await Preferences.set({ key: PREF_MEDIA_SOURCE, value: source });
+}
+
+export async function getActiveMediaSource(): Promise<'folder' | 'drive' | null> {
+  const { value } = await Preferences.get({ key: PREF_MEDIA_SOURCE });
+  if (value === 'folder' || value === 'drive') return value;
+  // Legado: pasta local sem flag explícita.
+  const { value: path } = await Preferences.get({ key: PREF_FOLDER_PATH });
+  const { value: label } = await Preferences.get({ key: PREF_FOLDER_LABEL });
+  if (path || label) return 'folder';
+  return null;
 }
 
 function flattenSlides(collections: CatalogCollection[]): CatalogSlide[] {
@@ -371,42 +398,125 @@ export async function pickMediaFolder(): Promise<MediaFolderState> {
     : await pickWebDirectory();
 
   assertHasMedia(result.groups);
+  await setActiveMediaSource('folder');
   return buildState(result.label, result.groups, sort);
 }
 
-/** Restaura pasta salva ou retorna null (usar demo). */
-export async function restoreMediaFolder(): Promise<MediaFolderState | null> {
+/**
+ * Conecta pasta remota do Drive: baixa para cache local e exibe.
+ * Substitui a fonte ativa (pasta local permanece salva, mas inativa).
+ */
+export async function pickDriveFolder(
+  folderId: string,
+  label: string,
+  onProgress?: (progress: DriveSyncProgress) => void
+): Promise<MediaFolderState> {
+  const sort = await getMediaSort();
+  const state = await syncAndLoadDriveFolder(sort, {
+    folderId,
+    label,
+    onProgress,
+  });
+  await setActiveMediaSource('drive');
+  return {
+    kind: 'drive',
+    label: state.label,
+    slides: state.slides,
+    collections: state.collections,
+    sort: state.sort,
+    syncedAt: state.syncedAt,
+  };
+}
+
+async function restoreLocalFolder(): Promise<MediaFolderState | null> {
+  const sort = await getMediaSort();
+  const result = isNative()
+    ? await restoreNativeDirectory()
+    : await restoreWebDirectory();
+
+  if (!result || result.groups.every((g) => g.entries.length === 0)) {
+    return null;
+  }
+
+  releaseAllMediaUrls();
+  return buildState(result.label, result.groups, sort);
+}
+
+/**
+ * Restaura a fonte ativa: Drive (sync no boot + fallback cache) ou pasta local.
+ */
+export async function restoreMediaFolder(options?: {
+  onDriveProgress?: (progress: DriveSyncProgress) => void;
+}): Promise<MediaFolderState | null> {
   try {
     const sort = await getMediaSort();
-    const result = isNative()
-      ? await restoreNativeDirectory()
-      : await restoreWebDirectory();
+    const active = await getActiveMediaSource();
 
-    if (!result || result.groups.every((g) => g.entries.length === 0)) {
-      return null;
+    if (active === 'drive') {
+      try {
+        const synced = await syncAndLoadDriveFolder(sort, {
+          onProgress: options?.onDriveProgress,
+        });
+        return {
+          kind: 'drive',
+          label: synced.label,
+          slides: synced.slides,
+          collections: synced.collections,
+          sort: synced.sort,
+          syncedAt: synced.syncedAt,
+        };
+      } catch (error) {
+        console.warn('[media-folder] drive sync:', error);
+        const cached = await restoreDriveFolderFromCache(sort);
+        if (cached) {
+          return {
+            kind: 'drive',
+            label: cached.label,
+            slides: cached.slides,
+            collections: cached.collections,
+            sort: cached.sort,
+            syncedAt: cached.syncedAt,
+          };
+        }
+        throw error;
+      }
     }
 
-    releaseAllMediaUrls();
-    return buildState(result.label, result.groups, sort);
+    return restoreLocalFolder();
   } catch (error) {
     console.warn('[media-folder] restore:', error);
     return null;
   }
 }
 
-/** Reaplica sort na pasta já vinculada (re-scan). */
+/** Reaplica sort na fonte já vinculada (re-scan / re-leitura do cache). */
 export async function refreshMediaFolderWithSort(
   sort: MediaSort
 ): Promise<MediaFolderState | null> {
   await setMediaSort(sort);
-  return restoreMediaFolder();
+  const active = await getActiveMediaSource();
+  if (active === 'drive') {
+    const cached = await restoreDriveFolderFromCache(sort);
+    if (!cached) return null;
+    return {
+      kind: 'drive',
+      label: cached.label,
+      slides: cached.slides,
+      collections: cached.collections,
+      sort: cached.sort,
+      syncedAt: cached.syncedAt,
+    };
+  }
+  return restoreLocalFolder();
 }
 
-/** Remove pasta vinculada e volta ao catálogo demo. */
+/** Remove pasta local, vínculo Drive e volta ao catálogo demo. */
 export async function clearMediaFolder(): Promise<void> {
   releaseAllMediaUrls();
   await Preferences.remove({ key: PREF_FOLDER_PATH });
   await Preferences.remove({ key: PREF_FOLDER_LABEL });
+  await Preferences.remove({ key: PREF_MEDIA_SOURCE });
+  await clearDriveFolderSelection();
   if (!isNative()) {
     try {
       await clearDirectoryHandle();
@@ -416,7 +526,12 @@ export async function clearMediaFolder(): Promise<void> {
   }
 }
 
-export async function getSavedFolderLabel(): Promise<string | null> {
-  const { value } = await Preferences.get({ key: PREF_FOLDER_LABEL });
-  return value;
+/** Remove vínculo Drive (cache + pasta) e desativa fonte se estiver ativa. */
+export async function clearDriveMediaSource(): Promise<void> {
+  await clearDriveFolderSelection();
+  const active = await getActiveMediaSource();
+  if (active === 'drive') {
+    await Preferences.remove({ key: PREF_MEDIA_SOURCE });
+  }
 }
+
