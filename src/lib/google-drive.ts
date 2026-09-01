@@ -189,7 +189,7 @@ export async function restoreDriveFolderFromCache(
 export async function connectGoogleAndPrepare(): Promise<void> {
   if (!isGoogleDriveConfigured()) {
     throw new Error(
-      'Defina VITE_GOOGLE_OAUTH_CLIENT_ID no ambiente para usar o Google Drive.'
+      'Defina VITE_GOOGLE_OAUTH_CLIENT_ID e VITE_GOOGLE_OAUTH_CLIENT_SECRET para usar o Google Drive.'
     );
   }
   await signInWithGoogle();

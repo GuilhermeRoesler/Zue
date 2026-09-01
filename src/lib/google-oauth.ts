@@ -34,8 +34,24 @@ export function getGoogleClientId(): string | null {
   return id || null;
 }
 
+/**
+ * Client secret do OAuth "Web application".
+ * O Google exige na troca do code/refresh (mesmo com PKCE).
+ * Em SPA/kiosk fica no bundle — trate o Client ID como público e restrinja
+ * redirect URIs + consent screen; não reutilize este client para outros apps.
+ */
+export function getGoogleClientSecret(): string | null {
+  const secret = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_SECRET?.trim();
+  return secret || null;
+}
+
 export function isGoogleDriveConfigured(): boolean {
-  return Boolean(getGoogleClientId());
+  return Boolean(getGoogleClientId() && getGoogleClientSecret());
+}
+
+function appendClientSecret(body: URLSearchParams): void {
+  const secret = getGoogleClientSecret();
+  if (secret) body.set('client_secret', secret);
 }
 
 /** Redirect URI registrado no Google Cloud (web ou Pages para o deep link nativo). */
@@ -104,6 +120,7 @@ async function refreshAccessToken(
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
   });
+  appendClientSecret(body);
 
   const res = await fetch(TOKEN_ENDPOINT, {
     method: 'POST',
@@ -133,6 +150,12 @@ async function exchangeCode(
   redirectUri: string,
   clientId: string
 ): Promise<GoogleOAuthTokens> {
+  if (!getGoogleClientSecret()) {
+    throw new Error(
+      'Defina VITE_GOOGLE_OAUTH_CLIENT_SECRET (Client secret do tipo Web no Google Cloud).'
+    );
+  }
+
   const body = new URLSearchParams({
     client_id: clientId,
     code,
@@ -140,6 +163,7 @@ async function exchangeCode(
     grant_type: 'authorization_code',
     redirect_uri: redirectUri,
   });
+  appendClientSecret(body);
 
   const res = await fetch(TOKEN_ENDPOINT, {
     method: 'POST',
@@ -285,7 +309,7 @@ export async function signInWithGoogle(): Promise<GoogleOAuthTokens> {
   const clientId = getGoogleClientId();
   if (!clientId) {
     throw new Error(
-      'Google Drive não configurado. Defina VITE_GOOGLE_OAUTH_CLIENT_ID.'
+      'Google Drive não configurado. Defina VITE_GOOGLE_OAUTH_CLIENT_ID e VITE_GOOGLE_OAUTH_CLIENT_SECRET.'
     );
   }
 
@@ -347,7 +371,7 @@ export async function getValidAccessToken(): Promise<string> {
   const clientId = getGoogleClientId();
   if (!clientId) {
     throw new Error(
-      'Google Drive não configurado. Defina VITE_GOOGLE_OAUTH_CLIENT_ID.'
+      'Google Drive não configurado. Defina VITE_GOOGLE_OAUTH_CLIENT_ID e VITE_GOOGLE_OAUTH_CLIENT_SECRET.'
     );
   }
 

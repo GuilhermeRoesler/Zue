@@ -51,6 +51,7 @@ jobs:
       - name: Build web and sync Capacitor
         env:
           VITE_GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.VITE_GOOGLE_OAUTH_CLIENT_ID }}
+          VITE_GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_OAUTH_CLIENT_SECRET }}
         run: npm run cap:sync
 
       - name: Setup JDK 21

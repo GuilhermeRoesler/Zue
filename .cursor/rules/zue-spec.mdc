@@ -27,7 +27,7 @@ alwaysApply: true
 - Tailwind CSS v4 + shadcn/ui (`radix-nova`, aliases `@/`) — carrossel: `embla-carousel-react` + `embla-carousel-autoplay`
 - Motion web: **Lenis** + cursor custom (`CustomCursor`); helpers em `src/lib/motion.ts`; **`motion`** (`motion/react`) para o FLIP fullscreen do catálogo (`CatalogPlayer`)
 - Capacitor 8 + StatusBar + Keep Awake + Preferences + Filesystem + Browser + `@capawesome/capacitor-file-picker` + plugin local `SafDirectory` (listagem SAF); kiosk em `src/lib/kiosk.ts` e `MainActivity`
-- Google Drive (opcional): OAuth PKCE + Drive API readonly → sync para cache local (`src/lib/google-drive*.ts`); env / secret `VITE_GOOGLE_OAUTH_CLIENT_ID`
+- Google Drive (opcional): OAuth PKCE + Drive API readonly → sync para cache local (`src/lib/google-drive*.ts`); env / secrets `VITE_GOOGLE_OAUTH_CLIENT_ID` + `VITE_GOOGLE_OAUTH_CLIENT_SECRET`
 - No Android: auto-update via GitHub Releases (`src/lib/app-update.ts` + plugin `ApkUpdater`)
 - Lucide React; navegação por estado em `App.tsx` (sem React Router)
 - Scripts: `icons:generate` | `cap:sync` | `cap:open` | `cap:android`

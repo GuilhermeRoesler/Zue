@@ -144,7 +144,7 @@ UI primitiva: `src/components/ui/*` (button, card, carousel, sheet, etc.).
 - Metadados: `alt`/`title` derivados do nome do arquivo
 - Acesso gerente: **pressionar logo ZUE ~1 s** no Header (seção catálogo) → sheet “Mídia da vitrine”
 - Sem pasta/Drive: coleções demo em `src/data/catalog-slides.ts` (`CATALOG_COLLECTIONS`)
-- Config Drive: `.env` com `VITE_GOOGLE_OAUTH_CLIENT_ID` (ver `.env.example` / README); em CI o mesmo valor via secret `VITE_GOOGLE_OAUTH_CLIENT_ID` (Pages + release APK)
+- Config Drive: `.env` com `VITE_GOOGLE_OAUTH_CLIENT_ID` + `VITE_GOOGLE_OAUTH_CLIENT_SECRET` (ver `.env.example` / README); em CI os mesmos via secrets (Pages + release APK)
 
 ---
 

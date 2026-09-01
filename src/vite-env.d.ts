@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_OAUTH_CLIENT_ID?: string;
+  /** Exigido pelo OAuth client tipo Web na troca do authorization code. */
+  readonly VITE_GOOGLE_OAUTH_CLIENT_SECRET?: string;
   /** Override do redirect (web ou Pages). */
   readonly VITE_GOOGLE_OAUTH_REDIRECT_URI?: string;
   /** Redirect HTTPS usado no app nativo (callback → deep link). */

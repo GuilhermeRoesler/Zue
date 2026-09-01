@@ -104,7 +104,10 @@ Requer configuração OAuth no Google Cloud (API Drive + Client ID tipo Web). Co
 
 ```bash
 VITE_GOOGLE_OAUTH_CLIENT_ID=seu-client-id.apps.googleusercontent.com
+VITE_GOOGLE_OAUTH_CLIENT_SECRET=seu-client-secret
 ```
+
+O tipo **Aplicativo da Web** do Google exige o **Client secret** na troca do código (mesmo com PKCE). No Cloud Console: Credentials → seu client OAuth → copie **Client secret**.
 
 Redirect URIs autorizados (Console Google):
 
@@ -159,7 +162,7 @@ O workflow [`.github/workflows/github-pages.yml`](.github/workflows/github-pages
 1. Em **Settings → Pages**, defina **Source: GitHub Actions** (uma vez)
 2. Após o deploy, o site fica em `https://guilhermeroesler.github.io/Zue/`
 3. O `base: './'` do Vite serve Capacitor e o Pages (assets relativos); `public/.nojekyll` evita o Jekyll
-4. Para Google Drive na web: secret `VITE_GOOGLE_OAUTH_CLIENT_ID` (mesmo valor do `.env` local)
+4. Para Google Drive na web: secrets `VITE_GOOGLE_OAUTH_CLIENT_ID` e `VITE_GOOGLE_OAUTH_CLIENT_SECRET`
 
 #### Release APK (tags `v*`)
 
@@ -183,6 +186,7 @@ Em **Settings → Secrets and variables → Actions → New repository secret**,
 | Secret | Conteúdo |
 |--------|----------|
 | `VITE_GOOGLE_OAUTH_CLIENT_ID` | Client ID OAuth (Drive) — o mesmo do `.env` |
+| `VITE_GOOGLE_OAUTH_CLIENT_SECRET` | Client secret OAuth (tipo Web) — o mesmo do `.env` |
 | `ANDROID_KEYSTORE_BASE64` | Keystore em Base64 |
 | `ANDROID_KEYSTORE_PASSWORD` | Senha do keystore |
 | `ANDROID_KEY_ALIAS` | Alias (ex.: `zue`) |

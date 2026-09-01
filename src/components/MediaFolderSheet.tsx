@@ -175,7 +175,13 @@ const MediaFolderSheet = ({
               {!driveConfigured && (
                 <p className="text-sm font-light text-gray-500">
                   Integração disponível após configurar{' '}
-                  <span className="text-gray-700">VITE_GOOGLE_OAUTH_CLIENT_ID</span>{' '}
+                  <span className="text-gray-700">
+                    VITE_GOOGLE_OAUTH_CLIENT_ID
+                  </span>{' '}
+                  e{' '}
+                  <span className="text-gray-700">
+                    VITE_GOOGLE_OAUTH_CLIENT_SECRET
+                  </span>{' '}
                   (ver README).
                 </p>
               )}
