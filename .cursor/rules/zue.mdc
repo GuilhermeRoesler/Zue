@@ -1,0 +1,25 @@
+---
+description: Índice das specs vivas Zue — aponta para rules/skills por seção
+alwaysApply: true
+---
+
+# Zue — Specs (índice)
+
+## Specs vivas
+
+- Rules + skills por seção + README espelham o repo **agora**.
+- Mudança de produto, stack, arquitetura, design, kiosk ou convenções → atualizar **rule + skill da seção** e o README na mesma entrega.
+- Validar: `node .cursor/hooks/check-spec-drift.mjs` (exit 0).
+
+## Seções (rule breve → skill detalhada)
+
+| Seção | Rule | Skill |
+|-------|------|-------|
+| Produto | `zue-produto` | **zue-produto** |
+| Stack | `zue-stack` | **zue-stack** |
+| Arquitetura | `zue-arquitetura` | **zue-arquitetura** |
+| Design | `zue-design` | **zue-design** |
+| Kiosk / Capacitor | `zue-kiosk` | **zue-kiosk** |
+| Convenções | `zue-convencoes` | **zue-convencoes** |
+
+Ao implementar, leia a **skill** da seção tocada (não só a rule).

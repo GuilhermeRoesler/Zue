@@ -20,20 +20,25 @@ Na loja física, a mesma interface roda em tablet Android em modo vitrine (tela 
 
 ## Specs (Cursor) — vivas
 
-A especificação acompanha o estado real do repositório (não é documento congelado):
+A especificação acompanha o estado real do repositório (não é documento congelado). Formato: **rule breve → skill detalhada**, por seção.
 
-| Formato | Caminho | Uso |
-|--------|---------|-----|
-| **Rule** (resumo) | [`.cursor/rules/zue-spec.mdc`](.cursor/rules/zue-spec.mdc) | Contexto curto, sempre aplicado ao agente |
-| **Skill** (detalhada) | [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md) | Guia completo: arquitetura, design, Capacitor/kiosk, convenções |
+| Seção | Rule | Skill |
+|-------|------|-------|
+| Índice | [`.cursor/rules/zue.mdc`](.cursor/rules/zue.mdc) | — |
+| Produto | [`.cursor/rules/zue-produto.mdc`](.cursor/rules/zue-produto.mdc) | [zue-produto](.cursor/skills/zue-produto/SKILL.md) |
+| Stack | [`.cursor/rules/zue-stack.mdc`](.cursor/rules/zue-stack.mdc) | [zue-stack](.cursor/skills/zue-stack/SKILL.md) |
+| Arquitetura | [`.cursor/rules/zue-arquitetura.mdc`](.cursor/rules/zue-arquitetura.mdc) | [zue-arquitetura](.cursor/skills/zue-arquitetura/SKILL.md) |
+| Design | [`.cursor/rules/zue-design.mdc`](.cursor/rules/zue-design.mdc) | [zue-design](.cursor/skills/zue-design/SKILL.md) |
+| Kiosk | [`.cursor/rules/zue-kiosk.mdc`](.cursor/rules/zue-kiosk.mdc) | [zue-kiosk](.cursor/skills/zue-kiosk/SKILL.md) |
+| Convenções | [`.cursor/rules/zue-convencoes.mdc`](.cursor/rules/zue-convencoes.mdc) | [zue-convencoes](.cursor/skills/zue-convencoes/SKILL.md) |
 
-Em mudanças de produto/stack, atualizar rule + skill + README na mesma entrega. Validar alinhamento:
+Em mudanças de produto/stack/arquitetura/design/kiosk, atualizar **rule + skill da seção** e o README na mesma entrega. Validar:
 
 ```bash
 node .cursor/hooks/check-spec-drift.mjs
 ```
 
-Consulte a skill ao implementar features, mudar UI ou trabalhar no app Android.
+Consulte a skill da seção tocada ao implementar features, mudar UI ou trabalhar no app Android.
 
 ## Tecnologias
 
@@ -297,9 +302,9 @@ public/
 └── site.webmanifest
 
 .cursor/
-├── hooks/                # Checker de drift das specs (`check-spec-drift.mjs`)
-├── rules/zue-spec.mdc    # Spec curta (rule)
-└── skills/zue-spec/      # Spec detalhada (skill)
+├── hooks/check-spec-drift.mjs
+├── rules/                # zue.mdc (índice) + zue-{seção}.mdc
+└── skills/zue-{seção}/   # produto, stack, arquitetura, design, kiosk, convencoes
 ```
 
 ## Funcionalidades
@@ -321,7 +326,7 @@ public/
 - Toque/kiosk: safe-area, `:active` além de hover, layout compacto em landscape curto
 - Imagens de produto: URLs Pexels (aspecto ~3/4)
 
-Detalhes em [`.cursor/skills/zue-spec/SKILL.md`](.cursor/skills/zue-spec/SKILL.md).
+Detalhes em [`.cursor/skills/zue-design/SKILL.md`](.cursor/skills/zue-design/SKILL.md).
 
 ## Licença
 

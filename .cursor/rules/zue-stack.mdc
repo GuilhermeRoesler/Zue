@@ -1,0 +1,13 @@
+---
+description: Stack Zue — React, Vite, Tailwind, Capacitor, CI (resumo)
+alwaysApply: true
+---
+
+# Zue — Stack (rule)
+
+- React 18 + TypeScript + Vite (`base: './'`) · Tailwind CSS v4 + shadcn (`radix-nova`, `@/`)
+- Capacitor 8 · embla + autoplay · Lenis / `motion` · Lucide · Vitest
+- Scripts: `lint` · `typecheck` · `test` · `ci` · `icons:generate` · `cap:sync` · `cap:open` · `cap:android`
+- CI: `ci.yml` · Pages · APK em tags `v*`
+
+**Detalhes:** skill **zue-stack**.

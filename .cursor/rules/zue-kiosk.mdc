@@ -1,0 +1,12 @@
+---
+description: Kiosk / Capacitor Zue — tablet, idle, sync, update (resumo)
+alwaysApply: true
+---
+
+# Zue — Kiosk (rule)
+
+- Capacitor 8 (`br.com.zue.vitrine`): fullscreen, tela ligada (`kiosk.ts` + `MainActivity`).
+- Hibernação 2 min (DEV 2 s), exceto Início; após UI nativa: `npm run cap:sync`.
+- Lenis/cursor só web; auto-update via GitHub Releases (`ApkUpdater`).
+
+**Detalhes:** skill **zue-kiosk**.

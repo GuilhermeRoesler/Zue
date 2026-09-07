@@ -1,0 +1,13 @@
+---
+description: Convenções Zue — o que fazer/evitar ao mudar o código (resumo)
+alwaysApply: true
+---
+
+# Zue — Convenções (rule)
+
+- Não adicionar checkout, WhatsApp, CTAs de conversão ou React Router.
+- Paridade web ↔ app; não inventar stack/plugins fora do repo.
+- Ao mudar spec: rule + skill da seção + README; rodar `check-spec-drift`.
+- Checklist: lint · typecheck · test (ou `ci`); `cap:sync` se UI nativa.
+
+**Detalhes:** skill **zue-convencoes**.

@@ -1,0 +1,13 @@
+---
+description: Design Zue — tipografia, paleta, motion, toque (resumo)
+alwaysApply: true
+---
+
+# Zue — Design (rule)
+
+- Tipografia: **Playfair Display** + **Inter** light; paleta P/B/cinza; `rounded-none`.
+- Sem scrollbar visível; `user-select: none` (exceto inputs).
+- Tablet: safe-area, alvos ≥44px, `:active`, `landscape` / `short-landscape`.
+- Preferir `src/components/ui/`; respeitar `prefers-reduced-motion`.
+
+**Detalhes:** skill **zue-design**.
