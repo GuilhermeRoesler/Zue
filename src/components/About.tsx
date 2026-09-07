@@ -7,6 +7,7 @@ import {
   ABOUT_STORY,
   ABOUT_TAGLINE,
 } from '@/data/about';
+import { CatalogMediaFill } from '@/components/CatalogMediaFill';
 import Reveal from '@/components/Reveal';
 import TextReveal from '@/components/TextReveal';
 import { cn } from '@/lib/utils';
@@ -44,40 +45,6 @@ function pickAboutMedia(collections: CatalogCollection[]): {
   };
 }
 
-function MediaFill({
-  slide,
-  className,
-  priority,
-}: {
-  slide: CatalogSlide;
-  className?: string;
-  priority?: boolean;
-}) {
-  if (slide.type === 'video') {
-    return (
-      <video
-        src={slide.src}
-        className={cn('h-full w-full object-cover', className)}
-        muted
-        playsInline
-        autoPlay
-        loop
-        aria-label={slide.alt ?? slide.title ?? 'Look Zue'}
-      />
-    );
-  }
-
-  return (
-    <img
-      src={slide.src}
-      alt={slide.alt ?? slide.title ?? 'Look Zue'}
-      className={cn('h-full w-full object-cover', className)}
-      loading={priority ? 'eager' : 'lazy'}
-      decoding={priority ? 'sync' : 'async'}
-    />
-  );
-}
-
 const About = ({ collections, onNavigateCatalog }: AboutProps) => {
   const { hero: heroSlide, story: storySlide } = useMemo(
     () => pickAboutMedia(collections),
@@ -93,9 +60,10 @@ const About = ({ collections, onNavigateCatalog }: AboutProps) => {
       >
         {heroSlide ? (
           <div className="absolute inset-0" aria-hidden={!heroSlide.alt}>
-            <MediaFill
+            <CatalogMediaFill
               slide={heroSlide}
               priority
+              variant="full"
               className="scale-[1.06] motion-safe:animate-zue-hero-drift"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-black/25 short-landscape:bg-linear-to-r short-landscape:from-black/75 short-landscape:via-black/45 short-landscape:to-black/25" />
@@ -168,7 +136,7 @@ const About = ({ collections, onNavigateCatalog }: AboutProps) => {
           >
             <div className="aspect-3/4 overflow-hidden bg-gray-100 landscape:aspect-4/5 short-landscape:max-h-[70dvh]">
               {storySlide ? (
-                <MediaFill slide={storySlide} />
+                <CatalogMediaFill slide={storySlide} variant="thumb" />
               ) : (
                 <div className="h-full w-full bg-linear-to-b from-neutral-200 to-neutral-300" />
               )}

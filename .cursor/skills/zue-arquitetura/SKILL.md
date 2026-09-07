@@ -26,9 +26,14 @@ description: >-
 pick (SAF / File System / Drive OAuth)
   → media-folder | google-drive-cache
   → media-types (ext → slide)
+  → media-thumbs (WebP/JPEG ≤960px no ingest)
   → use-catalog-slides
   → Hero / About / CatalogPage
 ```
+
+- `CatalogSlide`: `src` (full), `thumbSrc`, opcional `srcSet`/`sizes`/`width`/`height`.
+- Embutido / grades: thumb; fullscreen e LCP: full (`CatalogMediaFill` / `CatalogPlayer`).
+- Demo: `public/demo/*.webp` + `public/og.jpg` (`npm run media:generate`).
 
 ## Pastas essenciais
 
@@ -37,10 +42,11 @@ src/
   components/     # Hero, About, Catalog*, Header, Hibernate*, Media*, Update*, ui/
   data/           # about.ts, catalog-slides.ts
   hooks/          # use-idle, use-lenis, use-catalog-slides, use-in-view
-  lib/            # kiosk, idle-config, media-*, google-*, app-update, motion, utils
+  lib/            # kiosk, idle-config, media-*, media-thumbs, google-*, app-update, motion, utils, site
   App.tsx
 android/          # Capacitor + plugins locais
 resources/        # ícones + PlayfairDisplay.ttf
+public/demo/      # WebP demo + og.jpg (media:generate)
 .cursor/
   rules/zue*.mdc
   skills/zue-*/SKILL.md

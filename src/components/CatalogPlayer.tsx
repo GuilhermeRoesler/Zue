@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/carousel';
 import type { CatalogSlide } from '@/data/catalog-slides';
 import { IMAGE_SLIDE_MS } from '@/lib/idle-config';
-import { resolveMediaUrl } from '@/lib/media-blob-cache';
+import { resolveCatalogImageSrc } from '@/lib/media-resolve';
 import { prefersReducedMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
@@ -50,32 +50,40 @@ interface CatalogPlayerProps {
   onClose?: () => void;
 }
 
-function resolveSrc(slide: CatalogSlide, enabled: boolean) {
-  if (!enabled) return '';
-  return resolveMediaUrl(slide.id, slide.src);
-}
-
 function MediaImage({
   slide,
   eager,
+  useFull,
   animateLayout,
   transition,
 }: {
   slide: CatalogSlide;
   eager: boolean;
+  /** Fullscreen ou slide selecionado: resolução cheia; vizinhos embutidos: thumb. */
+  useFull: boolean;
   animateLayout: boolean;
   transition: Transition;
 }) {
-  const src = resolveSrc(slide, eager);
+  const src = resolveCatalogImageSrc(
+    slide,
+    useFull ? 'full' : 'thumb',
+    eager
+  );
   if (!src) return <div className="h-full w-full bg-neutral-900" aria-hidden />;
+  const useSrcSet = useFull && Boolean(slide.srcSet);
   return (
     <motion.img
       src={src}
+      srcSet={useSrcSet ? slide.srcSet : undefined}
+      sizes={useSrcSet ? slide.sizes : undefined}
       alt={slide.alt ?? slide.title ?? ''}
+      width={slide.width}
+      height={slide.height}
       className="h-full w-full object-cover"
       draggable={false}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
+      fetchPriority={useFull && eager ? 'high' : 'auto'}
       layout={animateLayout}
       transition={transition}
     />
@@ -97,7 +105,7 @@ function MediaVideo({
   transition: Transition;
   videoRef: React.MutableRefObject<HTMLVideoElement | null>;
 }) {
-  const src = resolveSrc(slide, eager);
+  const src = resolveCatalogImageSrc(slide, 'full', eager);
   const localRef = useRef<HTMLVideoElement | null>(null);
 
   const setRefs = useCallback(
@@ -523,6 +531,8 @@ const CatalogPlayer = ({
                 (selectedIndex === slides.length - 1 && index === 0);
 
               const eager = (canPlay && near) || isFullscreen;
+              const useFull =
+                isFullscreen || index === selectedIndex;
 
               return (
                 <CarouselItem
@@ -533,6 +543,7 @@ const CatalogPlayer = ({
                     <MediaImage
                       slide={slide}
                       eager={eager}
+                      useFull={useFull}
                       animateLayout={eager}
                       transition={transition}
                     />

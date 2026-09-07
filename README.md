@@ -2,7 +2,7 @@
 
 Website e vitrine digital da marca de moda **Zue**. Desenvolvido com **React**, **TypeScript** e **Vite**, com interface minimalista e responsiva em **Tailwind CSS v4**. O mesmo código-fonte gera um **app Android** (tablet na loja) via **Capacitor 8**.
 
-![](images/demo.png)
+![](docs/screenshots/demo.webp)
 
 ## Sobre o Projeto
 
@@ -129,6 +129,8 @@ Deep link Android: `br.com.zue.vitrine://oauth` (via `oauth-callback.html`). Arq
 
 Formatos (ambos os modos): `jpg`, `jpeg`, `png`, `webp`, `gif`, `mp4`, `webm`, `mov`, etc.
 
+No carregamento da pasta/Drive, imagens ganham **thumb** (WebP/JPEG, lado ≤960px) para carrossel embutido e grades; o fullscreen usa a resolução original. Demo web: WebP responsivo em `public/demo/` (`npm run media:generate`).
+
 Web pasta local: Chrome/Edge com File System Access API. Android pasta local: SAF via Capawesome + `SafDirectory`.
 
 ```bash
@@ -233,6 +235,7 @@ git push origin v1.0.0
 - `npm run test:watch` — Vitest em modo watch
 - `npm run ci` — pipeline local (lint + typecheck + test + build + spec-drift)
 - `npm run icons:generate` — gera masters Playfair Z (dark/light), favicons com radius, PWA e mipmaps Android
+- `npm run media:generate` — gera `public/og.jpg` (Open Graph) + WebP demo em `public/demo/`
 - `npm run cap:sync` — build + sync Capacitor Android
 - `npm run cap:open` — abre Android Studio
 - `npm run cap:android` — sync + abre Android Studio
@@ -244,6 +247,7 @@ src/
 ├── components/           # Seções e UI da vitrine
 │   ├── ui/               # Primitivos shadcn (incl. carousel)
 │   ├── About.tsx
+│   ├── CatalogMediaFill.tsx
 │   ├── CatalogPage.tsx
 │   ├── CatalogPlayer.tsx
 │   ├── CustomCursor.tsx
@@ -272,6 +276,10 @@ src/
 │   ├── media-folder.ts   # Pick/restore pasta (web + Android)
 │   ├── media-types.ts    # Extensões → slides
 │   ├── media-types.test.ts
+│   ├── media-thumbs.ts   # Thumbs WebP/JPEG no ingest (≤960px)
+│   ├── media-thumbs.test.ts
+│   ├── media-blob-cache.ts
+│   ├── site.ts           # URLs canônicas (OG / Pages)
 │   ├── motion.ts         # Gates Lenis / cursor / reduced-motion
 │   ├── motion.test.ts
 │   ├── utils.ts          # cn() — clsx + tailwind-merge
@@ -287,7 +295,8 @@ resources/
 ├── icon-dark.png / icon-light.png  # Masters 1024²
 └── icon.png              # Alias do dark → Android / PWA
 scripts/
-└── generate-icons.mjs    # Pipeline de ícones (sharp + opentype.js)
+├── generate-icons.mjs    # Pipeline de ícones (sharp + opentype.js)
+└── generate-media-assets.mjs  # OG + demo WebP
 .github/workflows/
 ├── ci.yml                # Lint, typecheck, test, build, spec-drift
 ├── github-pages.yml      # Deploy do dist/ no GitHub Pages
@@ -295,6 +304,8 @@ scripts/
 
 public/
 ├── .nojekyll             # Desativa Jekyll no GitHub Pages
+├── og.jpg                # Open Graph / Twitter (1200×630)
+├── demo/                 # WebP demo (800/1200/1600) — media:generate
 ├── favicon.svg           # Favicon vetorial (radius + dark/light via CSS)
 ├── favicon-*.png         # Favicons raster (radius; *-light = white-mode)
 ├── apple-touch-icon.png
@@ -324,7 +335,7 @@ public/
 - Sem scrollbar visível (scroll por Lenis/toque)
 - Sem seleção de texto (`user-select: none`; campos de formulário continuam selecionáveis)
 - Toque/kiosk: safe-area, `:active` além de hover, layout compacto em landscape curto
-- Imagens de produto: URLs Pexels (aspecto ~3/4)
+- Imagens: demo WebP + `srcSet`; pasta/Drive geram thumbs no ingest; LCP com `fetchPriority`; OG/Twitter em `og.jpg`
 
 Detalhes em [`.cursor/skills/zue-design/SKILL.md`](.cursor/skills/zue-design/SKILL.md).
 

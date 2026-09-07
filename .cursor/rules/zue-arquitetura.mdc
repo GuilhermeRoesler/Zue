@@ -7,7 +7,7 @@ alwaysApply: true
 
 - Navegação por estado em `App.tsx` (sem React Router): `home` | `about` | `catalog`.
 - Catálogo: coleções → carrosséis → expand fullscreen (FLIP).
-- Mídia: `media-folder` / SAF ou Google Drive → cache → `use-catalog-slides`.
+- Mídia: `media-folder` / SAF ou Google Drive → cache → thumbs (`media-thumbs`) → `use-catalog-slides`.
 - Domínio em `src/lib/*`; UI em `src/components/`; copy em `src/data/`.
 
 **Detalhes:** skill **zue-arquitetura**.

@@ -25,6 +25,7 @@ import {
   collectionsFromMediaGroups,
   type MediaSort,
 } from '@/lib/media-types';
+import { enrichCollectionsWithThumbs } from '@/lib/media-thumbs';
 
 const PREF_DRIVE_FOLDER_ID = 'zue.driveFolderId';
 const PREF_DRIVE_FOLDER_LABEL = 'zue.driveFolderLabel';
@@ -55,7 +56,9 @@ async function buildDriveState(
   }
 
   const groups = await mediaGroupsFromDriveCache(meta);
-  const collections = collectionsFromMediaGroups(groups, sort);
+  const collections = await enrichCollectionsWithThumbs(
+    collectionsFromMediaGroups(groups, sort)
+  );
   if (collections.length === 0) {
     throw new Error(
       'A pasta do Drive não contém imagens ou vídeos suportados.'

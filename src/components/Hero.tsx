@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { CatalogCollection, CatalogSlide } from '@/data/catalog-slides';
+import { CatalogMediaFill } from '@/components/CatalogMediaFill';
 import Reveal from '@/components/Reveal';
 import TextReveal from '@/components/TextReveal';
 import { cn } from '@/lib/utils';
@@ -47,40 +48,6 @@ function pickFeaturedLooks(
   return looks;
 }
 
-function MediaFill({
-  slide,
-  className,
-  priority,
-}: {
-  slide: CatalogSlide;
-  className?: string;
-  priority?: boolean;
-}) {
-  if (slide.type === 'video') {
-    return (
-      <video
-        src={slide.src}
-        className={cn('h-full w-full object-cover', className)}
-        muted
-        playsInline
-        autoPlay
-        loop
-        aria-label={slide.alt ?? slide.title ?? 'Look Zue'}
-      />
-    );
-  }
-
-  return (
-    <img
-      src={slide.src}
-      alt={slide.alt ?? slide.title ?? 'Look Zue'}
-      className={cn('h-full w-full object-cover', className)}
-      loading={priority ? 'eager' : 'lazy'}
-      decoding={priority ? 'sync' : 'async'}
-    />
-  );
-}
-
 const Hero = ({ collections, onNavigateCatalog }: HeroProps) => {
   const featuredLooks = useMemo(
     () => pickFeaturedLooks(collections, 3),
@@ -97,9 +64,10 @@ const Hero = ({ collections, onNavigateCatalog }: HeroProps) => {
       >
         {heroSlide ? (
           <div className="absolute inset-0" aria-hidden={!heroSlide.alt}>
-            <MediaFill
+            <CatalogMediaFill
               slide={heroSlide}
               priority
+              variant="full"
               className="scale-[1.06] motion-safe:animate-zue-hero-drift"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/35 to-black/20 short-landscape:bg-linear-to-r short-landscape:from-black/70 short-landscape:via-black/40 short-landscape:to-black/20" />
@@ -195,8 +163,9 @@ const Hero = ({ collections, onNavigateCatalog }: HeroProps) => {
                     className="group block w-full touch-manipulation text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black"
                   >
                     <div className="aspect-3/4 overflow-hidden bg-gray-100 landscape:aspect-4/5">
-                      <MediaFill
+                      <CatalogMediaFill
                         slide={look.slide}
+                        variant="thumb"
                         className="transition-transform duration-700 ease-out group-hover:scale-105 group-active:scale-105"
                       />
                     </div>

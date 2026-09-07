@@ -37,6 +37,8 @@ Navegação por estado em `App.tsx` (sem React Router):
 - **A) Pasta local** (padrão): Drive sync → SAF (Android) / File System Access (web); `SafDirectory` + Capawesome File Picker.
 - **B) Google Drive** (opcional): OAuth PKCE + API readonly → cache local (`google-oauth.ts`, `google-drive*.ts`, `DriveFolderPicker.tsx`).
 - Subpastas = coleções; raiz = coleção com nome da pasta; ordenação nome/data.
+- No ingest: thumbs WebP/JPEG (lado ≤960) via canvas (`media-thumbs.ts`) para carrossel/grades; full no fullscreen.
+- Demo: WebP responsivo em `public/demo/` + OG `public/og.jpg` (`npm run media:generate`).
 - Env: `VITE_GOOGLE_OAUTH_CLIENT_ID` + `VITE_GOOGLE_OAUTH_CLIENT_SECRET` (`.env.example`).
 
 ## Ícone / favicon

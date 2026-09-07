@@ -16,6 +16,7 @@ import {
   type MediaFileEntry,
   type MediaSort,
 } from '@/lib/media-types';
+import { enrichCollectionsWithThumbs } from '@/lib/media-thumbs';
 import SafDirectory from '@/lib/saf-directory';
 
 export type { DriveSyncProgress };
@@ -86,12 +87,14 @@ function flattenSlides(collections: CatalogCollection[]): CatalogSlide[] {
   return collections.flatMap((c) => c.slides);
 }
 
-function buildState(
+async function buildState(
   label: string,
   groups: MediaCollectionGroup[],
   sort: MediaSort
-): MediaFolderState {
-  const collections = collectionsFromMediaGroups(groups, sort);
+): Promise<MediaFolderState> {
+  const collections = await enrichCollectionsWithThumbs(
+    collectionsFromMediaGroups(groups, sort)
+  );
   return {
     kind: 'folder',
     label,

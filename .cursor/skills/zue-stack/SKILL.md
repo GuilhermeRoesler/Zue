@@ -24,13 +24,14 @@ description: >-
 
 ## Scripts npm
 
-`dev` · `build` · `preview` · `lint` · `typecheck` · `test` · `test:watch` · `ci` · `icons:generate` · `cap:sync` · `cap:open` · `cap:android`
+`dev` · `build` · `preview` · `lint` · `typecheck` · `test` · `test:watch` · `ci` · `icons:generate` · `media:generate` · `cap:sync` · `cap:open` · `cap:android`
 
 ## Testes unitários atuais
 
 - `utils.test.ts` (`cn`)
 - `app-update.test.ts` (`compareSemver`)
 - `media-types.test.ts`
+- `media-thumbs.test.ts`
 - `motion.test.ts`
 - `google-drive-cache.test.ts`
 

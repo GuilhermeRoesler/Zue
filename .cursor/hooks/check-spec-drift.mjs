@@ -45,7 +45,7 @@ const SKILL_MUST = {
     { id: 'google-drive', re: /Google Drive|google-drive/i },
   ],
   stack: [
-    { id: 'tests', re: /utils\.test|app-update\.test|media-types\.test/ },
+    { id: 'tests', re: /utils\.test|app-update\.test|media-types\.test|media-thumbs\.test/ },
     { id: 'workflows', re: /ci\.yml|github-pages\.yml|android-release\.yml/ },
   ],
   arquitetura: [
@@ -74,6 +74,7 @@ const REQUIRED_SCRIPTS = [
   'test',
   'ci',
   'icons:generate',
+  'media:generate',
   'cap:sync',
   'cap:open',
   'cap:android',

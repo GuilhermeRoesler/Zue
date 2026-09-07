@@ -7,7 +7,7 @@ alwaysApply: true
 
 - Vitrine **Zue** (*Elegância Atemporal*) — web + tablet; Sem checkout, WhatsApp ou CTAs de conversão.
 - Seções: Início (`Hero`), Sobre (`About`), Catálogo (`CatalogPage` / `CatalogPlayer`).
-- Hibernação idle **exceto na Início**; pasta de mídia (local ou Google Drive); long-press na logo no catálogo.
+- Hibernação idle **exceto na Início**; pasta de mídia (local ou Google Drive); thumbs no ingest; long-press na logo no catálogo.
 - App id: `br.com.zue.vitrine`.
 
 **Detalhes:** skill **zue-produto**.

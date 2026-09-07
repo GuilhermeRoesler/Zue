@@ -36,4 +36,5 @@ description: >-
 ## Componentes
 
 - Preferir primitivos em `src/components/ui/` (shadcn `radix-nova`)
+- Mídia: `CatalogMediaFill` — lazy, `fetchPriority`, `srcSet`/`sizes`, thumb vs full
 - Tokens e utilitários em `src/index.css`
